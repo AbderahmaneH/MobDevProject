@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:lab3c1/login/signup/login_page.dart';
 import 'package:lab3c1/login/signup/welcome_page.dart';
-import '../../user_database.dart';
+import '../user_database.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
