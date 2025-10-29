@@ -1,7 +1,7 @@
 // lib/create_account_page.dart
 import 'package:flutter/material.dart';
-import 'package:lab3c1/login/signup/login_page.dart';
-import 'package:lab3c1/login/signup/welcome_page.dart';
+import 'login_page.dart';
+import 'welcome_page.dart';
 import '../user_database.dart';
 
 class CreateAccountPage extends StatefulWidget {
