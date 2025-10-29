@@ -1,8 +1,7 @@
-// lib/create_account_page.dart
 import 'package:flutter/material.dart';
-import 'package:lab3c1/login/signup/login_page.dart';
-import 'package:lab3c1/login/signup/welcome_page.dart';
+import 'login_page.dart';
 import '../user_database.dart';
+import '../business_owner/queues_page.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -17,6 +16,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   final emailController = TextEditingController();
   final businessNameController = TextEditingController();
   final businessLocationController = TextEditingController();
+
   bool isBusinessOwner = false;
   bool showPassword = false;
   bool showConfirmPassword = false;
@@ -24,7 +24,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   @override
   void dispose() {
-    // ✅ Dispose them here to free memory
     phoneController.dispose();
     passwordController.dispose();
     emailController.dispose();
@@ -33,29 +32,27 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F3), // background-light
+      backgroundColor: const Color(0xFFF5F5F3),
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverAppBar(
               backgroundColor: const Color(0xFFF5F5F3),
-              surfaceTintColor: Colors.transparent, // prevents tint flicker
+              surfaceTintColor: Colors.transparent,
               elevation: 0,
               floating: true,
               snap: true,
               centerTitle: true,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Color(0xFF333333)),
-                onPressed: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const WelcomePage()),
-                ),
+                onPressed: () => Navigator.pop(context),
               ),
               title: const Text(
-                "Create an Account",
+                "Create Your Account",
                 style: TextStyle(
                   fontFamily: 'Lora',
                   fontWeight: FontWeight.bold,
@@ -63,56 +60,50 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 ),
               ),
             ),
-
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 6),
-                    // Short subtitle
-                    Center(
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(25),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF333333), // primary
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.access_time_filled,
-                              color: Colors.white,
-                              size: 48,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            "QNow",
-                            style: TextStyle(
-                              fontFamily: 'Lora',
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF333333),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                     const SizedBox(height: 24),
+                    // Logo + Title
+                    Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(25),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF333333),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.access_time_filled,
+                            color: Colors.white,
+                            size: 48,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          "QNow",
+                          style: TextStyle(
+                            fontFamily: 'Lora',
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
 
-                    // Role toggle
+                    // Role Toggle
                     Container(
                       decoration: BoxDecoration(
                         color: const Color(0xFFE5E5E7),
@@ -123,41 +114,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () =>
-                                  setState(() => isBusinessOwner = false),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: !isBusinessOwner
-                                      ? const Color(0xFF333333)
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "I'm a Customer",
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                      color: !isBusinessOwner
-                                          ? Colors.white
-                                          : const Color(0xFF6B7280),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () =>
                                   setState(() => isBusinessOwner = true),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
                                 decoration: BoxDecoration(
                                   color: isBusinessOwner
                                       ? const Color(0xFF333333)
@@ -166,7 +126,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    "I'm a Business Owner",
+                                    "Business Owner",
                                     style: TextStyle(
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w600,
@@ -180,19 +140,53 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                               ),
                             ),
                           ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () =>
+                                  setState(() => isBusinessOwner = false),
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: !isBusinessOwner
+                                      ? const Color(0xFF333333)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Customer",
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      color: !isBusinessOwner
+                                          ? Colors.white
+                                          : const Color(0xFF6B7280),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 20),
 
-                    // Full Name
-                    _buildLabel("Full Name"),
-                    _buildTextField("Enter your full name"),
-                    const SizedBox(height: 14),
-
-                    // Phone Number
-                    _buildLabel("Phone Number"),
+                    // Phone number field
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Phone Number",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF333333),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
                     TextField(
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
@@ -202,8 +196,211 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           fontFamily: 'Poppins',
                           color: Color(0xFF9CA3AF),
                         ),
-                        errorText:
-                            _phoneErrorText, // shows validation error under the field
+                        filled: true,
+                        fillColor: Colors.white,
+                        errorText: _phoneErrorText,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFE5E5E7),
+                          ),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xFF333333),
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                      onChanged: (text) {
+                        final phoneRegex = RegExp(r'^(05|06|07)\d{8}$');
+                        setState(() {
+                          if (text.isEmpty) {
+                            _phoneErrorText = null;
+                          } else if (!phoneRegex.hasMatch(text)) {
+                            _phoneErrorText =
+                                'Phone must start with 05, 06, or 07 and be 10 digits long.';
+                          } else {
+                            _phoneErrorText = null;
+                          }
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Email field (only for business)
+                    if (isBusinessOwner) ...[
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Email Address",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      TextField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          hintText: "Enter your email",
+                          hintStyle: const TextStyle(
+                            fontFamily: 'Poppins',
+                            color: Color(0xFF9CA3AF),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                            horizontal: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE5E5E7),
+                            ),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xFF333333),
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                    ],
+
+                    // Business name (only for business)
+                    if (isBusinessOwner) ...[
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Business Name",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      TextField(
+                        controller: businessNameController,
+                        decoration: InputDecoration(
+                          hintText: "Enter your business name",
+                          hintStyle: const TextStyle(
+                            fontFamily: 'Poppins',
+                            color: Color(0xFF9CA3AF),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                            horizontal: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE5E5E7),
+                            ),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xFF333333),
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                    ],
+
+                    // Business location (only for business)
+                    if (isBusinessOwner) ...[
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Business Location",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      TextField(
+                        controller: businessLocationController,
+                        decoration: InputDecoration(
+                          hintText: "Enter your business location",
+                          hintStyle: const TextStyle(
+                            fontFamily: 'Poppins',
+                            color: Color(0xFF9CA3AF),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                            horizontal: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE5E5E7),
+                            ),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0xFF333333),
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                    ],
+
+                    // Password field
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Password",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF333333),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: !showPassword,
+                      decoration: InputDecoration(
+                        hintText: "Create a password",
+                        hintStyle: const TextStyle(
+                          fontFamily: 'Poppins',
+                          color: Color(0xFF9CA3AF),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            showPassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: const Color(0xFF6B7280),
+                          ),
+                          onPressed: () =>
+                              setState(() => showPassword = !showPassword),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
@@ -212,80 +409,22 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(
                             color: Color(0xFFE5E5E7),
-                            width: 1.0,
                           ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
                             color: Color(0xFF333333),
                             width: 1.5,
                           ),
                         ),
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          if (value.isEmpty) {
-                            _phoneErrorText = 'Phone number is required';
-                          } else if (!RegExp(
-                            r'^(05|06|07)\d{8}$',
-                          ).hasMatch(value)) {
-                            _phoneErrorText =
-                                'Enter a valid 10-digit number starting with 05, 06, or 07';
-                          } else {
-                            _phoneErrorText = null;
-                          }
-                        });
-                      },
                     ),
-                    const SizedBox(height: 14),
 
-                    // Business fields (only if selected)
-                    if (isBusinessOwner) ...[
-                      _buildLabel("Email Address"),
-                      _buildTextField(
-                        "Enter your email",
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(height: 14),
+                    const SizedBox(height: 24),
 
-                      _buildLabel("Business Name"),
-                      _buildTextField("Enter your business name"),
-                      const SizedBox(height: 14),
-
-                      _buildLabel("Business Location"),
-                      _buildTextField("Enter your business location"),
-                      const SizedBox(height: 14),
-                    ],
-
-                    // Password
-                    _buildLabel("Password"),
-                    _buildPasswordField(
-                      hint: "Enter your password",
-                      visible: showPassword,
-                      onToggle: () =>
-                          setState(() => showPassword = !showPassword),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Confirm Password
-                    _buildLabel("Confirm Password"),
-                    _buildPasswordField(
-                      hint: "Confirm your password",
-                      visible: showConfirmPassword,
-                      onToggle: () => setState(
-                        () => showConfirmPassword = !showConfirmPassword,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Sign Up button
+                    // Sign up button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -317,7 +456,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             ),
                           );
 
-                          Navigator.pop(context); // go back to welcome or login
+                          // Navigate to QueuesPage after signup
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const QueuesPage(),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF333333),
@@ -338,131 +483,47 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       ),
                     ),
 
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 16),
 
-                    // Already have account
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          "Already have an account? ",
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            color: Color(0xFF6B7280),
+                    // Already have an account
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
                           ),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoginPage(),
+                        );
+                      },
+                      child: const Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "Already have an account? ",
+                              style: TextStyle(
+                                color: Color(0xFF6B7280),
+                                fontFamily: 'Poppins',
+                                fontSize: 13,
+                              ),
                             ),
-                          ),
-                          child: const Text(
-                            "Log In",
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              color: Color(0xFF333333),
-                              fontWeight: FontWeight.w600,
+                            TextSpan(
+                              text: "Log In",
+                              style: TextStyle(
+                                color: Color(0xFF333333),
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-
-                    const SizedBox(height: 36),
                   ],
                 ),
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLabel(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontFamily: 'Poppins',
-        fontWeight: FontWeight.w500,
-        color: Color(0xFF333333),
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-    String hint, {
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return TextField(
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(
-          fontFamily: 'Poppins',
-          color: Color(0xFF9CA3AF),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 14,
-          horizontal: 12,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E5E7), width: 1.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF333333), width: 1.5),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPasswordField({
-    required String hint,
-    required bool visible,
-    required VoidCallback onToggle,
-  }) {
-    return TextField(
-      obscureText: !visible,
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(
-          fontFamily: 'Poppins',
-          color: Color(0xFF9CA3AF),
-        ),
-        suffixIcon: IconButton(
-          icon: Icon(
-            visible ? Icons.visibility : Icons.visibility_off,
-            color: const Color(0xFF6B7280),
-          ),
-          onPressed: onToggle,
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 14,
-          horizontal: 12,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE5E5E7), width: 1.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF333333), width: 1.5),
         ),
       ),
     );

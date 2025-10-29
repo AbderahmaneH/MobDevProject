@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'create_account.dart';
 import '../user_database.dart';
+import '../business_owner/queues_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,7 +13,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
   bool isBusinessOwner = true;
   bool showPassword = false;
 
@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // Login success
+    // Login success - Navigate to QueuesPage
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -77,8 +77,8 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => const CreateAccountPage(),
-      ), // replace with your next page later
+        builder: (context) => const QueuesPage(),
+      ),
     );
   }
 
@@ -110,7 +110,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -121,14 +120,13 @@ class _LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 40),
-
                     // Logo and Title
                     Column(
                       children: [
                         Container(
                           padding: const EdgeInsets.all(25),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF333333), // primary
+                            color: const Color(0xFF333333),
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
@@ -144,8 +142,8 @@ class _LoginPageState extends State<LoginPage> {
                             size: 48,
                           ),
                         ),
-                        SizedBox(height: 12),
-                        Text(
+                        const SizedBox(height: 12),
+                        const Text(
                           "QNow",
                           style: TextStyle(
                             fontFamily: 'Lora',
@@ -156,9 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 36),
-
                     // Role Toggle
                     Container(
                       decoration: BoxDecoration(
@@ -183,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    "Customer",
+                                    "Business Owner",
                                     style: TextStyle(
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w600,
@@ -213,7 +209,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    "Business Owner",
+                                    "Customer",
                                     style: TextStyle(
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w600,
@@ -230,15 +226,13 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 24),
-
                     // Phone Field
-                    Align(
+                    const Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Phone Number",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
                           color: Color(0xFF333333),
@@ -287,15 +281,13 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-
                     const SizedBox(height: 16),
-
                     // Password Field
-                    Align(
+                    const Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Password",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
                           color: Color(0xFF333333),
@@ -354,9 +346,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-
                     const SizedBox(height: 20),
-
                     // Log In Button
                     SizedBox(
                       width: double.infinity,
@@ -380,9 +370,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
                     // Forgot + Sign Up
                     TextButton(
                       onPressed: () {},
