@@ -1,106 +1,63 @@
 import 'package:flutter/material.dart';
-import 'create_account_page.dart';
+import 'login_page.dart';
 import '../login_signup/welcome_page.dart';
 import '../models/user_database.dart';
 import '../business_owner/queues_page.dart';
 import '../colors/app_colors.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class CreateAccountPage extends StatefulWidget {
+  const CreateAccountPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<CreateAccountPage> createState() => _CreateAccountPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _CreateAccountPageState extends State<CreateAccountPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+  final emailController = TextEditingController();
+  final businessNameController = TextEditingController();
+  final businessLocationController = TextEditingController();
   bool isBusinessOwner = false;
   bool showPassword = false;
-  bool loginAttempted = false;
+  bool showConfirmPassword = false;
 
   @override
   void dispose() {
+    nameController.dispose();
     phoneController.dispose();
     passwordController.dispose();
+    confirmPasswordController.dispose();
+    emailController.dispose();
+    businessNameController.dispose();
+    businessLocationController.dispose();
     super.dispose();
   }
 
-  bool validatePhone(String phone) {
-    if (phone.isEmpty) return false;
-    if (phone.length != 10) return false;
-    if (phone[0] != '0') return false;
-    if (phone[1] != '5' && phone[1] != '6' && phone[1] != '7') return false;
-    return true;
-  }
-
-  String? _validatePhone(String? value) {
-    if (!loginAttempted) return null;
-    if (value == null || value.isEmpty) {
-      return 'Phone number is required';
-    }
-    if (!validatePhone(value)) {
-      return 'Phone must start with 05/06/07 and be 10 digits';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (!loginAttempted) return null;
-    if (value == null || value.isEmpty) {
-      return 'Password is required';
-    }
-
-    final phone = phoneController.text.trim();
-    if (phone.isNotEmpty) {
-      final user = userDatabase.firstWhere(
-        (u) => u.phone == phone && u.isBusiness == isBusinessOwner,
-        orElse: () =>
-            User(name: '', phone: '', password: '', isBusiness: false),
-      );
-      if (user.phone.isNotEmpty && user.password != value) {
-        return 'Incorrect password';
-      }
-    }
-
-    return null;
-  }
-
-  void _tryLogin() {
-    setState(() {
-      loginAttempted = true;
-    });
-
+  void _createAccount() {
     if (_formKey.currentState!.validate()) {
-      final phone = phoneController.text.trim();
-      final password = passwordController.text.trim();
+      String name = nameController.text.trim();
+      String phone = phoneController.text.trim();
+      String password = passwordController.text.trim();
 
-      final matchedUser = userDatabase.firstWhere(
-        (u) =>
-            u.phone == phone &&
-            u.password == password &&
-            u.isBusiness == isBusinessOwner,
-        orElse: () =>
-            User(name: '', phone: '', password: '', isBusiness: false),
+      userDatabase.add(
+        User(
+          name: name,
+          phone: phone,
+          password: password,
+          isBusiness: isBusinessOwner,
+          email: isBusinessOwner ? emailController.text.trim() : null,
+          businessName: isBusinessOwner
+              ? businessNameController.text.trim()
+              : null,
+          businessLocation: isBusinessOwner
+              ? businessLocationController.text.trim()
+              : null,
+        ),
       );
-
-      if (matchedUser.phone.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.cancel, color: Colors.white),
-                SizedBox(width: 8),
-                Text('Invalid credentials'),
-              ],
-            ),
-            backgroundColor: AppColors.buttonSecondaryDark,
-          ),
-        );
-        return;
-      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -108,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Icon(Icons.check_circle, color: Colors.white),
               SizedBox(width: 8),
-              Text('Welcome back, ${matchedUser.name}!'),
+              Text('Account created successfully!'),
             ],
           ),
           backgroundColor: AppColors.buttonSecondaryDark,
@@ -121,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
           builder: (context) => isBusinessOwner
               ? QueuesPage(
                   userPhone: phone,
-                  businessName: matchedUser.businessName ?? 'Business Owner',
+                  businessName: businessNameController.text.trim(),
                 )
               : const WelcomePage(),
         ),
@@ -152,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               title: Text(
-                "Login To Your Account",
+                "Create an Account",
                 style: TextStyle(
                   fontFamily: AppFonts.display,
                   fontWeight: FontWeight.bold,
@@ -170,10 +127,9 @@ class _LoginPageState extends State<LoginPage> {
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 6),
-
                       Center(
                         child: Column(
                           children: [
@@ -209,9 +165,9 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 24),
 
+                      // Role toggle
                       Container(
                         decoration: BoxDecoration(
                           color: AppColors.buttonSecondaryLight,
@@ -224,12 +180,6 @@ class _LoginPageState extends State<LoginPage> {
                                 onTap: () {
                                   setState(() {
                                     isBusinessOwner = false;
-                                    loginAttempted = false;
-                                  });
-                                  WidgetsBinding.instance.addPostFrameCallback((
-                                    _,
-                                  ) {
-                                    _formKey.currentState?.validate();
                                   });
                                 },
                                 child: Container(
@@ -244,7 +194,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      "Customer",
+                                      "I'm a Customer",
                                       style: TextStyle(
                                         fontFamily: AppFonts.body,
                                         fontWeight: FontWeight.w600,
@@ -263,12 +213,6 @@ class _LoginPageState extends State<LoginPage> {
                                 onTap: () {
                                   setState(() {
                                     isBusinessOwner = true;
-                                    loginAttempted = false;
-                                  });
-                                  WidgetsBinding.instance.addPostFrameCallback((
-                                    _,
-                                  ) {
-                                    _formKey.currentState?.validate();
                                   });
                                 },
                                 child: Container(
@@ -283,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      "Business Owner",
+                                      "I'm a Business Owner",
                                       style: TextStyle(
                                         fontFamily: AppFonts.body,
                                         fontWeight: FontWeight.w600,
@@ -300,33 +244,114 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 20),
 
-                      const SizedBox(height: 24),
+                      _buildLabel("Full Name"),
+                      _buildTextField(
+                        "Enter your full name",
+                        controller: nameController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Name is required';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 14),
 
                       _buildLabel("Phone Number"),
                       _buildTextField(
                         "Enter your phone number",
                         controller: phoneController,
                         keyboardType: TextInputType.phone,
-                        validator: _validatePhone,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Phone is required';
+                          }
+                          return null;
+                        },
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
+
+                      if (isBusinessOwner) ...[
+                        _buildLabel("Email Address"),
+                        _buildTextField(
+                          "Enter your email",
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Email is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 14),
+
+                        _buildLabel("Business Name"),
+                        _buildTextField(
+                          "Enter your business name",
+                          controller: businessNameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Business name is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 14),
+
+                        _buildLabel("Business Location"),
+                        _buildTextField(
+                          "Enter your business location",
+                          controller: businessLocationController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Location is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 14),
+                      ],
 
                       _buildLabel("Password"),
                       _buildPasswordField(
                         hint: "Enter your password",
                         visible: showPassword,
                         controller: passwordController,
-                        validator: _validatePassword,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Password is required';
+                          }
+                          return null;
+                        },
                         onToggle: () =>
                             setState(() => showPassword = !showPassword),
+                      ),
+                      const SizedBox(height: 14),
+
+                      _buildLabel("Confirm Password"),
+                      _buildPasswordField(
+                        hint: "Confirm your password",
+                        visible: showConfirmPassword,
+                        controller: confirmPasswordController,
+                        validator: (value) {
+                          if (value != passwordController.text) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                        onToggle: () => setState(
+                          () => showConfirmPassword = !showConfirmPassword,
+                        ),
                       ),
                       const SizedBox(height: 20),
 
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _tryLogin,
+                          onPressed: _createAccount,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -335,7 +360,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           child: Text(
-                            "Log In",
+                            "Sign Up",
                             style: TextStyle(
                               fontFamily: AppFonts.body,
                               fontSize: 16,
@@ -346,52 +371,38 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 18),
 
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          "Forgot Password?",
-                          style: TextStyle(
-                            fontFamily: AppFonts.body,
-                            color: AppColors.textSecondaryLight,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const CreateAccountPage(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Already have an account? ",
+                            style: TextStyle(
+                              fontFamily: AppFonts.body,
+                              color: AppColors.textSecondaryLight,
                             ),
-                          );
-                        },
-                        child: Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Don't have an account? ",
-                                style: TextStyle(
-                                  color: AppColors.textSecondaryLight,
-                                  fontFamily: AppFonts.body,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              TextSpan(
-                                text: "Sign Up",
-                                style: TextStyle(
-                                  color: AppColors.primary,
-                                  fontFamily: AppFonts.body,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
                           ),
-                        ),
+                          TextButton(
+                            onPressed: () => Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginPage(),
+                              ),
+                            ),
+                            child: Text(
+                              "Log In",
+                              style: TextStyle(
+                                fontFamily: AppFonts.body,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+
+                      const SizedBox(height: 36),
                     ],
                   ),
                 ),
@@ -404,15 +415,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildLabel(String text) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontFamily: AppFonts.body,
-          fontWeight: FontWeight.w500,
-          color: AppColors.textPrimaryLight,
-        ),
+    return Text(
+      text,
+      style: TextStyle(
+        fontFamily: AppFonts.body,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textPrimaryLight,
       ),
     );
   }
