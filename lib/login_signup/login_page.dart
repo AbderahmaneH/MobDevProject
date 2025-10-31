@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'create_account.dart';
 import '../welcome_page.dart';
 import '../user_database.dart';
-import '../business_owner/queue_page.dart';
+import '../business_owner/queues_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,8 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  bool isBusinessOwner = false;
+  bool isBusinessOwner = true;
   bool showPassword = false;
   bool loginAttempted = false;
 
@@ -90,39 +89,20 @@ class _LoginPageState extends State<LoginPage> {
             User(name: '', phone: '', password: '', isBusiness: false),
       );
 
-      if (matchedUser.phone.isEmpty) {
-        // This shouldn't happen if validation passed, but just in case
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid credentials'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      // Login success - welcome by actual name
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Welcome back, ${matchedUser.name}!', // Use actual user's name
-          ),
-          backgroundColor: Colors.green,
+    // Login success - Navigate to QueuesPage
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Welcome back, ${isBusinessOwner ? 'Business Owner' : 'Customer'}!',
         ),
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => isBusinessOwner
-              ? QueuesPage(
-                  userPhone: phone,
-                  businessName: matchedUser.businessName ?? 'Business Owner',
-                )
-              : const WelcomePage(), // Replace with your actual home page
-        ),
-      );
-    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const QueuesPage(),
+      ),
+    );
   }
 
   @override
@@ -156,146 +136,162 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 16,
                 ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 6),
-
-                      // Logo and Title
-                      Center(
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(25),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF333333), // primary
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 5),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 40),
+                    // Logo and Title
+                    Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(25),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF333333),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.access_time_filled,
+                            color: Colors.white,
+                            size: 48,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          "QNow",
+                          style: TextStyle(
+                            fontFamily: 'Lora',
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 36),
+                    // Role Toggle
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE5E5E7),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () =>
+                                  setState(() => isBusinessOwner = true),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isBusinessOwner
+                                      ? const Color(0xFF333333)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Business Owner",
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      color: isBusinessOwner
+                                          ? Colors.white
+                                          : const Color(0xFF6B7280),
+                                    ),
                                   ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.access_time_filled,
-                                color: Colors.white,
-                                size: 48,
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            const Text(
-                              "QNow",
-                              style: TextStyle(
-                                fontFamily: 'Lora',
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF333333),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () =>
+                                  setState(() => isBusinessOwner = false),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: !isBusinessOwner
+                                      ? const Color(0xFF333333)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Customer",
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      color: !isBusinessOwner
+                                          ? Colors.white
+                                          : const Color(0xFF6B7280),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Phone Field
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Phone Number",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF333333),
                         ),
                       ),
-
-                      const SizedBox(height: 24),
-
-                      // Role Toggle
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE5E5E7),
-                          borderRadius: BorderRadius.circular(10),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        hintText: "Enter your phone number",
+                        hintStyle: const TextStyle(
+                          fontFamily: 'Poppins',
+                          color: Color(0xFF9CA3AF),
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    isBusinessOwner = false;
-                                    loginAttempted = false;
-                                  });
-                                  WidgetsBinding.instance.addPostFrameCallback((
-                                    _,
-                                  ) {
-                                    _formKey.currentState?.validate();
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: !isBusinessOwner
-                                        ? const Color(0xFF333333)
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      "Customer",
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                        color: !isBusinessOwner
-                                            ? Colors.white
-                                            : const Color(0xFF6B7280),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    isBusinessOwner = true;
-                                    loginAttempted = false;
-                                  });
-                                  WidgetsBinding.instance.addPostFrameCallback((
-                                    _,
-                                  ) {
-                                    _formKey.currentState?.validate();
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isBusinessOwner
-                                        ? const Color(0xFF333333)
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      "Business Owner",
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                        color: isBusinessOwner
-                                            ? Colors.white
-                                            : const Color(0xFF6B7280),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFE5E5E7),
+                          ),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color(0xFF333333),
+                            width: 1.5,
+                          ),
                         ),
                       ),
 
@@ -309,17 +305,17 @@ class _LoginPageState extends State<LoginPage> {
                         keyboardType: TextInputType.phone,
                         validator: _validatePhone,
                       ),
-                      const SizedBox(height: 16),
-
-                      // Password Field
-                      _buildLabel("Password"),
-                      _buildPasswordField(
-                        hint: "Enter your password",
-                        visible: showPassword,
-                        controller: passwordController,
-                        validator: _validatePassword,
-                        onToggle: () =>
-                            setState(() => showPassword = !showPassword),
+                    const SizedBox(height: 16),
+                    // Password Field
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Password",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF333333),
+                        ),
                       ),
                       const SizedBox(height: 20),
 
@@ -346,12 +342,19 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-
-                      const SizedBox(height: 16),
-
-                      // Forgot + Sign Up
-                      TextButton(
-                        onPressed: () {},
+                    const SizedBox(height: 20),
+                    // Log In Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _tryLogin,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF333333),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                         child: const Text(
                           "Forgot Password?",
                           style: TextStyle(
@@ -361,12 +364,39 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const CreateAccountPage(),
+                    ),
+                    const SizedBox(height: 16),
+                    // Forgot + Sign Up
+                    TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                        "Forgot Password?",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          color: Color(0xFF6B7280),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CreateAccountPage(),
+                          ),
+                        );
+                      },
+                      child: const Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "Don't have an account? ",
+                              style: TextStyle(
+                                color: Color(0xFF6B7280),
+                                fontFamily: 'Poppins',
+                                fontSize: 13,
+                              ),
                             ),
                           );
                         },

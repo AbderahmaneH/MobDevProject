@@ -14,14 +14,12 @@ class QueueClient {
 
 class Queue {
   final String name;
-  List<QueueClient> clients;
-  final String ownerPhone; // Add this
+  final List<QueueClient> clients;
 
   Queue({
     required this.name,
     required this.clients,
-    required this.ownerPhone, // Add this
   });
 
-  int get peopleWaiting => clients.length;
+  int get peopleWaiting => clients.where((c) => !c.served).length;
 }
