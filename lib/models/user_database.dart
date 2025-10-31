@@ -18,7 +18,6 @@ class User {
   });
 }
 
-// Add these to your user_database.dart file
 List<User> userDatabase = [
   User(
     name: "Tech Solutions LLC",

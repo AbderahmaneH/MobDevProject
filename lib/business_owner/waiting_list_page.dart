@@ -1,130 +1,223 @@
 import 'package:flutter/material.dart';
 import '../models/queue_model.dart';
+import '../colors/app_colors.dart';
+<<<<<<< Updated upstream
+import '../login_signup/welcome_page.dart';
+=======
+import '../templates/widgets_temps.dart';
+import '../welcome_page.dart';
+>>>>>>> Stashed changes
 
 class WaitingListPage extends StatefulWidget {
   final Queue queue;
-  const WaitingListPage({Key? key, required this.queue}) : super(key: key);
+  const WaitingListPage({super.key, required this.queue});
 
   @override
   State<WaitingListPage> createState() => _WaitingListPageState();
 }
 
 class _WaitingListPageState extends State<WaitingListPage> {
-  late List<QueueClient> clients;
-
-  @override
-  void initState() {
-    super.initState();
-    clients = List.from(widget.queue.clients);
-  }
-
   void _showAddClientDialog() {
     final nameController = TextEditingController();
     final phoneController = TextEditingController();
+<<<<<<< Updated upstream
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+=======
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+>>>>>>> Stashed changes
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text(
+          backgroundColor: AppColors.backgroundLight,
+          surfaceTintColor: Colors.transparent,
+          title: Text(
             'Add New Person',
+<<<<<<< Updated upstream
             style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF333333),
-              fontFamily: 'Lora',
+              fontFamily: AppFonts.display,
+              fontWeight: FontWeight.bold,
+=======
+            style: AppTextStyles.titleLarge.copyWith(
+              fontFamily: AppFonts.display,
+>>>>>>> Stashed changes
+              color: AppColors.textPrimaryLight,
             ),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: 'Name',
+          content: Form(
+<<<<<<< Updated upstream
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter full name',
+                    hintStyle: TextStyle(
+                      fontFamily: AppFonts.body,
+                      color: AppColors.textSecondaryDark,
+                    ),
+                    filled: true,
+                    fillColor: AppColors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 12,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: AppColors.buttonSecondaryLight,
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: AppColors.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+=======
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppTextFields.textField(
                   hintText: 'Enter full name',
-                  prefixIcon: const Icon(Icons.person_outline),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(
-                      color: Color(0xFF333333),
-                      width: 2,
+                  controller: nameController,
+>>>>>>> Stashed changes
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Name is required';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+<<<<<<< Updated upstream
+                TextFormField(
+                  controller: phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    hintText: 'Enter phone number',
+                    hintStyle: TextStyle(
+                      fontFamily: AppFonts.body,
+                      color: AppColors.textSecondaryDark,
+                    ),
+                    filled: true,
+                    fillColor: AppColors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 12,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: AppColors.buttonSecondaryLight,
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: AppColors.primary,
+                        width: 1.5,
+                      ),
                     ),
                   ),
+=======
+                AppTextFields.textField(
+                  hintText: 'Enter phone number',
+                  controller: phoneController,
+                  keyboardType: TextInputType.phone,
+>>>>>>> Stashed changes
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Phone number is required';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  labelText: 'Phone Number',
-                  hintText: '+1 (555) 123-4567',
-                  prefixIcon: const Icon(Icons.phone_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(
-                      color: Color(0xFF333333),
-                      width: 2,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
-            TextButton(
+            AppButtons.textButton(
+              text: 'Cancel',
               onPressed: () => Navigator.pop(context),
-              child: const Text(
+<<<<<<< Updated upstream
+              child: Text(
                 'Cancel',
                 style: TextStyle(
-                  color: Color(0xFF6B7280),
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'Poppins',
+                  fontFamily: AppFonts.body,
+                  color: AppColors.textSecondaryLight,
                 ),
               ),
+=======
+              textColor: AppColors.textSecondaryLight,
+>>>>>>> Stashed changes
             ),
-            ElevatedButton(
+            AppButtons.primaryButton(
+              text: 'Add',
               onPressed: () {
-                if (nameController.text.isNotEmpty &&
-                    phoneController.text.isNotEmpty) {
+<<<<<<< Updated upstream
+                if (_formKey.currentState!.validate()) {
+=======
+                if (formKey.currentState!.validate()) {
+>>>>>>> Stashed changes
+                  final newClient = QueueClient(
+                    name: nameController.text,
+                    phone: phoneController.text,
+                  );
+
                   setState(() {
-                    clients.add(
-                      QueueClient(
-                        name: nameController.text,
-                        phone: phoneController.text,
-                      ),
-                    );
+                    widget.queue.clients.add(newClient);
                   });
+
                   Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text('Person added to queue!'),
+                        ],
+                      ),
+<<<<<<< Updated upstream
+                      backgroundColor: AppColors.buttonSecondaryDark,
+=======
+                      backgroundColor: Colors.green,
+>>>>>>> Stashed changes
+                    ),
+                  );
                 }
               },
+<<<<<<< Updated upstream
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF333333),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
+                backgroundColor: AppColors.primary,
               ),
-              child: const Text(
+              child: Text(
                 'Add',
                 style: TextStyle(
-                  color: Color(0xFFE5E5E7),
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Poppins',
+                  fontFamily: AppFonts.body,
+                  color: AppColors.white,
                 ),
               ),
+=======
+              isFullWidth: false,
+>>>>>>> Stashed changes
             ),
           ],
         );
@@ -134,271 +227,801 @@ class _WaitingListPageState extends State<WaitingListPage> {
 
   void _serveClient(int index) {
     setState(() {
-      clients[index].served = true;
+      widget.queue.clients[index].served = true;
+    });
+
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          widget.queue.clients.removeAt(index);
+        });
+      }
     });
   }
 
   void _notifyClient(int index) {
     setState(() {
-      clients[index].notified = true;
+      widget.queue.clients[index].notified = true;
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Notified ${widget.queue.clients[index].name}'),
+        backgroundColor: Colors.blue,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< Updated upstream
+    final waitingCount =
+        widget.queue.clients.where((c) => !c.served).length;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F3),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1C1C1E),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFFE5E5E7)),
-          onPressed: () => Navigator.pop(context),
+      backgroundColor: AppColors.backgroundLight,
+      endDrawer: Drawer(
+        child: Container(
+          color: AppColors.backgroundLight,
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+=======
+    final waitingCount = widget.queue.clients.where((c) => !c.served).length;
+
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            AppAppBar.sliverAppBar(
+              title: widget.queue.name,
+              onBackPressed: () => Navigator.pop(context),
+              actions: [],
+            ),
+
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+>>>>>>> Stashed changes
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+<<<<<<< Updated upstream
+                    Icon(
+                      Icons.access_time_filled,
+                      color: Colors.white,
+                      size: 48,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'QNow',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: AppFonts.display,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      widget.queue.name,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontFamily: AppFonts.body,
+                        fontSize: 14,
+=======
+                    const SizedBox(height: 6),
+
+                    // Header Section
+                    Center(
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(25),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.people_alt,
+                              color: AppColors.white,
+                              size: 48,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "Waiting List",
+                            style: AppTextStyles.displayLarge,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "$waitingCount ${waitingCount == 1 ? 'person' : 'people'} in queue",
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Stats Card
+                    AppContainers.card(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatItem(
+                            'Total',
+                            '${widget.queue.clients.length}',
+                          ),
+                          _buildStatItem('Waiting', '$waitingCount'),
+                          _buildStatItem(
+                            'Served',
+                            '${widget.queue.clients.where((c) => c.served).length}',
+                          ),
+                        ],
+>>>>>>> Stashed changes
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+<<<<<<< Updated upstream
+              ListTile(
+                leading: Icon(
+                  Icons.account_circle,
+                  color: AppColors.textPrimaryLight,
+                ),
+                title: Text(
+                  'Profile',
+                  style: TextStyle(
+                    fontFamily: AppFonts.body,
+                    color: AppColors.textPrimaryLight,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text('Profile page - Coming soon'),
+                        ],
+                      ),
+                      backgroundColor: Colors.blue,
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.help_outline,
+                  color: AppColors.textPrimaryLight,
+                ),
+                title: Text(
+                  'Help',
+                  style: TextStyle(
+                    fontFamily: AppFonts.body,
+                    color: AppColors.textPrimaryLight,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text('Help page - Coming soon'),
+=======
+            ),
+
+            // Clients List
+            widget.queue.clients.isEmpty
+                ? SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Center(
+                        child: Text(
+                          "No one in queue\nTap the button below to add people",
+                          textAlign: TextAlign.center,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 8,
+                        ),
+                        child: _buildPersonCard(
+                          widget.queue.clients[index],
+                          index,
+                        ),
+                      ),
+                      childCount: widget.queue.clients.length,
+                    ),
+                  ),
+          ],
         ),
-        centerTitle: true,
-        title: Text(
-          widget.queue.name,
-          style: const TextStyle(
-            color: Color(0xFFE5E5E7),
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Poppins',
+      ),
+      floatingActionButton: AppButtons.floatingActionButton(
+        icon: Icons.add,
+        label: 'Add Person',
+        onPressed: _showAddClientDialog,
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String title, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: AppTextStyles.bodyLarge.copyWith(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          title,
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPersonCard(QueueClient person, int index) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: AppContainers.card(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(Icons.person, color: AppColors.white, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        person.name,
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.phone,
+                            size: 14,
+                            color: AppColors.textSecondaryLight,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            person.phone,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          ),
+>>>>>>> Stashed changes
+                        ],
+                      ),
+                      backgroundColor: Colors.blue,
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.info_outline,
+                  color: AppColors.textPrimaryLight,
+                ),
+                title: Text(
+                  'About',
+                  style: TextStyle(
+                    fontFamily: AppFonts.body,
+                    color: AppColors.textPrimaryLight,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text('About page - Coming soon'),
+                        ],
+                      ),
+                      backgroundColor: Colors.blue,
+                    ),
+                  );
+                },
+              ),
+              Divider(),
+              ListTile(
+                leading: Icon(
+                  Icons.logout,
+                  color: AppColors.buttonSecondaryDark,
+                ),
+                title: Text(
+                  'Sign Out',
+                  style: TextStyle(
+                    fontFamily: AppFonts.body,
+                    color: AppColors.buttonSecondaryDark,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const WelcomePage(),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Waiting List',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF333333),
-                        fontFamily: 'Lora',
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${clients.where((c) => !c.served).length} people in queue',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF6B7280),
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
-                  ],
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              backgroundColor: AppColors.backgroundLight,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              floating: true,
+              snap: true,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: AppColors.textPrimaryLight),
+                onPressed: () => Navigator.pop(context),
+              ),
+              centerTitle: true,
+              title: Text(
+                widget.queue.name,
+                style: TextStyle(
+                  fontFamily: AppFonts.display,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimaryLight,
                 ),
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF333333),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Total',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFF9CA3AF),
-                          fontFamily: 'Poppins',
-                        ),
-                      ),
-                      Text(
-                        '${clients.length}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFFE5E5E7),
-                          fontFamily: 'Poppins',
-                        ),
-                      ),
-                    ],
+              ),
+              actions: [
+                Builder(
+                  builder: (context) => IconButton(
+                    icon: Icon(
+                      Icons.menu,
+                      color: AppColors.textPrimaryLight,
+                    ),
+                    onPressed: () {
+                      Scaffold.of(context).openEndDrawer();
+                    },
                   ),
                 ),
               ],
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: clients.length,
-              itemBuilder: (context, index) {
-                return PersonCard(
-                  person: clients[index],
-                  onServe: () => _serveClient(index),
-                  onNotify: () => _notifyClient(index),
-                );
-              },
+<<<<<<< Updated upstream
+
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 6),
+                    // Header Section
+                    Center(
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(25),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.people_alt,
+                              color: AppColors.white,
+                              size: 48,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "Waiting List",
+                            style: TextStyle(
+                              fontFamily: AppFonts.display,
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimaryLight,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "$waitingCount ${waitingCount == 1 ? 'person' : 'people'} in queue",
+                            style: TextStyle(
+                              fontFamily: AppFonts.body,
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Stats Card
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatItem('Total', '${widget.queue.clients.length}'),
+                          _buildStatItem('Waiting', '$waitingCount'),
+                          _buildStatItem(
+                            'Served',
+                            '${widget.queue.clients.where((c) => c.served).length}',
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+
+            // Clients List
+            if (widget.queue.clients.isEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Center(
+                    child: Text(
+                      "No one in queue\nTap the button below to add people",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: AppFonts.body,
+                        color: AppColors.textSecondaryLight,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
+                    child: AnimatedPersonCard(
+                      person: widget.queue.clients[index],
+                      onServe: () => _serveClient(index),
+                      onNotify: () => _notifyClient(index),
+                    ),
+                  ),
+                  childCount: widget.queue.clients.length,
+                ),
+              ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddClientDialog,
-        backgroundColor: const Color(0xFF333333),
-        icon: const Icon(Icons.add, color: Color(0xFFE5E5E7)),
-        label: const Text(
+        backgroundColor: AppColors.primary,
+        icon: Icon(Icons.add, color: AppColors.buttonSecondaryLight),
+        label: Text(
           'Add Person',
           style: TextStyle(
-            color: Color(0xFFE5E5E7),
+            fontFamily: AppFonts.body,
+            color: AppColors.buttonSecondaryLight,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Poppins',
+          ),
+=======
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: person.notified
+                        ? null
+                        : () => _notifyClient(index),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: person.notified
+                            ? AppColors.buttonSecondaryLight
+                            : AppColors.primary,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      person.notified ? 'Notified' : 'Notify',
+                      style: TextStyle(
+                        color: person.notified
+                            ? AppColors.textSecondaryLight
+                            : AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: AppFonts.body,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: person.served ? null : () => _serveClient(index),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: person.served
+                          ? AppColors.buttonSecondaryLight
+                          : AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      person.served ? 'Served' : 'Serve',
+                      style: TextStyle(
+                        color: person.served
+                            ? AppColors.textSecondaryLight
+                            : AppColors.white,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: AppFonts.body,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+>>>>>>> Stashed changes
+        ),
+      ),
+    );
+  }
+<<<<<<< Updated upstream
+
+  Widget _buildStatItem(String title, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimaryLight,
+            fontFamily: AppFonts.body,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 12,
+            color: AppColors.textSecondaryLight,
+            fontFamily: AppFonts.body,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class AnimatedPersonCard extends StatelessWidget {
+  final QueueClient person;
+  final VoidCallback onServe;
+  final VoidCallback onNotify;
+
+  const AnimatedPersonCard({
+    super.key,
+    required this.person,
+    required this.onServe,
+    required this.onNotify,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Card(
+        elevation: 0,
+        color: AppColors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      Icons.person,
+                      color: AppColors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          person.name,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimaryLight,
+                            fontFamily: AppFonts.body,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.phone,
+                              size: 14,
+                              color: AppColors.textSecondaryLight,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              person.phone,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.textSecondaryLight,
+                                fontFamily: AppFonts.body,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: person.notified ? null : onNotify,
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: person.notified
+                              ? AppColors.buttonSecondaryLight
+                              : AppColors.primary,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text(
+                        person.notified ? 'Notified' : 'Notify',
+                        style: TextStyle(
+                          color: person.notified
+                              ? AppColors.textSecondaryLight
+                              : AppColors.primary,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: AppFonts.body,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: person.served ? null : onServe,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: person.served
+                            ? AppColors.buttonSecondaryLight
+                            : AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text(
+                        person.served ? 'Served' : 'Serve',
+                        style: TextStyle(
+                          color: person.served
+                              ? AppColors.textSecondaryLight
+                              : AppColors.white,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: AppFonts.body,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
-
-class PersonCard extends StatelessWidget {
-  final QueueClient person;
-  final VoidCallback onServe;
-  final VoidCallback onNotify;
-  const PersonCard({
-    Key? key,
-    required this.person,
-    required this.onServe,
-    required this.onNotify,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF3F4F6),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(
-                  Icons.person_outline,
-                  color: Color(0xFF6B7280),
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      person.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF333333),
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.phone_outlined,
-                          size: 14,
-                          color: Color(0xFF6B7280),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          person.phone,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF6B7280),
-                            fontFamily: 'Poppins',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: person.notified ? null : onNotify,
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFE5E5E7)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  child: Text(
-                    person.notified ? 'Notified' : 'Notify',
-                    style: TextStyle(
-                      color: person.notified
-                          ? const Color(0xFF6B7280)
-                          : const Color(0xFF333333),
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: person.served ? null : onServe,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: person.served
-                        ? const Color(0xFFE5E5E7)
-                        : const Color(0xFF333333),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  child: Text(
-                    person.served ? 'Served' : 'Serve',
-                    style: TextStyle(
-                      color: person.served
-                          ? const Color(0xFF6B7280)
-                          : const Color(0xFFE5E5E7),
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+=======
 }
+>>>>>>> Stashed changes

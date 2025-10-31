@@ -1,7 +1,7 @@
-// lib/welcome_page.dart
 import 'package:flutter/material.dart';
-import 'login_signup/create_account.dart';
+import 'login_signup/create_account_page.dart';
 import 'login_signup/login_page.dart';
+import '../colors/app_colors.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -9,7 +9,7 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F3), // background-light
+      backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -18,11 +18,10 @@ class WelcomePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // App icon
                 Container(
                   padding: const EdgeInsets.all(25),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF333333), // primary
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -40,31 +39,28 @@ class WelcomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
 
-                // Title
-                const Text(
+                Text(
                   "Welcome to QNow",
                   style: TextStyle(
-                    fontFamily: 'Lora',
+                    fontFamily: AppFonts.display,
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF333333),
+                    color: AppColors.textPrimaryLight,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),
 
-                // Subtitle
-                const Text(
+                Text(
                   "Manage your queues",
                   style: TextStyle(
-                    fontFamily: 'Poppins',
+                    fontFamily: AppFonts.body,
                     fontSize: 16,
-                    color: Color(0xFF6B7280), // text-secondary-light
+                    color: AppColors.textSecondaryLight,
                   ),
                 ),
                 const SizedBox(height: 50),
 
-                // Create Account button
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -75,7 +71,7 @@ class WelcomePage extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF333333),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     minimumSize: const Size(double.infinity, 0),
@@ -84,17 +80,16 @@ class WelcomePage extends StatelessWidget {
                     ),
                     elevation: 4,
                   ),
-                  child: const Text(
+                  child: Text(
                     "Create Account",
                     style: TextStyle(
-                      fontFamily: 'Poppins',
+                      fontFamily: AppFonts.body,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
                 const SizedBox(height: 15),
 
-                // Sign In button (outline)
                 OutlinedButton(
                   onPressed: () {
                     Navigator.push(
@@ -105,26 +100,25 @@ class WelcomePage extends StatelessWidget {
                     );
                   },
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF333333)),
+                    side: BorderSide(color: AppColors.primary),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     minimumSize: const Size(double.infinity, 0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     "Log In",
                     style: TextStyle(
-                      fontFamily: 'Poppins',
+                      fontFamily: AppFonts.body,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF333333),
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
 
                 const SizedBox(height: 25),
 
-                // Page indicator
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -147,9 +141,7 @@ class WelcomePage extends StatelessWidget {
       width: active ? 10 : 8,
       height: active ? 10 : 8,
       decoration: BoxDecoration(
-        color: active
-            ? const Color(0xFF333333)
-            : const Color(0xFF9CA3AF), // active/inactive dot color
+        color: active ? AppColors.primary : AppColors.textSecondaryDark,
         shape: BoxShape.circle,
       ),
     );
