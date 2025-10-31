@@ -11,8 +11,11 @@ class CreateAccountPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   final emailController = TextEditingController();
   final businessNameController = TextEditingController();
   final businessLocationController = TextEditingController();
@@ -20,12 +23,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   bool isBusinessOwner = false;
   bool showPassword = false;
   bool showConfirmPassword = false;
-  String? _phoneErrorText;
 
   @override
   void dispose() {
     phoneController.dispose();
     passwordController.dispose();
+    confirmPasswordController.dispose();
     emailController.dispose();
     businessNameController.dispose();
     businessLocationController.dispose();
@@ -367,7 +370,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         ),
                       ),
                       const SizedBox(height: 14),
-                    ],
 
                     // Password field
                     const Align(
@@ -471,15 +473,26 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text(
-                          "Sign Up",
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
+                        const SizedBox(height: 14),
+
+                        _buildLabel("Business Location"),
+                        _buildTextField(
+                          "Enter your business location",
+                          controller: businessLocationController,
+                          validator: _validateBusinessLocation,
                         ),
+                        const SizedBox(height: 14),
+                      ],
+
+                      // Password
+                      _buildLabel("Password"),
+                      _buildPasswordField(
+                        hint: "Enter your password",
+                        visible: showPassword,
+                        controller: passwordController,
+                        validator: _validatePassword,
+                        onToggle: () =>
+                            setState(() => showPassword = !showPassword),
                       ),
                     ),
 
