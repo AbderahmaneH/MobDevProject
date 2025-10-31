@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'create_account_page.dart';
-import '../welcome_page.dart';
+import '../login_signup/welcome_page.dart';
 import '../models/user_database.dart';
 import '../business_owner/queues_page.dart';
 import '../colors/app_colors.dart';
-import '../templates/widgets_temps.dart'; // Import the template
+import '../templates/widgets_temps.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -34,19 +34,20 @@ class _LoginPageState extends State<LoginPage> {
     if (value == null || value.isEmpty) {
       return 'Phone number is required';
     }
-    if (value.length != 10 || value[0] != '0' || 
+    if (value.length != 10 ||
+        value[0] != '0' ||
         (value[1] != '5' && value[1] != '6' && value[1] != '7')) {
       return 'Phone must start with 05/06/07 and be 10 digits';
     }
-    
-    // Check if user exists in database
+
     final userExists = userDatabase.any(
-      (user) => user.phone == value.trim() && user.isBusiness == isBusinessOwner,
+      (user) =>
+          user.phone == value.trim() && user.isBusiness == isBusinessOwner,
     );
     if (!userExists) {
       return 'No account found with this phone number';
     }
-    
+
     return null;
   }
 
@@ -56,12 +57,12 @@ class _LoginPageState extends State<LoginPage> {
       return 'Password is required';
     }
 
-    // Check if password matches for the given phone
     final phone = phoneController.text.trim();
     if (phone.isNotEmpty) {
       final user = userDatabase.firstWhere(
         (u) => u.phone == phone && u.isBusiness == isBusinessOwner,
-        orElse: () => User(name: '', phone: '', password: '', isBusiness: false),
+        orElse: () =>
+            User(name: '', phone: '', password: '', isBusiness: false),
       );
       if (user.phone.isNotEmpty && user.password != value) {
         return 'Incorrect password';
@@ -85,7 +86,8 @@ class _LoginPageState extends State<LoginPage> {
             u.phone == phone &&
             u.password == password &&
             u.isBusiness == isBusinessOwner,
-        orElse: () => User(name: '', phone: '', password: '', isBusiness: false),
+        orElse: () =>
+            User(name: '', phone: '', password: '', isBusiness: false),
       );
 
       if (matchedUser.phone.isEmpty) {
@@ -98,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                 Text('Invalid credentials'),
               ],
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.red,
           ),
         );
         return;
@@ -108,12 +110,12 @@ class _LoginPageState extends State<LoginPage> {
         SnackBar(
           content: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.white),
+              Icon(Icons.check_circle, color: AppColors.white),
               SizedBox(width: 8),
               Text('Welcome back, ${matchedUser.name}!'),
             ],
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.buttonSecondaryDark,
         ),
       );
 
@@ -149,22 +151,23 @@ class _LoginPageState extends State<LoginPage> {
 
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 6),
-                      
-                      // Logo Header
+
                       const LogoHeader(
                         title: "QNow",
                         subtitle: "Login to your account",
                       ),
                       const SizedBox(height: 24),
 
-                      // Role Toggle
                       RoleToggle(
                         initialValue: isBusinessOwner,
                         onChanged: (isBusiness) {
@@ -179,7 +182,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Phone Field
                       AppLabels.label("Phone Number"),
                       const SizedBox(height: 6),
                       AppTextFields.textField(
@@ -190,26 +192,24 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Password Field
                       AppLabels.label("Password"),
                       const SizedBox(height: 6),
                       AppTextFields.passwordField(
                         hintText: "Enter your password",
                         controller: passwordController,
                         isVisible: showPassword,
-                        onToggleVisibility: () => setState(() => showPassword = !showPassword),
+                        onToggleVisibility: () =>
+                            setState(() => showPassword = !showPassword),
                         validator: _validatePassword,
                       ),
                       const SizedBox(height: 20),
 
-                      // Login Button
                       AppButtons.primaryButton(
                         text: "Log In",
                         onPressed: _tryLogin,
                       ),
                       const SizedBox(height: 16),
 
-                      // Forgot Password
                       Center(
                         child: AppButtons.textButton(
                           text: "Forgot Password?",
@@ -217,8 +217,7 @@ class _LoginPageState extends State<LoginPage> {
                           textColor: AppColors.textSecondaryLight,
                         ),
                       ),
-                      
-                      // Sign Up Link
+
                       Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -235,7 +234,8 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const CreateAccountPage(),
+                                    builder: (context) =>
+                                        const CreateAccountPage(),
                                   ),
                                 );
                               },

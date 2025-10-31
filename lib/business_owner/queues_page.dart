@@ -165,7 +165,6 @@ class _QueuesPageState extends State<QueuesPage> {
 
   void _refreshQueues() {
     setState(() {
-      // This will trigger a rebuild and reload the queues
     });
   }
 
@@ -208,7 +207,6 @@ class _QueuesPageState extends State<QueuesPage> {
                   children: [
                     const SizedBox(height: 6),
 
-                    // Welcome Message Only
                     Center(
                       child: Text(
                         "Welcome, ${widget.businessName}",
@@ -219,7 +217,6 @@ class _QueuesPageState extends State<QueuesPage> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Buttons Row
                     Row(
                       children: [
                         Expanded(
@@ -255,7 +252,6 @@ class _QueuesPageState extends State<QueuesPage> {
               ),
             ),
 
-            // Queues List
             userQueues.isEmpty
                 ? SliverToBoxAdapter(
                     child: Padding(
@@ -303,7 +299,6 @@ class _QueuesPageState extends State<QueuesPage> {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            // Queue Icon
             Container(
               width: 48,
               height: 48,
@@ -315,7 +310,6 @@ class _QueuesPageState extends State<QueuesPage> {
             ),
             const SizedBox(width: 12),
 
-            // Queue Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,10 +343,9 @@ class _QueuesPageState extends State<QueuesPage> {
               ),
             ),
 
-            // Remove Button
             IconButton(
               onPressed: () => _removeQueue(index),
-              icon: Icon(Icons.delete_outline, color: Colors.red, size: 20),
+              icon: Icon(Icons.delete_outline, color: AppColors.red, size: 20),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             ),
@@ -375,18 +368,18 @@ class _QueuesPageState extends State<QueuesPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Icon(Icons.access_time_filled, color: Colors.white, size: 48),
+                  Icon(Icons.access_time_filled, color: AppColors.white, size: 48),
                   const SizedBox(height: 8),
                   Text(
                     'QNow',
                     style: AppTextStyles.displayMedium.copyWith(
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                   ),
                   Text(
                     widget.businessName,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: Colors.white70,
+                      color: AppColors.white,
                     ),
                   ),
                 ],
@@ -426,8 +419,8 @@ class _QueuesPageState extends State<QueuesPage> {
             _buildDrawerItem(
               icon: Icons.logout,
               title: 'Sign Out',
-              iconColor: Colors.red,
-              textColor: Colors.red,
+              iconColor: AppColors.red,
+              textColor: AppColors.red,
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushReplacement(

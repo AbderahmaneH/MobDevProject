@@ -1,10 +1,7 @@
-// lib/widgets/buttons_textfields.dart
 import 'package:flutter/material.dart';
 import '../colors/app_colors.dart';
 
-// ==============================
 // TEXT STYLES
-// ==============================
 
 class AppTextStyles {
   static const TextStyle displayLarge = TextStyle(
@@ -61,10 +58,7 @@ class AppTextStyles {
     color: AppColors.white,
   );
 }
-
-// ==============================
 // BUTTONS
-// ==============================
 
 class AppButtons {
   static Widget primaryButton({
@@ -159,10 +153,7 @@ class AppButtons {
     );
   }
 }
-
-// ==============================
 // TEXT FIELDS
-// ==============================
 
 class AppTextFields {
   static Widget textField({
@@ -267,10 +258,7 @@ class AppTextFields {
     );
   }
 }
-
-// ==============================
 // LABELS
-// ==============================
 
 class AppLabels {
   static Widget label(String text) {
@@ -292,9 +280,7 @@ class AppLabels {
   }
 }
 
-// ==============================
 // CARDS & CONTAINERS
-// ==============================
 
 class AppContainers {
   static Widget card({
@@ -350,9 +336,8 @@ class AppContainers {
   }
 }
 
-// ==============================
+
 // ROLE TOGGLE
-// ==============================
 
 class RoleToggle extends StatefulWidget {
   final bool initialValue;
@@ -452,9 +437,9 @@ class _RoleToggleState extends State<RoleToggle> {
   }
 }
 
-// ==============================
+
 // APP BAR
-// ==============================
+
 
 class AppAppBar {
   static AppBar customAppBar({
@@ -510,9 +495,9 @@ class AppAppBar {
   }
 }
 
-// ==============================
+
 // LOGO HEADER
-// ==============================
+
 
 class LogoHeader extends StatelessWidget {
   final String title;

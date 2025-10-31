@@ -156,7 +156,6 @@ class _WaitingListPageState extends State<WaitingListPage> {
                   children: [
                     const SizedBox(height: 6),
 
-                    // Header Section
                     Center(
                       child: Column(
                         children: [
@@ -196,7 +195,6 @@ class _WaitingListPageState extends State<WaitingListPage> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Stats Card
                     AppContainers.card(
                       padding: const EdgeInsets.all(20),
                       child: Row(
@@ -220,7 +218,6 @@ class _WaitingListPageState extends State<WaitingListPage> {
               ),
             ),
 
-            // Clients List
             widget.queue.clients.isEmpty
                 ? SliverToBoxAdapter(
                     child: Padding(

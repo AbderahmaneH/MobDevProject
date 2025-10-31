@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
-import '../welcome_page.dart';
+import '../login_signup/welcome_page.dart';
 import '../models/user_database.dart';
 import '../business_owner/queues_page.dart';
 import '../colors/app_colors.dart';
-import '../templates/widgets_temps.dart'; // Import the template
+import '../templates/widgets_temps.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -133,7 +133,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               Text('Account created successfully!'),
             ],
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.buttonSecondaryDark,
         ),
       );
 
@@ -179,12 +179,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 6),
-
-                      // Logo Header
                       const LogoHeader(title: "QNow"),
                       const SizedBox(height: 24),
 
-                      // Role Toggle
                       RoleToggle(
                         initialValue: isBusinessOwner,
                         onChanged: (isBusiness) {
@@ -195,7 +192,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Full Name
                       AppLabels.label("Full Name"),
                       const SizedBox(height: 6),
                       AppTextFields.textField(
@@ -205,7 +201,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       ),
                       const SizedBox(height: 14),
 
-                      // Phone Number
                       AppLabels.label("Phone Number"),
                       const SizedBox(height: 6),
                       AppTextFields.textField(
@@ -216,7 +211,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       ),
                       const SizedBox(height: 14),
 
-                      // Business fields (only if selected)
                       if (isBusinessOwner) ...[
                         AppLabels.label("Email Address"),
                         const SizedBox(height: 6),
@@ -247,7 +241,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         const SizedBox(height: 14),
                       ],
 
-                      // Password
                       AppLabels.label("Password"),
                       const SizedBox(height: 6),
                       AppTextFields.passwordField(
@@ -260,7 +253,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       ),
                       const SizedBox(height: 14),
 
-                      // Confirm Password
                       AppLabels.label("Confirm Password"),
                       const SizedBox(height: 6),
                       AppTextFields.passwordField(
@@ -274,14 +266,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Sign Up Button
                       AppButtons.primaryButton(
                         text: "Sign Up",
                         onPressed: _createAccount,
                       ),
                       const SizedBox(height: 18),
 
-                      // Already have account
                       Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
