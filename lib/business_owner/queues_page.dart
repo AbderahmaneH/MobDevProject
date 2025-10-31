@@ -4,7 +4,6 @@ import '../models/queue_model.dart';
 import '../models/queues_database.dart';
 import '../colors/app_colors.dart';
 import '../templates/widgets_temps.dart';
-import '../welcome_page.dart';
 import '../drawer/about_us_page.dart';
 import '../drawer/help_page.dart';
 import '../drawer/profile_page.dart';

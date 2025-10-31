@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/queue_model.dart';
 import '../colors/app_colors.dart';
 import '../templates/widgets_temps.dart';
-import '../welcome_page.dart';
 
 class WaitingListPage extends StatefulWidget {
   final Queue queue;
