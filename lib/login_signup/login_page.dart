@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'create_account_page.dart';
+<<<<<<< Updated upstream
 import '../login_signup/welcome_page.dart';
 import '../models/user_database.dart';
 import '../business_owner/queues_page.dart';
 import '../colors/app_colors.dart';
+=======
+import '../welcome_page.dart';
+import '../models/user_database.dart';
+import '../business_owner/queues_page.dart';
+import '../colors/app_colors.dart';
+import '../templates/widgets_temps.dart'; // Import the template
+>>>>>>> Stashed changes
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -28,22 +36,27 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  bool validatePhone(String phone) {
-    if (phone.isEmpty) return false;
-    if (phone.length != 10) return false;
-    if (phone[0] != '0') return false;
-    if (phone[1] != '5' && phone[1] != '6' && phone[1] != '7') return false;
-    return true;
-  }
-
   String? _validatePhone(String? value) {
     if (!loginAttempted) return null;
     if (value == null || value.isEmpty) {
       return 'Phone number is required';
     }
-    if (!validatePhone(value)) {
+    if (value.length != 10 || value[0] != '0' || 
+        (value[1] != '5' && value[1] != '6' && value[1] != '7')) {
       return 'Phone must start with 05/06/07 and be 10 digits';
     }
+<<<<<<< Updated upstream
+=======
+    
+    // Check if user exists in database
+    final userExists = userDatabase.any(
+      (user) => user.phone == value.trim() && user.isBusiness == isBusinessOwner,
+    );
+    if (!userExists) {
+      return 'No account found with this phone number';
+    }
+    
+>>>>>>> Stashed changes
     return null;
   }
 
@@ -57,8 +70,7 @@ class _LoginPageState extends State<LoginPage> {
     if (phone.isNotEmpty) {
       final user = userDatabase.firstWhere(
         (u) => u.phone == phone && u.isBusiness == isBusinessOwner,
-        orElse: () =>
-            User(name: '', phone: '', password: '', isBusiness: false),
+        orElse: () => User(name: '', phone: '', password: '', isBusiness: false),
       );
       if (user.phone.isNotEmpty && user.password != value) {
         return 'Incorrect password';
@@ -82,8 +94,7 @@ class _LoginPageState extends State<LoginPage> {
             u.phone == phone &&
             u.password == password &&
             u.isBusiness == isBusinessOwner,
-        orElse: () =>
-            User(name: '', phone: '', password: '', isBusiness: false),
+        orElse: () => User(name: '', phone: '', password: '', isBusiness: false),
       );
 
       if (matchedUser.phone.isEmpty) {
@@ -96,7 +107,11 @@ class _LoginPageState extends State<LoginPage> {
                 Text('Invalid credentials'),
               ],
             ),
+<<<<<<< Updated upstream
             backgroundColor: AppColors.buttonSecondaryDark,
+=======
+            backgroundColor: Colors.red,
+>>>>>>> Stashed changes
           ),
         );
         return;
@@ -111,7 +126,11 @@ class _LoginPageState extends State<LoginPage> {
               Text('Welcome back, ${matchedUser.name}!'),
             ],
           ),
+<<<<<<< Updated upstream
           backgroundColor: AppColors.buttonSecondaryDark,
+=======
+          backgroundColor: Colors.green,
+>>>>>>> Stashed changes
         ),
       );
 
@@ -137,6 +156,7 @@ class _LoginPageState extends State<LoginPage> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
+<<<<<<< Updated upstream
             SliverAppBar(
               backgroundColor: AppColors.backgroundLight,
               surfaceTintColor: Colors.transparent,
@@ -158,11 +178,19 @@ class _LoginPageState extends State<LoginPage> {
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimaryLight,
                 ),
+=======
+            AppAppBar.sliverAppBar(
+              title: "Login To Your Account",
+              onBackPressed: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const WelcomePage()),
+>>>>>>> Stashed changes
               ),
             ),
 
             SliverToBoxAdapter(
               child: Padding(
+<<<<<<< Updated upstream
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 16,
@@ -299,19 +327,56 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ],
                         ),
+=======
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 6),
+                      
+                      // Logo Header
+                      const LogoHeader(
+                        title: "QNow",
+                        subtitle: "Login to your account",
+>>>>>>> Stashed changes
                       ),
-
                       const SizedBox(height: 24),
 
+                      // Role Toggle
+                      RoleToggle(
+                        initialValue: isBusinessOwner,
+                        onChanged: (isBusiness) {
+                          setState(() {
+                            isBusinessOwner = isBusiness;
+                            loginAttempted = false;
+                          });
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _formKey.currentState?.validate();
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 24),
+
+<<<<<<< Updated upstream
                       _buildLabel("Phone Number"),
                       _buildTextField(
                         "Enter your phone number",
+=======
+                      // Phone Field
+                      AppLabels.label("Phone Number"),
+                      const SizedBox(height: 6),
+                      AppTextFields.textField(
+                        hintText: "Enter your phone number",
+>>>>>>> Stashed changes
                         controller: phoneController,
                         keyboardType: TextInputType.phone,
                         validator: _validatePhone,
                       ),
                       const SizedBox(height: 16),
 
+<<<<<<< Updated upstream
                       _buildLabel("Password"),
                       _buildPasswordField(
                         hint: "Enter your password",
@@ -390,6 +455,59 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
+=======
+                      // Password Field
+                      AppLabels.label("Password"),
+                      const SizedBox(height: 6),
+                      AppTextFields.passwordField(
+                        hintText: "Enter your password",
+                        controller: passwordController,
+                        isVisible: showPassword,
+                        onToggleVisibility: () => setState(() => showPassword = !showPassword),
+                        validator: _validatePassword,
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Login Button
+                      AppButtons.primaryButton(
+                        text: "Log In",
+                        onPressed: _tryLogin,
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Forgot Password
+                      Center(
+                        child: AppButtons.textButton(
+                          text: "Forgot Password?",
+                          onPressed: () {},
+                          textColor: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                      
+                      // Sign Up Link
+                      Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Don't have an account? ",
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.textSecondaryLight,
+                              ),
+                            ),
+                            AppButtons.textButton(
+                              text: "Sign Up",
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const CreateAccountPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+>>>>>>> Stashed changes
                         ),
                       ),
                     ],
@@ -402,6 +520,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+<<<<<<< Updated upstream
 
   Widget _buildLabel(String text) {
     return Align(
@@ -516,4 +635,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+=======
+>>>>>>> Stashed changes
 }

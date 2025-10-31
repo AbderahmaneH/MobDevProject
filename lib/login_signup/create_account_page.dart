@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
+<<<<<<< Updated upstream
 import '../login_signup/welcome_page.dart';
 import '../models/user_database.dart';
 import '../business_owner/queues_page.dart';
 import '../colors/app_colors.dart';
+=======
+import '../welcome_page.dart';
+import '../models/user_database.dart';
+import '../business_owner/queues_page.dart';
+import '../colors/app_colors.dart';
+import '../templates/widgets_temps.dart'; // Import the template
+>>>>>>> Stashed changes
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -24,6 +32,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   bool isBusinessOwner = false;
   bool showPassword = false;
   bool showConfirmPassword = false;
+<<<<<<< Updated upstream
+=======
+  bool signed = false;
+>>>>>>> Stashed changes
 
   @override
   void dispose() {
@@ -37,6 +49,72 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     super.dispose();
   }
 
+<<<<<<< Updated upstream
+=======
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Name is required';
+    }
+    if (value.length < 3) {
+      return 'Name must be at least 3 characters';
+    }
+    return null;
+  }
+
+  String? _validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Phone is required';
+    }
+    if (value.length != 10 ||
+        value[0] != '0' ||
+        (value[1] != '5' && value[1] != '6' && value[1] != '7')) {
+      return 'Phone must start with 05/06/07 and be 10 digits';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (isBusinessOwner && (value == null || value.isEmpty)) {
+      return 'Email is required';
+    }
+    return null;
+  }
+
+  String? _validateBusinessName(String? value) {
+    if (isBusinessOwner && (value == null || value.isEmpty)) {
+      return 'Business name is required';
+    }
+    return null;
+  }
+
+  String? _validateBusinessLocation(String? value) {
+    if (isBusinessOwner && (value == null || value.isEmpty)) {
+      return 'Location is required';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please confirm your password';
+    }
+    if (value != passwordController.text) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
+>>>>>>> Stashed changes
   void _createAccount() {
     if (_formKey.currentState!.validate()) {
       String name = nameController.text.trim();
@@ -68,7 +146,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               Text('Account created successfully!'),
             ],
           ),
+<<<<<<< Updated upstream
           backgroundColor: AppColors.buttonSecondaryDark,
+=======
+          backgroundColor: Colors.green,
+>>>>>>> Stashed changes
         ),
       );
 
@@ -94,6 +176,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
+<<<<<<< Updated upstream
             SliverAppBar(
               backgroundColor: AppColors.backgroundLight,
               surfaceTintColor: Colors.transparent,
@@ -115,6 +198,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimaryLight,
                 ),
+=======
+            AppAppBar.sliverAppBar(
+              title: "Create an Account",
+              onBackPressed: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const WelcomePage()),
+>>>>>>> Stashed changes
               ),
             ),
 
@@ -130,6 +220,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 6),
+<<<<<<< Updated upstream
                       Center(
                         child: Column(
                           children: [
@@ -311,10 +402,77 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             }
                             return null;
                           },
+=======
+
+                      // Logo Header
+                      const LogoHeader(title: "QNow"),
+                      const SizedBox(height: 24),
+
+                      // Role Toggle
+                      RoleToggle(
+                        initialValue: isBusinessOwner,
+                        onChanged: (isBusiness) {
+                          setState(() {
+                            isBusinessOwner = isBusiness;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Full Name
+                      AppLabels.label("Full Name"),
+                      const SizedBox(height: 6),
+                      AppTextFields.textField(
+                        hintText: "Enter your full name",
+                        controller: nameController,
+                        validator: _validateName,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Phone Number
+                      AppLabels.label("Phone Number"),
+                      const SizedBox(height: 6),
+                      AppTextFields.textField(
+                        hintText: "Enter your phone number",
+                        controller: phoneController,
+                        keyboardType: TextInputType.phone,
+                        validator: _validatePhone,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Business fields (only if selected)
+                      if (isBusinessOwner) ...[
+                        AppLabels.label("Email Address"),
+                        const SizedBox(height: 6),
+                        AppTextFields.textField(
+                          hintText: "Enter your email",
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: _validateEmail,
+                        ),
+                        const SizedBox(height: 14),
+
+                        AppLabels.label("Business Name"),
+                        const SizedBox(height: 6),
+                        AppTextFields.textField(
+                          hintText: "Enter your business name",
+                          controller: businessNameController,
+                          validator: _validateBusinessName,
+                        ),
+                        const SizedBox(height: 14),
+
+                        AppLabels.label("Business Location"),
+                        const SizedBox(height: 6),
+                        AppTextFields.textField(
+                          hintText: "Enter your business location",
+                          controller: businessLocationController,
+                          validator: _validateBusinessLocation,
+>>>>>>> Stashed changes
                         ),
                         const SizedBox(height: 14),
                       ],
 
+<<<<<<< Updated upstream
                       _buildLabel("Password"),
                       _buildPasswordField(
                         hint: "Enter your password",
@@ -400,6 +558,64 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             ),
                           ),
                         ],
+=======
+                      // Password
+                      AppLabels.label("Password"),
+                      const SizedBox(height: 6),
+                      AppTextFields.passwordField(
+                        hintText: "Enter your password",
+                        controller: passwordController,
+                        isVisible: showPassword,
+                        onToggleVisibility: () =>
+                            setState(() => showPassword = !showPassword),
+                        validator: _validatePassword,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Confirm Password
+                      AppLabels.label("Confirm Password"),
+                      const SizedBox(height: 6),
+                      AppTextFields.passwordField(
+                        hintText: "Confirm your password",
+                        controller: confirmPasswordController,
+                        isVisible: showConfirmPassword,
+                        onToggleVisibility: () => setState(
+                          () => showConfirmPassword = !showConfirmPassword,
+                        ),
+                        validator: _validateConfirmPassword,
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Sign Up Button
+                      AppButtons.primaryButton(
+                        text: "Sign Up",
+                        onPressed: _createAccount,
+                      ),
+                      const SizedBox(height: 18),
+
+                      // Already have account
+                      Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Already have an account? ",
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.textSecondaryLight,
+                              ),
+                            ),
+                            AppButtons.textButton(
+                              text: "Log In",
+                              onPressed: () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LoginPage(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+>>>>>>> Stashed changes
                       ),
 
                       const SizedBox(height: 36),
@@ -413,6 +629,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       ),
     );
   }
+<<<<<<< Updated upstream
 
   Widget _buildLabel(String text) {
     return Text(
@@ -525,3 +742,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 }
+=======
+}
+>>>>>>> Stashed changes
