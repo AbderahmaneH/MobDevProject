@@ -147,8 +147,6 @@ class AppColors {
   }
 
   // Material Color generation for primary color
-  static MaterialColor get primarySwatch =>
-      MaterialColor(primary.value, const <int, Color>{
     static MaterialColor get primarySwatch =>
       MaterialColor(0xFF333333, const <int, Color>{
         50: Color(0xFFE8EAF6),
