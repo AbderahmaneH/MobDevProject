@@ -11,7 +11,6 @@ import '../drawer/settings_page.dart';
 import '../drawer/about_us_page.dart';
 import '../login_signup/login_page.dart';
 import '../business/queue_page.dart';
-
 class BusinessOwnerPage extends StatelessWidget {
   final User user;
 
@@ -315,9 +314,9 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: queue.isActive
-                      ? AppColors.success.withOpacity(0.1)
-                      : AppColors.error.withOpacity(0.1),
+                    color: queue.isActive
+                      ? AppColors.success.withAlpha((0.1 * 255).round())
+                      : AppColors.error.withAlpha((0.1 * 255).round()),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -558,8 +557,8 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                     style: AppTextStyles.getAdaptiveStyle(
                       context,
                       fontSize: 14,
-                      lightColor: AppColors.white.withOpacity(0.8),
-                      darkColor: AppColors.white.withOpacity(0.8),
+                      lightColor: AppColors.white.withAlpha((0.8 * 255).round()),
+                      darkColor: AppColors.white.withAlpha((0.8 * 255).round()),
                     ),
                   ),
                 ],

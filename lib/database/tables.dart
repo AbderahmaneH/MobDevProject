@@ -118,7 +118,7 @@ class Queue {
 
 // Queue Client Model
 class QueueClient {
-  final int id;
+  final int? id;
   final int queueId;
   final int userId;
   final String name;
@@ -130,7 +130,7 @@ class QueueClient {
   final DateTime? notifiedAt;
 
   QueueClient({
-    required this.id,
+    this.id,
     required this.queueId,
     required this.userId,
     required this.name,
@@ -149,7 +149,6 @@ class QueueClient {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'queue_id': queueId,
       'user_id': userId,
       'name': name,
@@ -159,6 +158,7 @@ class QueueClient {
       'joined_at': joinedAt.millisecondsSinceEpoch,
       'served_at': servedAt?.millisecondsSinceEpoch,
       'notified_at': notifiedAt?.millisecondsSinceEpoch,
+      if(id != null) 'id': id,
     };
   }
 

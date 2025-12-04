@@ -159,7 +159,7 @@ class QueueCubit extends Cubit<QueueState> {
     }
   }
 
-  Future<void> removeClientFromQueue(int clientId) async {
+  Future<void> removeClientFromQueue(int? clientId) async {
     try {
       await _dbHelper.deleteQueueClient(clientId);
       await loadQueues();
@@ -169,7 +169,7 @@ class QueueCubit extends Cubit<QueueState> {
     }
   }
 
-  Future<void> serveClient(int clientId) async {
+  Future<void> serveClient(int? clientId) async {
     try {
       await _dbHelper.updateClientStatus(clientId, 'served');
       await loadQueues();
@@ -179,7 +179,7 @@ class QueueCubit extends Cubit<QueueState> {
     }
   }
 
-  Future<void> notifyClient(int clientId) async {
+  Future<void> notifyClient(int? clientId) async {
     try {
       await _dbHelper.updateClientStatus(clientId, 'notified');
       await loadQueues();

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../core/app_colors.dart';
-import '../core/localization.dart';
-import '../logic/app_cubit.dart';
-import '../presentation/login_signup/login_page.dart';
-import '../core/common_widgets.dart';
+import '../../core/app_colors.dart';
+import '../../core/localization.dart';
+import '../../logic/app_cubit.dart';
+import '../../presentation/login_signup/login_page.dart';
+import '../../core/common_widgets.dart';
+
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
 
@@ -93,7 +94,7 @@ class WelcomePage extends StatelessWidget {
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withAlpha((0.1 * 255).round()),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(

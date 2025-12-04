@@ -6,6 +6,7 @@ import '../../database/db_helper.dart';
 import '../../database/tables.dart';
 import '../../core/common_widgets.dart';
 import '../../core/localization.dart';
+
 class QueuePage extends StatelessWidget {
   final Queue queue;
 
@@ -313,7 +314,7 @@ class _QueueViewState extends State<QueueView> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withAlpha((0.1 * 255).round()),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(

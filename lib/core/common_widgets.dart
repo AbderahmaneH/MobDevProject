@@ -32,7 +32,7 @@ class AppButtons {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? (isDark ? AppColors.primary : AppColors.primary),
-          disabledBackgroundColor: (backgroundColor ?? AppColors.primary).withOpacity(0.5),
+          disabledBackgroundColor: (backgroundColor ?? AppColors.primary).withAlpha((0.5 * 255).round()),
           foregroundColor: textColor ?? AppColors.white,
           padding: padding ?? const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
           shape: RoundedRectangleBorder(
@@ -423,7 +423,7 @@ class AppLabels {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: backgroundColor ?? (isDark ? AppColors.primary.withOpacity(0.2) : AppColors.primary.withOpacity(0.1)),
+      color: backgroundColor ?? (isDark ? AppColors.primary.withAlpha((0.2 * 255).round()) : AppColors.primary.withAlpha((0.1 * 255).round())),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -466,7 +466,7 @@ class AppContainers {
           boxShadow: shadow ??
               [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                  color: Colors.black.withAlpha(isDark ? (0.2 * 255).round() : (0.05 * 255).round()),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -493,7 +493,7 @@ class AppContainers {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.1),
+            color: Colors.black.withAlpha(isDark ? (0.2 * 255).round() : (0.1 * 255).round()),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -518,8 +518,8 @@ class AppContainers {
             style: AppTextStyles.getAdaptiveStyle(
               context,
               fontSize: 12,
-              lightColor: textColor?.withOpacity(0.8) ?? AppColors.textSecondaryDark,
-              darkColor: textColor?.withOpacity(0.8) ?? AppColors.textSecondaryDark,
+              lightColor: textColor?.withAlpha((0.8 * 255).round()) ?? AppColors.textSecondaryDark,
+              darkColor: textColor?.withAlpha((0.8 * 255).round()) ?? AppColors.textSecondaryDark,
             ),
           ),
         ],
@@ -590,11 +590,9 @@ class RoleToggle extends StatelessWidget {
   final bool isBusinessOwner;
   final ValueChanged<bool> onChanged;
   final Duration animationDuration;
-  final BuildContext context;
 
-  RoleToggle({
+  const RoleToggle({
     super.key,
-    required this.context,
     required this.isBusinessOwner,
     required this.onChanged,
     this.animationDuration = const Duration(milliseconds: 300),
@@ -790,7 +788,7 @@ class LogoHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.3 : 0.2),
+                  color: Colors.black.withAlpha(isDark ? (0.3 * 255).round() : (0.2 * 255).round()),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),

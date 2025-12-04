@@ -109,27 +109,33 @@ class _JoinQueueViewState extends State<JoinQueueView> {
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(context.loc('cancel')),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              // Use the outer widget context to access the provided CustomerCubit
-              try {
-                await context.read<CustomerCubit>().joinQueue(queueId);
-                // Close dialog then pop page returning a true result to indicate join
-                Navigator.pop(dialogContext);
-                if (Navigator.canPop(context)) {
-                  Navigator.pop(context, true);
-                } else {
-                  Navigator.pop(context);
-                }
-              } catch (_) {
-                Navigator.pop(dialogContext);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(context.loc('error')),
-                    backgroundColor: AppColors.error,
-                  ),
-                );
-              }
+              ElevatedButton(
+                onPressed: () async {
+                  // Capture references before the async gap
+                  final customerCubit = context.read<CustomerCubit>();
+                  final navigator = Navigator.of(context);
+                  final messenger = ScaffoldMessenger.of(context);
+                  final canPopNow = Navigator.canPop(context);
+                  try {
+                    await customerCubit.joinQueue(queueId);
+                    if (!mounted) return;
+                    // Close dialog then pop page returning a true result to indicate join
+                    Navigator.pop(dialogContext);
+                    if (canPopNow) {
+                      navigator.pop(true);
+                    } else {
+                      navigator.pop();
+                    }
+                  } catch (_) {
+                    Navigator.pop(dialogContext);
+                    if (!mounted) return;
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(context.loc('error')),
+                        backgroundColor: AppColors.error,
+                      ),
+                    );
+                  }
             },
             child: Text(context.loc('join')),
           ),
@@ -197,25 +203,25 @@ class _JoinQueueViewState extends State<JoinQueueView> {
               ),
 
               // Status badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isFull
-                      ? AppColors.error.withOpacity(0.1)
-                      : AppColors.success.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  isFull ? context.loc('full') : context.loc('available'),
-                  style: AppTextStyles.getAdaptiveStyle(
-                    context,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    lightColor: isFull ? AppColors.error : AppColors.success,
-                    darkColor: isFull ? AppColors.error : AppColors.success,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: isFull
+                          ? AppColors.error.withAlpha((0.1 * 255).round())
+                          : AppColors.success.withAlpha((0.1 * 255).round()),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      isFull ? context.loc('full') : context.loc('available'),
+                      style: AppTextStyles.getAdaptiveStyle(
+                        context,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        lightColor: isFull ? AppColors.error : AppColors.success,
+                        darkColor: isFull ? AppColors.error : AppColors.success,
+                      ),
+                    ),
                   ),
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 16),

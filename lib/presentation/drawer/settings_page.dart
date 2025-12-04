@@ -38,7 +38,7 @@ class SettingsPage extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.1),
+                                  color: AppColors.primary.withAlpha((0.1 * 255).round()),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Icon(
@@ -204,7 +204,7 @@ class SettingsPage extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.1),
+                                  color: AppColors.primary.withAlpha((0.1 * 255).round()),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Icon(
@@ -369,7 +369,7 @@ class SettingsPage extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.1),
+                                  color: AppColors.primary.withAlpha((0.1 * 255).round()),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Icon(
@@ -432,7 +432,7 @@ class SettingsPage extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.1),
+                                  color: AppColors.primary.withAlpha((0.1 * 255).round()),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Icon(
@@ -532,7 +532,7 @@ class SettingsPage extends StatelessWidget {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: AppColors.primary,
+          activeThumbColor: AppColors.primary,
         ),
       ],
     );
@@ -550,7 +550,7 @@ class SettingsPage extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
+          color: AppColors.primary.withAlpha((0.1 * 255).round()),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, color: textColor ?? AppColors.primary, size: 20),

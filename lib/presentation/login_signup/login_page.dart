@@ -6,9 +6,9 @@ import '../../logic/auth_cubit.dart';
 import '../../database/db_helper.dart';
 import '../../core/common_widgets.dart';
 import '../../database/tables.dart';
-import '../login_signup/signup_page.dart';
-import '../business/business_owner_page.dart';
-import '../customer/customer_page.dart';
+import '../../presentation/login_signup/signup_page.dart';
+import '../../presentation/business/business_owner_page.dart';
+import '../../presentation/customer/customer_page.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -108,7 +108,6 @@ class _LoginViewState extends State<LoginView> {
 
                         // Role Toggle
                         RoleToggle(
-                          context: context,
                           isBusinessOwner: _isBusiness,
                           onChanged: (isBusiness) {
                             setState(() {

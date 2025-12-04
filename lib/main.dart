@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '/logic/app_cubit.dart';
-import '/logic/auth_cubit.dart';
-import '/database/db_helper.dart';
-import '/core/localization.dart';
+import 'logic/app_cubit.dart';
+import 'logic/auth_cubit.dart';
+import 'database/db_helper.dart';
+import 'core/localization.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import '/core/app_colors.dart';
-import '/presentation/welcome_page.dart';
+import 'core/app_colors.dart';
+import 'presentation/welcome_page.dart';
 
 void main() {
   runApp(const MyApp());

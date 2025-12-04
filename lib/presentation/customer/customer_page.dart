@@ -6,11 +6,12 @@ import '../../database/db_helper.dart';
 import '../../database/tables.dart';
 import '../../core/common_widgets.dart';
 import '../../core/localization.dart';
-import '../drawer/profile_page.dart';
-import '../drawer/settings_page.dart';
-import '../drawer/about_us_page.dart';
-import '../login_signup/login_page.dart';
-import '../customer/join_queue_page.dart';
+import '../../presentation/drawer/profile_page.dart';
+import '../../presentation/drawer/settings_page.dart';
+import '../../presentation/drawer/about_us_page.dart';
+import '../../presentation/login_signup/login_page.dart';
+import '../../presentation/customer/join_queue_page.dart';
+
 class CustomerPage extends StatelessWidget {
   final User user;
 
@@ -19,10 +20,8 @@ class CustomerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CustomerCubit(
-        dbHelper: DatabaseHelper(),
-        userId: user.id,
-      ),
+      create: (context) =>
+          CustomerCubit(dbHelper: DatabaseHelper(), userId: user.id),
       child: CustomerView(user: user),
     );
   }
@@ -46,7 +45,6 @@ class _CustomerViewState extends State<CustomerView> {
     _searchController.dispose();
     super.dispose();
   }
-  
 
   void _toggleSearch() {
     setState(() {
@@ -68,7 +66,7 @@ class _CustomerViewState extends State<CustomerView> {
 
   void _leaveQueue(int queueId) {
     final customerCubit = context.read<CustomerCubit>();
-    
+
     showDialog(
       context: context,
       builder: (dialogContext) {
@@ -91,9 +89,7 @@ class _CustomerViewState extends State<CustomerView> {
                   ),
                 );
               },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.error,
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
               child: Text(context.loc('leave')),
             ),
           ],
@@ -117,12 +113,14 @@ class _CustomerViewState extends State<CustomerView> {
         joinedAt: DateTime.now(),
       ),
     );
-    
+
     final position = userClient.position > 0 ? userClient.position : null;
-    final peopleAhead = position != null 
-        ? queue.clients.where((c) => c.position < position && c.status == 'waiting').length
+    final peopleAhead = position != null
+        ? queue.clients
+              .where((c) => c.position < position && c.status == 'waiting')
+              .length
         : 0;
-    
+
     final estimatedWait = peopleAhead * queue.estimatedWaitTime;
 
     return AppContainers.card(
@@ -183,23 +181,30 @@ class _CustomerViewState extends State<CustomerView> {
 
               // Status badge
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: queue.isActive 
-                      ? AppColors.success.withOpacity(0.1)
-                      : AppColors.error.withOpacity(0.1),
+                  color: queue.isActive
+                      ? AppColors.success.withAlpha((0.1 * 255).round())
+                      : AppColors.error.withAlpha((0.1 * 255).round()),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  queue.isActive 
-                      ? context.loc('active') 
+                  queue.isActive
+                      ? context.loc('active')
                       : context.loc('inactive'),
                   style: AppTextStyles.getAdaptiveStyle(
                     context,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    lightColor: queue.isActive ? AppColors.success : AppColors.error,
-                    darkColor: queue.isActive ? AppColors.success : AppColors.error,
+                    lightColor: queue.isActive
+                        ? AppColors.success
+                        : AppColors.error,
+                    darkColor: queue.isActive
+                        ? AppColors.success
+                        : AppColors.error,
                   ),
                 ),
               ),
@@ -217,7 +222,7 @@ class _CustomerViewState extends State<CustomerView> {
               ),
               _buildStatItem(
                 icon: Icons.trending_up,
-                text: position != null 
+                text: position != null
                     ? '${context.loc('position')} #$position'
                     : context.loc('not_joined'),
               ),
@@ -233,15 +238,6 @@ class _CustomerViewState extends State<CustomerView> {
           if (position != null)
             Row(
               children: [
-                Expanded(
-                  child: AppButtons.secondaryButton(
-                    text: context.loc('view_details'),
-                    onPressed: () {
-                      // TODO: Navigate to queue details
-                    },
-                    context: context,
-                  ),
-                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppButtons.primaryButton(
@@ -275,8 +271,6 @@ class _CustomerViewState extends State<CustomerView> {
       ],
     );
   }
-  
-  
 
   @override
   Widget build(BuildContext context) {
@@ -285,6 +279,10 @@ class _CustomerViewState extends State<CustomerView> {
       endDrawer: _buildDrawer(context),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
+          // Capture objects that will be used after the async gap
+          final customerCubit = context.read<CustomerCubit>();
+          final messenger = ScaffoldMessenger.of(context);
+
           final result = await Navigator.push<bool?>(
             context,
             MaterialPageRoute(
@@ -292,12 +290,15 @@ class _CustomerViewState extends State<CustomerView> {
             ),
           );
 
+          if (!mounted) return;
+
           // If joined (true), refresh joined queues to show the newly-joined queue
           if (result == true) {
             try {
-              await context.read<CustomerCubit>().loadJoinedQueues();
+              await customerCubit.loadJoinedQueues();
             } catch (_) {}
-            ScaffoldMessenger.of(context).showSnackBar(
+            if (!mounted) return;
+            messenger.showSnackBar(
               SnackBar(
                 content: Text(context.loc('joined_queue')),
                 backgroundColor: AppColors.success,
@@ -392,8 +393,10 @@ class _CustomerViewState extends State<CustomerView> {
                         builder: (context, state) {
                           if (state is CustomerLoaded) {
                             final joinedQueues = state.joinedQueues;
-                            final activeQueues = joinedQueues.where((q) => q.isActive).length;
-                            
+                            final activeQueues = joinedQueues
+                                .where((q) => q.isActive)
+                                .length;
+
                             return Row(
                               children: [
                                 Expanded(
@@ -452,9 +455,8 @@ class _CustomerViewState extends State<CustomerView> {
                     return SliverToBoxAdapter(
                       child: AppStates.errorState(
                         message: state.error,
-                        onRetry: () => context
-                            .read<CustomerCubit>()
-                            .loadJoinedQueues(),
+                        onRetry: () =>
+                            context.read<CustomerCubit>().loadJoinedQueues(),
                         context: context,
                       ),
                     );
@@ -534,8 +536,11 @@ class _CustomerViewState extends State<CustomerView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Icon(Icons.access_time_filled,
-                      color: AppColors.white, size: 48),
+                  const Icon(
+                    Icons.access_time_filled,
+                    color: AppColors.white,
+                    size: 48,
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     context.loc('app_title'),
@@ -553,8 +558,10 @@ class _CustomerViewState extends State<CustomerView> {
                     style: AppTextStyles.getAdaptiveStyle(
                       context,
                       fontSize: 14,
-                      lightColor: AppColors.white.withOpacity(0.8),
-                      darkColor: AppColors.white.withOpacity(0.8),
+                      lightColor: AppColors.white.withAlpha(
+                        (0.8 * 255).round(),
+                      ),
+                      darkColor: AppColors.white.withAlpha((0.8 * 255).round()),
                     ),
                   ),
                 ],
@@ -571,7 +578,8 @@ class _CustomerViewState extends State<CustomerView> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProfilePage(user: widget.user), // Pass actual user
+                    builder: (context) =>
+                        ProfilePage(user: widget.user), // Pass actual user
                   ),
                 );
               },
@@ -584,9 +592,7 @@ class _CustomerViewState extends State<CustomerView> {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const SettingsPage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
                 );
               },
             ),
@@ -606,9 +612,7 @@ class _CustomerViewState extends State<CustomerView> {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const AboutUsPage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const AboutUsPage()),
                 );
               },
             ),
@@ -623,9 +627,7 @@ class _CustomerViewState extends State<CustomerView> {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginPage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
                 );
               },
             ),
@@ -644,10 +646,7 @@ class _CustomerViewState extends State<CustomerView> {
     Color? textColor,
   }) {
     return ListTile(
-      leading: Icon(
-        icon,
-        color: iconColor ?? AppColors.primary,
-      ),
+      leading: Icon(icon, color: iconColor ?? AppColors.primary),
       title: Text(
         title,
         style: AppTextStyles.getAdaptiveStyle(

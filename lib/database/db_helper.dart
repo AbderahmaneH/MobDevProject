@@ -280,6 +280,23 @@ class DatabaseHelper {
     return queues;
   }
 
+  Future<int> getActiveQueuesCountForUser(int userId) async {
+    final db = await database;
+    final maps = await db.rawQuery(
+      '''
+      SELECT COUNT(DISTINCT queue_id) as cnt
+      FROM ${DatabaseTables.queueClients}
+      WHERE user_id = ? AND status != ?
+      ''',
+      [userId, 'served'],
+    );
+
+    final cnt = maps.first['cnt'];
+    if (cnt is int) return cnt;
+    if (cnt is int?) return cnt ?? 0;
+    return int.tryParse(cnt.toString()) ?? 0;
+  }
+
   Future<QueueClient?> getQueueClient(int queueId, int userId) async {
     final db = await database;
     final maps = await db.query(
@@ -303,7 +320,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> deleteQueueClient(int id) async {
+  Future<int> deleteQueueClient(int? id) async {
     final db = await database;
     return await db.delete(
       DatabaseTables.queueClients,
@@ -327,7 +344,7 @@ class DatabaseHelper {
     return (maxPosition as int? ?? 0) + 1;
   }
 
-  Future<void> updateClientStatus(int clientId, String status) async {
+  Future<void> updateClientStatus(int? clientId, String status) async {
     final db = await database;
     final now = DateTime.now().millisecondsSinceEpoch;
 

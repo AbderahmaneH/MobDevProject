@@ -202,7 +202,7 @@ class _ProfileViewState extends State<ProfileView> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withAlpha((0.1 * 255).round()),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: AppColors.primary, size: 20),
@@ -347,8 +347,8 @@ class _ProfileViewState extends State<ProfileView> {
                               style: AppTextStyles.getAdaptiveStyle(
                                 context,
                                 fontSize: 14,
-                                lightColor: AppColors.white.withOpacity(0.8),
-                                darkColor: AppColors.white.withOpacity(0.8),
+                                lightColor: AppColors.white.withAlpha((0.8 * 255).round()),
+                                darkColor: AppColors.white.withAlpha((0.8 * 255).round()),
                               ),
                             ),
                           ],
@@ -363,7 +363,7 @@ class _ProfileViewState extends State<ProfileView> {
                           AppButtons.iconButton(
                             icon: _isEditing ? Icons.save : Icons.edit,
                             onPressed: _saveProfile,
-                            backgroundColor: AppColors.primary.withOpacity(0.1),
+                            backgroundColor: AppColors.primary.withAlpha((0.1 * 255).round()),
                             iconColor: AppColors.primary,
                           ),
                         ],
@@ -431,7 +431,7 @@ class _ProfileViewState extends State<ProfileView> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.1),
+                                color: AppColors.primary.withAlpha((0.1 * 255).round()),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
