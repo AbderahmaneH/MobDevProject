@@ -11,6 +11,7 @@ import '../drawer/settings_page.dart';
 import '../drawer/about_us_page.dart';
 import '../login_signup/login_page.dart';
 import '../business/queue_page.dart';
+
 class BusinessOwnerPage extends StatelessWidget {
   final User user;
 
@@ -58,6 +59,7 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
   void _addQueue() {
     final queueCubit = context.read<QueueCubit>();
     final queueNameController = TextEditingController();
+    final queueSizeController = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
     showDialog(
@@ -68,25 +70,47 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
           title: Text(context.loc('add_queue')),
           content: Form(
             key: formKey,
-            child: AppTextFields.textField(
-              context: dialogContext,
-              hintText: context.loc('queue_name'),
-              controller: queueNameController,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return context.loc('required_field');
-                }
-                if (value.length < 2) {
-                  return context.loc('invalid_name');
-                }
-                return null;
-              },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppTextFields.textField(
+                  context: dialogContext,
+                  hintText: context.loc('queue_name'),
+                  controller: queueNameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return context.loc('required_field');
+                    }
+                    if (value.length < 2) {
+                      return context.loc('invalid_name');
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                AppTextFields.textField(
+                  context: dialogContext,
+                  hintText: 'Max Size (Default: 50)',
+                  controller: queueSizeController,
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty) {
+                      final size = int.tryParse(value);
+                      if (size == null || size <= 0) {
+                        return 'Invalid size';
+                      }
+                    }
+                    return null;
+                  },
+                ),
+              ],
             ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 queueNameController.clear();
+                queueSizeController.clear();
                 Navigator.pop(dialogContext);
               },
               child: Text(context.loc('cancel')),
@@ -94,8 +118,15 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
             ElevatedButton(
               onPressed: () {
                 if (formKey.currentState!.validate()) {
-                  queueCubit.createQueue(name: queueNameController.text.trim());
+                  final size = int.tryParse(queueSizeController.text.trim()) ?? 50;
+                  
+                  queueCubit.createQueue(
+                    name: queueNameController.text.trim(),
+                    maxSize: size,
+                  );
+                  
                   queueNameController.clear();
+                  queueSizeController.clear();
                   Navigator.pop(dialogContext);
                 }
               },
