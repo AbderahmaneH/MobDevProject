@@ -174,9 +174,17 @@ class QNowLocalizations {
       'missed_turn': 'You missed your turn',
       'notification': 'Notification',
       'notifications': 'Notifications',
+      'queue_notifications': 'Queue Notifications',
+      'queue_notifications_subtitle': 'Get notified when your turn is near',
+      'promotional_notifications': 'Promotional Notifications',
+      'promotional_notifications_subtitle': 'Receive offers and updates',
+      'sound_alerts': 'Sound Alerts',
+      'sound_alerts_subtitle': 'Play sound for notifications',
       
       // Settings & Help
       'settings': 'Settings',
+      'privacy_security': 'Privacy & Security',
+      'delete_account': 'Delete Account',
       'help': 'Help & Support',
       'about': 'About Us',
       'contact_support': 'Contact Support',
@@ -192,6 +200,7 @@ class QNowLocalizations {
       'feedback': 'Feedback',
       'rate_app': 'Rate App',
       'share_app': 'Share App',
+      'profile_updated' : 'Profile Updated',
       
       // Business Specific
       'business_info': 'Business Information',
@@ -283,7 +292,7 @@ class QNowLocalizations {
       'login': 'Connexion',
       'signup': 'S\'inscrire',
       'sign_out': 'Déconnexion',
-      'business_owner': 'Propriétaire d\'entreprise',
+      'business_owner': 'Entrepreneur',
       'customer': 'Client',
       'email': 'E-mail',
       'password': 'Mot de passe',
@@ -396,9 +405,17 @@ class QNowLocalizations {
       'missed_turn': 'Vous avez manqué votre tour',
       'notification': 'Notification',
       'notifications': 'Notifications',
+      'queue_notifications': 'Notifications de file',
+      'queue_notifications_subtitle': 'Être averti quand votre tour approche',
+      'promotional_notifications': 'Notifications promotionnelles',
+      'promotional_notifications_subtitle': 'Recevoir des offres et mises à jour',
+      'sound_alerts': 'Alertes sonores',
+      'sound_alerts_subtitle': 'Jouer un son pour les notifications',
       
       // Settings & Help
       'settings': 'Paramètres',
+      'privacy_security': 'Confidentialité et sécurité',
+      'delete_account': 'Supprimer le compte',
       'help': 'Aide & Support',
       'about': 'À propos',
       'contact_support': 'Contacter le support',
@@ -414,6 +431,7 @@ class QNowLocalizations {
       'feedback': 'Retour',
       'rate_app': 'Noter l\'app',
       'share_app': 'Partager l\'app',
+      'profile_updated' : 'Profil changé',
       
       // Business Specific
       'business_info': 'Informations de l\'entreprise',
@@ -617,9 +635,17 @@ class QNowLocalizations {
       'missed_turn': 'لقد فاتك دورك',
       'notification': 'إشعار',
       'notifications': 'الإشعارات',
+      'queue_notifications': 'إشعارات الطابور',
+      'queue_notifications_subtitle': 'احصل على إشعار عندما يقترب دورك',
+      'promotional_notifications': 'الإشعارات الترويجية',
+      'promotional_notifications_subtitle': 'تلقي العروض والتحديثات',
+      'sound_alerts': 'التنبيهات الصوتية',
+      'sound_alerts_subtitle': 'تشغيل الصوت للإشعارات',
       
       // Settings & Help
       'settings': 'الإعدادات',
+      'privacy_security': 'الخصوصية والأمان',
+      'delete_account': 'حذف الحساب',
       'help': 'المساعدة والدعم',
       'about': 'حول التطبيق',
       'contact_support': 'اتصل بالدعم',
@@ -635,6 +661,7 @@ class QNowLocalizations {
       'feedback': 'التقييم',
       'rate_app': 'قيم التطبيق',
       'share_app': 'شارك التطبيق',
+      'profile_updated' : 'تم تحديث الملف الشخصي',
       
       // Business Specific
       'business_info': 'معلومات العمل',

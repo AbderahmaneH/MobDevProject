@@ -5,13 +5,23 @@ import '../../logic/app_cubit.dart';
 import '../../core/localization.dart';
 import '../../core/common_widgets.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  bool queueNotifications = true;
+  bool promotionalNotifications = false;
+  bool soundAlerts = true;
+
+  @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: isDark ? AppColors.black : AppColors.backgroundLight,
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -61,297 +71,7 @@ class SettingsPage extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          // In the theme toggle section:
-                          BlocBuilder<AppCubit, AppState>(
-                            builder: (context, state) {
-                              final isDarkMode = state is AppLoaded
-                                  ? state.isDarkMode
-                                  : false;
-
-                              return Row(
-                                children: [
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        if (isDarkMode) {
-                                          context
-                                              .read<AppCubit>()
-                                              .toggleTheme();
-                                        }
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 12,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: !isDarkMode
-                                              ? AppColors.primary
-                                              : AppColors.buttonSecondaryLight,
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                          border: Border.all(
-                                            color: !isDarkMode
-                                                ? AppColors.primary
-                                                : Colors.transparent,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.light_mode,
-                                              color: !isDarkMode
-                                                  ? AppColors.white
-                                                  : AppColors.textPrimaryLight,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              'Light',
-                                              style: TextStyle(
-                                                color: !isDarkMode
-                                                    ? AppColors.white
-                                                    : AppColors
-                                                          .textPrimaryLight,
-                                                fontWeight: !isDarkMode
-                                                    ? FontWeight.w600
-                                                    : FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        if (!isDarkMode) {
-                                          context
-                                              .read<AppCubit>()
-                                              .toggleTheme();
-                                        }
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 12,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: isDarkMode
-                                              ? AppColors.primary
-                                              : AppColors.buttonSecondaryLight,
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                          border: Border.all(
-                                            color: isDarkMode
-                                                ? AppColors.primary
-                                                : Colors.transparent,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.dark_mode,
-                                              color: isDarkMode
-                                                  ? AppColors.white
-                                                  : AppColors.textPrimaryLight,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              'Dark',
-                                              style: TextStyle(
-                                                color: isDarkMode
-                                                    ? AppColors.white
-                                                    : AppColors
-                                                          .textPrimaryLight,
-                                                fontWeight: isDarkMode
-                                                    ? FontWeight.w600
-                                                    : FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Theme Settings
-                    AppContainers.card(
-                      context: context,
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withAlpha((0.1 * 255).round()),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.dark_mode_outlined,
-                                  color: AppColors.primary,
-                                  size: 24,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Text(
-                                  'Theme',
-                                  style: AppTextStyles.getAdaptiveStyle(
-                                    context,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          BlocBuilder<AppCubit, AppState>(
-                            builder: (context, state) {
-                              final isDarkMode = state is AppLoaded
-                                  ? state.isDarkMode
-                                  : false;
-
-                              return Row(
-                                children: [
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        if (isDarkMode) {
-                                          context
-                                              .read<AppCubit>()
-                                              .toggleTheme();
-                                        }
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 12,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: !isDarkMode
-                                              ? AppColors.primary
-                                              : AppColors.buttonSecondaryLight,
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                          border: Border.all(
-                                            color: !isDarkMode
-                                                ? AppColors.primary
-                                                : Colors.transparent,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.light_mode,
-                                              color: !isDarkMode
-                                                  ? AppColors.white
-                                                  : AppColors.textPrimaryLight,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              'Light',
-                                              style: TextStyle(
-                                                color: !isDarkMode
-                                                    ? AppColors.white
-                                                    : AppColors
-                                                          .textPrimaryLight,
-                                                fontWeight: !isDarkMode
-                                                    ? FontWeight.w600
-                                                    : FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        if (!isDarkMode) {
-                                          context
-                                              .read<AppCubit>()
-                                              .toggleTheme();
-                                        }
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 12,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: isDarkMode
-                                              ? AppColors.primary
-                                              : AppColors.buttonSecondaryLight,
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                          border: Border.all(
-                                            color: isDarkMode
-                                                ? AppColors.primary
-                                                : Colors.transparent,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.dark_mode,
-                                              color: isDarkMode
-                                                  ? AppColors.white
-                                                  : AppColors.textPrimaryLight,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              'Dark',
-                                              style: TextStyle(
-                                                color: isDarkMode
-                                                    ? AppColors.white
-                                                    : AppColors
-                                                          .textPrimaryLight,
-                                                fontWeight: isDarkMode
-                                                    ? FontWeight.w600
-                                                    : FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
+                          _buildLanguageSelector(context),
                         ],
                       ),
                     ),
@@ -381,7 +101,7 @@ class SettingsPage extends StatelessWidget {
                               const SizedBox(width: 16),
                               Expanded(
                                 child: Text(
-                                  'Notifications',
+                                  context.loc('notifications'),
                                   style: AppTextStyles.getAdaptiveStyle(
                                     context,
                                     fontSize: 16,
@@ -394,26 +114,38 @@ class SettingsPage extends StatelessWidget {
                           const SizedBox(height: 16),
                           _buildSwitchSetting(
                             context: context,
-                            title: 'Queue Notifications',
-                            subtitle: 'Get notified when your turn is near',
-                            value: true,
-                            onChanged: (value) {},
+                            title: context.loc('queue_notifications'),
+                            subtitle: context.loc('queue_notifications_subtitle'),
+                            value: queueNotifications,
+                            onChanged: (value) {
+                              setState(() {
+                                queueNotifications = value;
+                              });
+                            },
                           ),
                           const SizedBox(height: 12),
                           _buildSwitchSetting(
                             context: context,
-                            title: 'Promotional Notifications',
-                            subtitle: 'Receive offers and updates',
-                            value: false,
-                            onChanged: (value) {},
+                            title: context.loc('promotional_notifications'),
+                            subtitle: context.loc('promotional_notifications_subtitle'),
+                            value: promotionalNotifications,
+                            onChanged: (value) {
+                              setState(() {
+                                promotionalNotifications = value;
+                              });
+                            },
                           ),
                           const SizedBox(height: 12),
                           _buildSwitchSetting(
                             context: context,
-                            title: 'Sound Alerts',
-                            subtitle: 'Play sound for notifications',
-                            value: true,
-                            onChanged: (value) {},
+                            title: context.loc('sound_alerts'),
+                            subtitle: context.loc('sound_alerts_subtitle'),
+                            value: soundAlerts,
+                            onChanged: (value) {
+                              setState(() {
+                                soundAlerts = value;
+                              });
+                            },
                           ),
                         ],
                       ),
@@ -444,7 +176,7 @@ class SettingsPage extends StatelessWidget {
                               const SizedBox(width: 16),
                               Expanded(
                                 child: Text(
-                                  'Privacy & Security',
+                                  context.loc('privacy_security'),
                                   style: AppTextStyles.getAdaptiveStyle(
                                     context,
                                     fontSize: 16,
@@ -458,7 +190,7 @@ class SettingsPage extends StatelessWidget {
                           _buildListTile(
                             context: context,
                             icon: Icons.privacy_tip_outlined,
-                            title: 'Privacy Policy',
+                            title: context.loc('privacy_policy'),
                             onTap: () {
                               // TODO: Show privacy policy
                             },
@@ -467,7 +199,7 @@ class SettingsPage extends StatelessWidget {
                           _buildListTile(
                             context: context,
                             icon: Icons.description_outlined,
-                            title: 'Terms of Service',
+                            title: context.loc('terms_of_service'),
                             onTap: () {
                               // TODO: Show terms of service
                             },
@@ -476,7 +208,7 @@ class SettingsPage extends StatelessWidget {
                           _buildListTile(
                             context: context,
                             icon: Icons.delete_outline,
-                            title: 'Delete Account',
+                            title: context.loc('delete_account'),
                             onTap: () {
                               // TODO: Show delete account confirmation
                             },
@@ -571,6 +303,77 @@ class SettingsPage extends StatelessWidget {
         color: AppColors.textSecondaryLight,
       ),
       onTap: onTap,
+    );
+  }
+
+  Widget _buildLanguageSelector(BuildContext context) {
+    final languages = [
+      {'code': 'en', 'name': 'English', 'flag': '🇺🇸'},
+      {'code': 'fr', 'name': 'Français', 'flag': '🇫🇷'},
+      {'code': 'ar', 'name': 'العربية', 'flag': '🇸🇦'},
+    ];
+
+    return BlocBuilder<AppCubit, AppState>(
+      builder: (context, state) {
+        final currentLanguage = QNowLocalizations().currentLocale.languageCode;
+
+        return Column(
+          children: [
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: languages.map((lang) {
+                final isSelected = currentLanguage == lang['code'];
+                return GestureDetector(
+                  onTap: () {
+                    context.read<AppCubit>().changeLanguage(Locale(lang['code']!));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.buttonSecondaryLight,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.primary
+                            : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          lang['flag']!,
+                          style: const TextStyle(fontSize: 28),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          lang['name']!,
+                          style: TextStyle(
+                            color: isSelected
+                                ? AppColors.white
+                                : AppColors.textPrimaryLight,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../logic/app_cubit.dart';
 
 class AppColors {
   // Primary Colors - Modern Blue
@@ -96,6 +97,16 @@ class AppColors {
   static const Color grey700 = Color(0xFF616161);
   static const Color grey800 = Color(0xFF424242);
   static const Color grey900 = Color(0xFF212121);
+
+  // Ocean Theme Colors
+  static const Color oceanPrimary = Color(0xFF0077BE); // Deep Ocean Blue
+  static const Color oceanPrimaryLight = Color(0xFF00B4D8);
+  static const Color oceanPrimaryDark = Color(0xFF005A87);
+  static const Color oceanBackgroundLight = Color(0xFFF0F8FF); // Alice Blue
+  static const Color oceanBackgroundDark = Color(0xFF001F3F); // Very Dark Ocean Blue
+  static const Color oceanSurfaceLight = Color(0xFFFFFFFF);
+  static const Color oceanSurfaceDark = Color(0xFF00293C);
+  static const Color oceanSecondary = Color(0xFF00D4FF); // Cyan/Turquoise
 
   // Gradient Colors
   static const Gradient primaryGradient = LinearGradient(
@@ -392,6 +403,17 @@ class AppTextStyles {
 
 // Theme data for easy app theming
 class AppTheme {
+  static ThemeData getThemeData(AppThemeMode themeMode) {
+    switch (themeMode) {
+      case AppThemeMode.light:
+        return lightTheme;
+      case AppThemeMode.dark:
+        return darkTheme;
+      case AppThemeMode.ocean:
+        return oceanTheme;
+    }
+  }
+
   static ThemeData get lightTheme => ThemeData(
     useMaterial3: true,
     primarySwatch: AppColors.primarySwatch,
@@ -477,31 +499,134 @@ class AppTheme {
 
   static ThemeData get darkTheme => ThemeData(
     useMaterial3: true,
-    primarySwatch: AppColors.primarySwatch,
-    primaryColor: AppColors.primary,
-    scaffoldBackgroundColor: AppColors.backgroundDark,
+    primaryColor: AppColors.black,
+    scaffoldBackgroundColor: AppColors.black,
     appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: AppColors.black,
       surfaceTintColor: AppColors.transparent,
       elevation: 0,
       centerTitle: true,
-      titleTextStyle: AppTextStyles.titleLargeDark,
-      iconTheme: const IconThemeData(color: AppColors.textPrimaryDark),
+      titleTextStyle: AppTextStyles.titleLargeDark.copyWith(
+        color: AppColors.white,
+      ),
+      iconTheme: const IconThemeData(color: AppColors.white),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.inputBackgroundDark,
+      fillColor: AppColors.grey900,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.inputBorderDark),
+        borderSide: const BorderSide(color: AppColors.grey700),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.inputBorderDark),
+        borderSide: const BorderSide(color: AppColors.grey700),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        borderSide: const BorderSide(color: AppColors.white, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.error),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      labelStyle: const TextStyle(color: AppColors.grey400),
+      hintStyle: const TextStyle(color: AppColors.grey500),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.white,
+        foregroundColor: AppColors.black,
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        textStyle: AppTextStyles.buttonMediumDark.copyWith(
+          color: AppColors.black,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.white,
+        side: const BorderSide(color: AppColors.white),
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        textStyle: AppTextStyles.buttonMediumDark.copyWith(
+          color: AppColors.white,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.white,
+        textStyle: AppTextStyles.bodyMediumDark.copyWith(
+          color: AppColors.white,
+        ),
+      ),
+    ),
+    dividerTheme: const DividerThemeData(
+      color: AppColors.grey800,
+      thickness: 1,
+      space: 0,
+    ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: AppColors.white,
+      foregroundColor: AppColors.black,
+    ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: AppColors.grey900,
+      contentTextStyle: AppTextStyles.bodyMediumDark.copyWith(
+        color: AppColors.white,
+      ),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    ),
+    cardTheme: const CardThemeData(
+      color: AppColors.grey900,
+      elevation: 2,
+    ),
+    iconTheme: const IconThemeData(
+      color: AppColors.white,
+    ),
+    textTheme: TextTheme(
+      bodyLarge: AppTextStyles.bodyLargeDark.copyWith(color: AppColors.white),
+      bodyMedium: AppTextStyles.bodyMediumDark.copyWith(color: AppColors.white),
+      bodySmall: AppTextStyles.bodySmallDark.copyWith(color: AppColors.grey400),
+      titleLarge: AppTextStyles.titleLargeDark.copyWith(color: AppColors.white),
+      titleMedium: AppTextStyles.titleMediumDark.copyWith(color: AppColors.white),
+    ),
+  );
+
+  static ThemeData get oceanTheme => ThemeData(
+    useMaterial3: true,
+    primaryColor: AppColors.oceanPrimary,
+    scaffoldBackgroundColor: AppColors.oceanBackgroundDark,
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.oceanBackgroundDark,
+      surfaceTintColor: AppColors.transparent,
+      elevation: 0,
+      centerTitle: true,
+      titleTextStyle: AppTextStyles.titleLargeDark.copyWith(
+        color: AppColors.oceanPrimaryLight,
+      ),
+      iconTheme: const IconThemeData(color: AppColors.oceanPrimaryLight),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppColors.oceanSurfaceDark,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.oceanPrimary),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.oceanPrimary),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.oceanSecondary, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
@@ -511,7 +636,7 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.oceanPrimary,
         foregroundColor: AppColors.white,
         minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -521,40 +646,41 @@ class AppTheme {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.primary,
-        side: const BorderSide(color: AppColors.primary),
+        foregroundColor: AppColors.oceanPrimary,
+        side: const BorderSide(color: AppColors.oceanPrimary),
         minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         textStyle: AppTextStyles.buttonMediumDark.copyWith(
-          color: AppColors.primary,
+          color: AppColors.oceanPrimary,
         ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: AppColors.primary,
+        foregroundColor: AppColors.oceanPrimary,
         textStyle: AppTextStyles.bodyMediumDark.copyWith(
-          color: AppColors.primary,
+          color: AppColors.oceanPrimary,
         ),
       ),
     ),
     dividerTheme: const DividerThemeData(
-      color: AppColors.dividerDark,
+      color: AppColors.oceanPrimary,
       thickness: 1,
       space: 0,
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.oceanPrimary,
       foregroundColor: AppColors.white,
     ),
     snackBarTheme: SnackBarThemeData(
-      backgroundColor: AppColors.grey200,
+      backgroundColor: AppColors.oceanBackgroundDark,
       contentTextStyle: AppTextStyles.bodyMediumDark.copyWith(
-        color: AppColors.black,
+        color: AppColors.oceanSecondary,
       ),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
   );
 }
+
