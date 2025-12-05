@@ -1,144 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../core/app_colors.dart';
-import '../../core/localization.dart';
-import '../../logic/app_cubit.dart';
-import '../../presentation/login_signup/login_page.dart';
-import '../../core/common_widgets.dart';
+import '../../src/generated/l10n/app_localizations.dart';
+import 'login_signup/login_page.dart';
+import 'customer/customer_page.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Access localization
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Language selector
-              _buildLanguageSelector(context),
-
-              // Main content
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Logo
-                    LogoHeader(
-                      title: context.loc('app_title'),
-                      subtitle: context.loc('welcome'),
-                      icon: Icons.access_time_filled,
-                      iconSize: 60,
-                      iconContainerSize: 30,
+              const Spacer(),
+              const Icon(Icons.queue, size: 80, color: Colors.blue),
+              const SizedBox(height: 32),
+              Text(
+                l10n.welcomeTitle, // Localized
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
-
-                    const SizedBox(height: 40),
-
-                    // App description
-                    Text(
-                      context.loc('manage_your_queues'),
-                      style: AppTextStyles.getAdaptiveStyle(
-                        context,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    const SizedBox(height: 60),
-
-                    // Buttons
-                    Column(
-                      children: [
-                        AppButtons.primaryButton(
-                          text: context.loc('get_started'),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const LoginPage(),
-                              ),
-                            );
-                          },
-                          context: context,
-                        ),
-
-                        const SizedBox(height: 16),
-                      ],
-                    ),
-                  ],
-                ),
+                textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.welcomeSubtitle, // Localized
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const Spacer(),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: Text(l10n.businessOwner), // Localized
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CustomerPage()),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: Text(l10n.customer), // Localized
+              ),
+              const SizedBox(height: 32),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildLanguageSelector(BuildContext context) {
-    return BlocBuilder<AppCubit, AppState>(
-      builder: (context, state) {
-        final currentLocale = QNowLocalizations().currentLocale;
-
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            PopupMenuButton<Locale>(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withAlpha((0.1 * 255).round()),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      QNowLocalizations().getLanguageFlag(
-                        currentLocale.languageCode,
-                      ),
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(Icons.arrow_drop_down, color: AppColors.primary),
-                  ],
-                ),
-              ),
-              onSelected: (locale) {
-                context.read<AppCubit>().changeLanguage(locale);
-              },
-              itemBuilder: (context) {
-                return QNowLocalizations().supportedLocalesList.map((locale) {
-                  return PopupMenuItem<Locale>(
-                    value: locale,
-                    child: Row(
-                      children: [
-                        Text(
-                          QNowLocalizations().getLanguageFlag(
-                            locale.languageCode,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          QNowLocalizations().getLanguageName(
-                            locale.languageCode,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }

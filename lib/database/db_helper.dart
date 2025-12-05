@@ -55,7 +55,6 @@ class DatabaseHelper {
     return await db.insert(
       DatabaseTables.users,
       user.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
@@ -129,7 +128,6 @@ class DatabaseHelper {
     return await db.insert(
       DatabaseTables.queues,
       queue.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
@@ -154,7 +152,7 @@ class DatabaseHelper {
       DatabaseTables.queues,
       where: 'business_owner_id = ?',
       whereArgs: [businessOwnerId],
-      orderBy: 'created_at DESC',
+      orderBy: 'created_at DESC, id DESC',
     );
 
     final queues = maps.map((map) => Queue.fromMap(map)).toList();
@@ -232,7 +230,6 @@ class DatabaseHelper {
     return await db.insert(
       DatabaseTables.queueClients,
       client.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 

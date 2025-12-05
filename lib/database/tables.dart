@@ -29,19 +29,24 @@ class User {
   });
 
   Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'email': email,
-      'phone': phone,
-      'password': password,
-      'is_business': isBusiness ? 1 : 0,
-      'created_at': createdAt.millisecondsSinceEpoch,
-      'business_name': businessName,
-      'business_type': businessType,
-      'business_address': businessAddress,
-      if (id != null) 'id': id,
-    };
+  final map = {
+    'name': name,
+    'email': email,
+    'phone': phone,
+    'password': password,
+    'is_business': isBusiness ? 1 : 0,
+    'created_at': createdAt.millisecondsSinceEpoch,
+    'business_name': businessName,
+    'business_type': businessType,
+    'business_address': businessAddress,
+  };
+
+  if (id != null) {
+    map['id'] = id;
   }
+
+  return map;
+}
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
