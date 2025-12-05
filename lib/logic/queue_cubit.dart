@@ -65,7 +65,7 @@ class QueueCubit extends Cubit<QueueState> {
     try {
       final existingQueue = await _dbHelper.getQueueById(queueId);
       if (existingQueue == null) {
-        emit(QueueError(error: 'Queue not found'));
+        emit(const QueueError(error: 'Queue not found'));
         return;
       }
       
