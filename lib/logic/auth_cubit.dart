@@ -10,8 +10,8 @@ class AuthCubit extends Cubit<AuthState> {
   final DatabaseHelper _dbHelper;
 
   AuthCubit({required DatabaseHelper dbHelper})
-      : _dbHelper = dbHelper,
-        super(AuthInitial());
+    : _dbHelper = dbHelper,
+      super(AuthInitial());
 
   Future<void> login(String phone, String password, bool isBusiness) async {
     emit(AuthLoading());
@@ -59,7 +59,7 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       final user = User(
-        id: null, // Will be auto-generated
+        id: 0, // Will be auto-generated
         name: name,
         email: email,
         phone: phone,
@@ -120,7 +120,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> changePassword({
-    required int? userId,
+    required int userId,
     required String currentPassword,
     required String newPassword,
   }) async {
@@ -186,8 +186,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
     return null;
   }
-
-  String? validateEmail(String? value, BuildContext context, bool isBusiness) {
+  String? validateEmail(String? value , BuildContext context, bool isBusiness) {
     if (isBusiness && (value == null || value.isEmpty)) {
       return context.loc('required_field');
     }
@@ -196,9 +195,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
     return null;
   }
-
-  String? validateConfirmPassword(
-      String? value, BuildContext context, String password) {
+    String? validateConfirmPassword(String? value , BuildContext context , String password) {
     if (value == null || value.isEmpty) {
       return context.loc('required_field');
     }
@@ -207,23 +204,19 @@ class AuthCubit extends Cubit<AuthState> {
     }
     return null;
   }
-
-  String? validateBusinessName(
-      String? value, BuildContext context, bool isBusiness) {
+  String? validateBusinessName(String? value , BuildContext context, bool isBusiness) {
     if (isBusiness && (value == null || value.isEmpty)) {
       return context.loc('required_field');
     }
     return null;
   }
-
-  String? validateBusinessAddress(
-      String? value, BuildContext context, bool isBusiness) {
+  String? validateBusinessAddress(String? value , BuildContext context, bool isBusiness) {
     if (isBusiness && (value == null || value.isEmpty)) {
       return context.loc('required_field');
     }
     return null;
   }
-
+  
   void logout() {
     emit(AuthInitial());
   }

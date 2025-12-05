@@ -55,10 +55,11 @@ class DatabaseHelper {
     return await db.insert(
       DatabaseTables.users,
       user.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<User?> getUserById(int? id) async {
+  Future<User?> getUserById(int id) async {
     final db = await database;
     final maps = await db.query(
       DatabaseTables.users,
@@ -128,6 +129,7 @@ class DatabaseHelper {
     return await db.insert(
       DatabaseTables.queues,
       queue.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
@@ -146,17 +148,17 @@ class DatabaseHelper {
     return null;
   }
 
-  Future<List<Queue>> getQueuesByBusinessOwner(int? businessOwnerId) async {
+  Future<List<Queue>> getQueuesByBusinessOwner(int businessOwnerId) async {
     final db = await database;
     final maps = await db.query(
       DatabaseTables.queues,
       where: 'business_owner_id = ?',
       whereArgs: [businessOwnerId],
-      orderBy: 'created_at DESC, id DESC',
     );
 
     final queues = maps.map((map) => Queue.fromMap(map)).toList();
 
+    // Load clients for each queue
     for (final queue in queues) {
       queue.clients = await getQueueClients(queue.id);
     }
@@ -230,6 +232,7 @@ class DatabaseHelper {
     return await db.insert(
       DatabaseTables.queueClients,
       client.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
@@ -244,7 +247,7 @@ class DatabaseHelper {
     return maps.map((map) => QueueClient.fromMap(map)).toList();
   }
 
-  Future<List<Queue>> getQueuesByUser(int? userId) async {
+  Future<List<Queue>> getQueuesByUser(int userId) async {
     final db = await database;
 
     // Get all queue IDs where user is a client
@@ -277,7 +280,7 @@ class DatabaseHelper {
     return queues;
   }
 
-  Future<int> getActiveQueuesCountForUser(int? userId) async {
+  Future<int> getActiveQueuesCountForUser(int userId) async {
     final db = await database;
     final maps = await db.rawQuery(
       '''
@@ -294,7 +297,7 @@ class DatabaseHelper {
     return int.tryParse(cnt.toString()) ?? 0;
   }
 
-  Future<QueueClient?> getQueueClient(int queueId, int? userId) async {
+  Future<QueueClient?> getQueueClient(int queueId, int userId) async {
     final db = await database;
     final maps = await db.query(
       DatabaseTables.queueClients,

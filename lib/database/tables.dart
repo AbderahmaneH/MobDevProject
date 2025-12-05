@@ -4,7 +4,7 @@
 
 // User Model
 class User {
-  final int? id;
+  final int id;
   final String name;
   final String? email;
   final String phone;
@@ -16,7 +16,7 @@ class User {
   String? businessAddress;
 
   User({
-    this.id,
+    required this.id,
     required this.name,
     this.email,
     required this.phone,
@@ -29,24 +29,19 @@ class User {
   });
 
   Map<String, dynamic> toMap() {
-  final map = {
-    'name': name,
-    'email': email,
-    'phone': phone,
-    'password': password,
-    'is_business': isBusiness ? 1 : 0,
-    'created_at': createdAt.millisecondsSinceEpoch,
-    'business_name': businessName,
-    'business_type': businessType,
-    'business_address': businessAddress,
-  };
-
-  if (id != null) {
-    map['id'] = id;
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'password': password,
+      'is_business': isBusiness ? 1 : 0,
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'business_name': businessName,
+      'business_type': businessType,
+      'business_address': businessAddress,
+    };
   }
-
-  return map;
-}
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
@@ -67,7 +62,7 @@ class User {
 // Queue Model
 class Queue {
   final int id;
-  final int? businessOwnerId;
+  final int businessOwnerId;
   final String name;
   final String? description;
   final int maxSize;
@@ -94,7 +89,8 @@ class Queue {
   int get notifiedCount => clients.where((c) => c.status == 'notified').length;
 
   Map<String, dynamic> toMap() {
-    final map = {
+    return {
+      'id': id,
       'business_owner_id': businessOwnerId,
       'name': name,
       'description': description,
@@ -103,12 +99,6 @@ class Queue {
       'is_active': isActive ? 1 : 0,
       'created_at': createdAt.millisecondsSinceEpoch,
     };
-
-    if (id != 0) {
-      map['id'] = id;
-    }
-
-    return map;
   }
 
   factory Queue.fromMap(Map<String, dynamic> map) {
@@ -130,7 +120,7 @@ class Queue {
 class QueueClient {
   final int? id;
   final int queueId;
-  final int? userId;
+  final int userId;
   final String name;
   final String phone;
   final int position;
@@ -142,7 +132,7 @@ class QueueClient {
   QueueClient({
     this.id,
     required this.queueId,
-    this.userId,
+    required this.userId,
     required this.name,
     required this.phone,
     required this.position,
@@ -168,7 +158,7 @@ class QueueClient {
       'joined_at': joinedAt.millisecondsSinceEpoch,
       'served_at': servedAt?.millisecondsSinceEpoch,
       'notified_at': notifiedAt?.millisecondsSinceEpoch,
-      if (id != null) 'id': id,
+      if(id != null) 'id': id,
     };
   }
 
@@ -182,7 +172,7 @@ class QueueClient {
       position: map['position'],
       status: map['status'],
       joinedAt: DateTime.fromMillisecondsSinceEpoch(map['joined_at']),
-      servedAt: map['served_at'] != null
+      servedAt: map['served_at'] != null 
           ? DateTime.fromMillisecondsSinceEpoch(map['served_at'])
           : null,
       notifiedAt: map['notified_at'] != null
@@ -197,7 +187,7 @@ class DatabaseTables {
   static const String users = 'users';
   static const String queues = 'queues';
   static const String queueClients = 'queue_clients';
-
+  
   static const String createUsersTable = '''
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -212,7 +202,7 @@ class DatabaseTables {
       business_address TEXT
     )
   ''';
-
+  
   static const String createQueuesTable = '''
     CREATE TABLE IF NOT EXISTS queues (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -226,7 +216,7 @@ class DatabaseTables {
       FOREIGN KEY (business_owner_id) REFERENCES users (id) ON DELETE CASCADE
     )
   ''';
-
+  
   static const String createQueueClientsTable = '''
     CREATE TABLE IF NOT EXISTS queue_clients (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -244,7 +234,7 @@ class DatabaseTables {
       UNIQUE(queue_id, user_id)
     )
   ''';
-
+  
   static const List<String> createTableQueries = [
     createUsersTable,
     createQueuesTable,
@@ -254,17 +244,12 @@ class DatabaseTables {
 
 // Database Indexes
 class DatabaseIndexes {
-  static const String usersPhoneIndex =
-      'CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone)';
-  static const String queuesBusinessOwnerIndex =
-      'CREATE INDEX IF NOT EXISTS idx_queues_business_owner ON queues(business_owner_id)';
-  static const String queueClientsQueueIndex =
-      'CREATE INDEX IF NOT EXISTS idx_queue_clients_queue ON queue_clients(queue_id)';
-  static const String queueClientsUserIndex =
-      'CREATE INDEX IF NOT EXISTS idx_queue_clients_user ON queue_clients(user_id)';
-  static const String queueClientsStatusIndex =
-      'CREATE INDEX IF NOT EXISTS idx_queue_clients_status ON queue_clients(status)';
-
+  static const String usersPhoneIndex = 'CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone)';
+  static const String queuesBusinessOwnerIndex = 'CREATE INDEX IF NOT EXISTS idx_queues_business_owner ON queues(business_owner_id)';
+  static const String queueClientsQueueIndex = 'CREATE INDEX IF NOT EXISTS idx_queue_clients_queue ON queue_clients(queue_id)';
+  static const String queueClientsUserIndex = 'CREATE INDEX IF NOT EXISTS idx_queue_clients_user ON queue_clients(user_id)';
+  static const String queueClientsStatusIndex = 'CREATE INDEX IF NOT EXISTS idx_queue_clients_status ON queue_clients(status)';
+  
   static const List<String> createIndexQueries = [
     usersPhoneIndex,
     queuesBusinessOwnerIndex,

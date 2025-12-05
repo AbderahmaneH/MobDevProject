@@ -7,9 +7,9 @@ part 'customer_state.dart';
 
 class CustomerCubit extends Cubit<CustomerState> {
   final DatabaseHelper _dbHelper;
-  final int? _userId;
+  final int _userId;
 
-  CustomerCubit({required DatabaseHelper dbHelper, required int? userId})
+  CustomerCubit({required DatabaseHelper dbHelper, required int userId})
     : _dbHelper = dbHelper,
       _userId = userId,
       super(CustomerInitial()) {

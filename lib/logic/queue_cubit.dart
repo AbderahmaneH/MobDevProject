@@ -6,11 +6,11 @@ part 'queue_state.dart';
 
 class QueueCubit extends Cubit<QueueState> {
   final DatabaseHelper _dbHelper;
-  final int? _businessOwnerId;
+  final int _businessOwnerId;
 
   QueueCubit({
     required DatabaseHelper dbHelper,
-    required int? businessOwnerId,
+    required int businessOwnerId,
   })  : _dbHelper = dbHelper,
         _businessOwnerId = businessOwnerId,
         super(QueueInitial()) {
@@ -37,7 +37,7 @@ class QueueCubit extends Cubit<QueueState> {
     try {
       final queue = Queue(
         id: 0,
-        businessOwnerId: _businessOwnerId, // Fixed: Using private variable
+        businessOwnerId: _businessOwnerId,
         name: name,
         description: description,
         maxSize: maxSize,
@@ -47,10 +47,8 @@ class QueueCubit extends Cubit<QueueState> {
       );
       
       await _dbHelper.insertQueue(queue);
-      
-      // Fixed: Emit Created first, then loadQueues so the UI updates
+      await loadQueues(); // Refresh the list
       emit(QueueCreated());
-      await loadQueues(); 
     } catch (e) {
       emit(QueueError(error: 'Failed to create queue: $e'));
     }
@@ -67,7 +65,7 @@ class QueueCubit extends Cubit<QueueState> {
     try {
       final existingQueue = await _dbHelper.getQueueById(queueId);
       if (existingQueue == null) {
-        emit(QueueError(error: 'Queue not found'));
+        emit(const QueueError(error: 'Queue not found'));
         return;
       }
       

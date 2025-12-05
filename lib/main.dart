@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'logic/auth_cubit.dart';
 import 'logic/app_cubit.dart';
-import 'presentation/welcome_page.dart';
-import 'src/generated/l10n/app_localizations.dart';
+import 'logic/auth_cubit.dart';
 import 'database/db_helper.dart';
+import 'core/localization.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'core/app_colors.dart';
+import 'presentation/welcome_page.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() {
   runApp(const MyApp());
 }
 
@@ -17,34 +17,70 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    final databaseHelper = DatabaseHelper();
+    
+    return MultiRepositoryProvider(
       providers: [
-        BlocProvider(
-            create: (context) => AuthCubit(dbHelper: DatabaseHelper())),
-        BlocProvider(create: (context) => AppCubit()),
+        RepositoryProvider.value(value: databaseHelper),
       ],
-      child: MaterialApp(
-        title: 'Qline',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          useMaterial3: true,
-          fontFamily: 'Poppins',
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => AppCubit()),
+          BlocProvider(create: (context) => AuthCubit(dbHelper: databaseHelper)),
+        ],
+        child: Builder(
+          builder: (context) {
+            return BlocBuilder<AppCubit, AppState>(
+              builder: (context, state) {
+                Locale currentLocale = QNowLocalizations().currentLocale;
+                
+                // Update locale if state has changed
+                if (state is LanguageChanged) {
+                  currentLocale = state.locale;
+                }
+                
+                return MaterialApp(
+                  debugShowCheckedModeBanner: false,
+                  title: QNowLocalizations.getTranslation('app_title'),
+                  theme: AppTheme.lightTheme,
+                  darkTheme: AppTheme.darkTheme,
+                  themeMode: state is AppLoaded && state.isDarkMode 
+                      ? ThemeMode.dark 
+                      : ThemeMode.light,
+                  supportedLocales: QNowLocalizations().supportedLocalesList,
+                  locale: currentLocale,
+                    localizationsDelegates: [
+                      GlobalMaterialLocalizations.delegate,
+                      GlobalWidgetsLocalizations.delegate,
+                      GlobalCupertinoLocalizations.delegate,
+                    ],
+                    localeResolutionCallback: (locale, supported) {
+                      if (locale == null) return QNowLocalizations().currentLocale;
+                      for (final supportedLocale in supported) {
+                        if (supportedLocale.languageCode == locale.languageCode) {
+                          return supportedLocale;
+                        }
+                      }
+                      return QNowLocalizations().currentLocale;
+                    },
+                  builder: (context, child) {
+                    return BlocListener<AuthCubit, AuthState>(
+                      listener: (context, state) {
+                        if (state is AuthSuccess) {
+                          context.read<AppCubit>().setUserLoggedIn(true, user: state.user);
+                        } else if (state is AuthInitial) {
+                          context.read<AppCubit>().setUserLoggedIn(false);
+                        }
+                      },
+                      child: child,
+                    );
+                  },
+                  home: const WelcomePage(),
+                );
+              },
+            );
+          },
         ),
-        // Localization Configuration
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en'), // English
-          Locale('fr'), // French
-          Locale('ar'), // Arabic
-        ],
-        // Set initial route
-        home: const WelcomePage(),
       ),
     );
   }
