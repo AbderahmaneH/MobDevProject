@@ -34,10 +34,16 @@ class MyApp extends StatelessWidget {
             return BlocBuilder<AppCubit, AppState>(
               builder: (context, state) {
                 Locale currentLocale = QNowLocalizations().currentLocale;
+                AppThemeMode currentThemeMode = AppThemeMode.light;
                 
                 // Update locale if state has changed
                 if (state is LanguageChanged) {
                   currentLocale = state.locale;
+                }
+                
+                // Get theme mode from state
+                if (state is AppLoaded) {
+                  currentThemeMode = state.themeMode;
                 }
                 
                 return MaterialApp(
@@ -45,9 +51,7 @@ class MyApp extends StatelessWidget {
                   title: QNowLocalizations.getTranslation('app_title'),
                   theme: AppTheme.lightTheme,
                   darkTheme: AppTheme.darkTheme,
-                  themeMode: state is AppLoaded && state.isDarkMode 
-                      ? ThemeMode.dark 
-                      : ThemeMode.light,
+                  themeMode: currentThemeMode == AppThemeMode.dark ? ThemeMode.dark : ThemeMode.light,
                   supportedLocales: QNowLocalizations().supportedLocalesList,
                   locale: currentLocale,
                     localizationsDelegates: [

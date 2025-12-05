@@ -13,14 +13,29 @@ class AppCubit extends Cubit<AppState> {
     emit(LanguageChanged(locale: locale));
   }
 
+  void changeTheme(AppThemeMode themeMode) {
+    final currentState = state;
+    final isDarkMode = themeMode != AppThemeMode.light;
+    if (currentState is AppLoaded) {
+      emit(currentState.copyWith(
+        themeMode: themeMode,
+        isDarkMode: isDarkMode,
+      ));
+    } else {
+      emit(AppLoaded(
+        isDarkMode: isDarkMode,
+        themeMode: themeMode,
+      ));
+    }
+  }
+
   void toggleTheme() {
     final currentState = state;
     if (currentState is AppLoaded) {
-      emit(currentState.copyWith(
-        isDarkMode: !currentState.isDarkMode,
-      ));
+      final nextTheme = currentState.isDarkMode ? AppThemeMode.light : AppThemeMode.dark;
+      changeTheme(nextTheme);
     } else {
-      emit(const AppLoaded(isDarkMode: true));
+      changeTheme(AppThemeMode.dark);
     }
   }
 
