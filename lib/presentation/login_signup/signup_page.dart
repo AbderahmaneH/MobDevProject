@@ -9,6 +9,8 @@ import '../../core/common_widgets.dart';
 import '../../presentation/login_signup/login_page.dart';
 import '../../presentation/business/business_owner_page.dart';
 import '../../presentation/customer/customer_page.dart';
+import '../../database/models/user_model.dart';
+import '../../database/repositories/user_repository.dart';
 
 class SignupPage extends StatelessWidget {
   const SignupPage({super.key});
@@ -17,7 +19,7 @@ class SignupPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AuthCubit(
-        dbHelper: DatabaseHelper(),
+        userRepository: UserRepository(databaseHelper: DatabaseHelper()),
       ),
       child: const SignupView(),
     );
@@ -87,7 +89,7 @@ class _SignupViewState extends State<SignupView> {
           listener: (context, state) {
             if (state is AuthSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('Account created successfully!'),
                   backgroundColor: AppColors.success,
                 ),

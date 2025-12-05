@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/app_colors.dart';
-import '../../logic/customer_cubit.dart';
-import '../../database/db_helper.dart';
-import '../../database/tables.dart';
-import '../../core/common_widgets.dart';
 import '../../core/localization.dart';
-import '../../presentation/drawer/profile_page.dart';
-import '../../presentation/drawer/settings_page.dart';
-import '../../presentation/drawer/about_us_page.dart';
-import '../../presentation/login_signup/login_page.dart';
-import '../../presentation/customer/join_queue_page.dart';
+import '../../logic/customer_cubit.dart';
+import '../../core/common_widgets.dart';
+import '../../database/models/queue_model.dart';
+import '../../database/models/user_model.dart';
+import '../../database/repositories/queue_repository.dart';
+import '../../database/repositories/queue_client_repository.dart';
+import '../../database/repositories/user_repository.dart';
+import '../../database/db_helper.dart';
+import '../drawer/profile_page.dart';
+import '../drawer/settings_page.dart';
+import '../drawer/about_us_page.dart';
+import '../login_signup/login_page.dart';
+import '../../database/models/queue_client_model.dart';
+import 'join_queue_page.dart';
 
 class CustomerPage extends StatelessWidget {
   final User user;
@@ -21,7 +26,7 @@ class CustomerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          CustomerCubit(dbHelper: DatabaseHelper(), userId: user.id),
+          CustomerCubit(queueRepository: QueueRepository(databaseHelper: DatabaseHelper()), queueClientRepository: QueueClientRepository(databaseHelper: DatabaseHelper()),userRepository: UserRepository(databaseHelper: DatabaseHelper()), userId: user.id),
       child: CustomerView(user: user),
     );
   }
@@ -142,7 +147,7 @@ class _CustomerViewState extends State<CustomerView> {
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.access_time,
                   color: AppColors.white,
                   size: 24,
@@ -531,7 +536,7 @@ class _CustomerViewState extends State<CustomerView> {
           children: [
             // Header
             DrawerHeader(
-              decoration: BoxDecoration(color: AppColors.primary),
+              decoration: const BoxDecoration(color: AppColors.primary),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,

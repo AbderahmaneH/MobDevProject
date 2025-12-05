@@ -1,17 +1,22 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../database/tables.dart';
-import '../database/db_helper.dart';
+import '../database/repositories/queue_repository.dart';
+import '../database/repositories/queue_client_repository.dart';
+import '../database/models/queue_client_model.dart';
+import '../database/models/queue_model.dart';
 
 part 'queue_state.dart';
 
 class QueueCubit extends Cubit<QueueState> {
-  final DatabaseHelper _dbHelper;
-  final int _businessOwnerId;
+  final QueueRepository _queueRepository;
+  final QueueClientRepository _queueClientRepository;
+  final int? _businessOwnerId;
 
   QueueCubit({
-    required DatabaseHelper dbHelper,
-    required int businessOwnerId,
-  })  : _dbHelper = dbHelper,
+    required QueueRepository queueRepository,
+    required QueueClientRepository queueClientRepository,
+    required int? businessOwnerId,
+  })  : _queueRepository = queueRepository,
+        _queueClientRepository = queueClientRepository,
         _businessOwnerId = businessOwnerId,
         super(QueueInitial()) {
     loadQueues();
@@ -19,9 +24,9 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> loadQueues() async {
     emit(QueueLoading());
-    
+
     try {
-      final queues = await _dbHelper.getQueuesByBusinessOwner(_businessOwnerId);
+      final queues = await _queueRepository.getQueuesByBusinessOwner(_businessOwnerId);
       emit(QueueLoaded(queues: queues));
     } catch (e) {
       emit(QueueError(error: 'Failed to load queues: $e'));
@@ -45,8 +50,8 @@ class QueueCubit extends Cubit<QueueState> {
         isActive: true,
         createdAt: DateTime.now(),
       );
-      
-      await _dbHelper.insertQueue(queue);
+
+      await _queueRepository.insertQueue(queue);
       await loadQueues(); // Refresh the list
       emit(QueueCreated());
     } catch (e) {
@@ -63,12 +68,12 @@ class QueueCubit extends Cubit<QueueState> {
     bool? isActive,
   }) async {
     try {
-      final existingQueue = await _dbHelper.getQueueById(queueId);
+      final existingQueue = await _queueRepository.getQueueById(queueId);
       if (existingQueue == null) {
         emit(const QueueError(error: 'Queue not found'));
         return;
       }
-      
+
       final updatedQueue = Queue(
         id: queueId,
         businessOwnerId: _businessOwnerId,
@@ -80,8 +85,8 @@ class QueueCubit extends Cubit<QueueState> {
         createdAt: existingQueue.createdAt,
         clients: existingQueue.clients,
       );
-      
-      await _dbHelper.updateQueue(updatedQueue);
+
+      await _queueRepository.updateQueue(updatedQueue);
       await loadQueues();
       emit(QueueUpdated());
     } catch (e) {
@@ -91,7 +96,7 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> deleteQueue(int queueId) async {
     try {
-      await _dbHelper.deleteQueue(queueId);
+      await _queueRepository.deleteQueue(queueId);
       await loadQueues();
       emit(QueueDeleted());
     } catch (e) {
@@ -101,12 +106,12 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> toggleQueueStatus(int queueId) async {
     try {
-      final queue = await _dbHelper.getQueueById(queueId);
+      final queue = await _queueRepository.getQueueById(queueId);
       if (queue == null) {
-        emit(QueueError(error: 'Queue not found'));
+        emit(const QueueError(error: 'Queue not found'));
         return;
       }
-      
+
       await updateQueue(
         queueId: queueId,
         name: queue.name,
@@ -127,19 +132,19 @@ class QueueCubit extends Cubit<QueueState> {
     int? userId,
   }) async {
     try {
-      final queue = await _dbHelper.getQueueById(queueId);
+      final queue = await _queueRepository.getQueueById(queueId);
       if (queue == null) {
-        emit(QueueError(error: 'Queue not found'));
+        emit(const QueueError(error: 'Queue not found'));
         return;
       }
-      
+
       if (queue.currentSize >= queue.maxSize) {
-        emit(QueueError(error: 'Queue is full'));
+        emit(const QueueError(error: 'Queue is full'));
         return;
       }
-      
-      final nextPosition = await _dbHelper.getNextPosition(queueId);
-      
+
+      final nextPosition = await _queueClientRepository.getNextPosition(queueId);
+
       final client = QueueClient(
         id: 0,
         queueId: queueId,
@@ -150,8 +155,8 @@ class QueueCubit extends Cubit<QueueState> {
         status: 'waiting',
         joinedAt: DateTime.now(),
       );
-      
-      await _dbHelper.insertQueueClient(client);
+
+      await _queueClientRepository.insertQueueClient(client);
       await loadQueues(); // Refresh to show updated queue
       emit(ClientAdded());
     } catch (e) {
@@ -161,7 +166,7 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> removeClientFromQueue(int? clientId) async {
     try {
-      await _dbHelper.deleteQueueClient(clientId);
+      await _queueClientRepository.deleteQueueClient(clientId);
       await loadQueues();
       emit(ClientRemoved());
     } catch (e) {
@@ -171,7 +176,7 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> serveClient(int? clientId) async {
     try {
-      await _dbHelper.updateClientStatus(clientId, 'served');
+      await _queueClientRepository.updateClientStatus(clientId, 'served');
       await loadQueues();
       emit(ClientServed());
     } catch (e) {
@@ -181,7 +186,7 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> notifyClient(int? clientId) async {
     try {
-      await _dbHelper.updateClientStatus(clientId, 'notified');
+      await _queueClientRepository.updateClientStatus(clientId, 'notified');
       await loadQueues();
       emit(ClientNotified());
     } catch (e) {
@@ -192,4 +197,5 @@ class QueueCubit extends Cubit<QueueState> {
   void refreshQueues() {
     loadQueues();
   }
+  
 }

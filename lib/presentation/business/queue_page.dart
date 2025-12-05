@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/app_colors.dart';
-import '../../logic/queue_cubit.dart';
-import '../../database/db_helper.dart';
-import '../../database/tables.dart';
-import '../../core/common_widgets.dart';
 import '../../core/localization.dart';
+import '../../logic/queue_cubit.dart';
+import '../../core/common_widgets.dart';
+import '../../database/models/queue_model.dart';
+import '../../database/models/queue_client_model.dart';
+import '../../database/repositories/queue_repository.dart';
+import '../../database/repositories/queue_client_repository.dart';
+import '../../database/db_helper.dart';
 
 class QueuePage extends StatelessWidget {
   final Queue queue;
@@ -16,7 +19,9 @@ class QueuePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => QueueCubit(
-        dbHelper: DatabaseHelper(),
+        queueRepository: QueueRepository(databaseHelper: DatabaseHelper()),
+        queueClientRepository:
+            QueueClientRepository(databaseHelper: DatabaseHelper()),
         businessOwnerId: queue.businessOwnerId,
       )..loadQueues(),
       child: QueueView(queue: queue),
@@ -115,10 +120,10 @@ class _QueueViewState extends State<QueueView> {
                 if (_addClientFormKey.currentState!.validate()) {
                   // Use the outer context to access QueueCubit
                   context.read<QueueCubit>().addClientToQueue(
-                    queueId: widget.queue.id,
-                    name: _nameController.text.trim(),
-                    phone: _phoneController.text.trim(),
-                  );
+                        queueId: widget.queue.id,
+                        name: _nameController.text.trim(),
+                        phone: _phoneController.text.trim(),
+                      );
                   _nameController.clear();
                   _phoneController.clear();
                   Navigator.pop(dialogContext);
@@ -139,36 +144,37 @@ class _QueueViewState extends State<QueueView> {
   }
 
   void _serveClient(QueueClient client) {
-  showDialog(
-    context: context,
-    builder: (dialogContext) {
-      return AlertDialog(
-        title: Text(context.loc('serve_customer')),
-        content: Text('${context.loc('serve_confirm')} ${client.name}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(context.loc('cancel')),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Use context from QueueView, not dialog context
-              context.read<QueueCubit>().serveClient(client.id);
-              Navigator.pop(dialogContext);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${client.name} ${context.loc('served')}'),
-                  backgroundColor: AppColors.success,
-                ),
-              );
-            },
-            child: Text(context.loc('serve')),
-          ),
-        ],
-      );
-    },
-  );
-}
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(context.loc('serve_customer')),
+          content: Text('${context.loc('serve_confirm')} ${client.name}?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(context.loc('cancel')),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Use context from QueueView, not dialog context
+                context.read<QueueCubit>().serveClient(client.id);
+                Navigator.pop(dialogContext);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${client.name} ${context.loc('served')}'),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
+              },
+              child: Text(context.loc('serve')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _notifyClient(QueueClient client) {
     showDialog(
       context: context,
@@ -245,7 +251,7 @@ class _QueueViewState extends State<QueueView> {
                   color: _getStatusColor(client.status),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Icon(Icons.person, color: AppColors.white, size: 20),
+                child: const Icon(Icons.person, color: AppColors.white, size: 20),
               ),
               const SizedBox(width: 12),
 
@@ -265,7 +271,7 @@ class _QueueViewState extends State<QueueView> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.phone,
                           size: 14,
                           color: AppColors.textSecondaryLight,
@@ -337,9 +343,8 @@ class _QueueViewState extends State<QueueView> {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: client.notified
-                      ? null
-                      : () => _notifyClient(client),
+                  onPressed:
+                      client.notified ? null : () => _notifyClient(client),
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
                       color: client.notified
@@ -382,7 +387,7 @@ class _QueueViewState extends State<QueueView> {
               ),
               const SizedBox(width: 12),
               IconButton(
-                icon: Icon(Icons.delete, color: AppColors.error),
+                icon: const Icon(Icons.delete, color: AppColors.error),
                 onPressed: () => _removeClient(client),
               ),
             ],
@@ -399,15 +404,13 @@ class _QueueViewState extends State<QueueView> {
                 if (client.notifiedAt != null)
                   _buildTimestamp(
                     icon: Icons.notifications,
-                    text:
-                        '${context.loc('notified_at')}: '
+                    text: '${context.loc('notified_at')}: '
                         '${_formatTime(client.notifiedAt!)}',
                   ),
                 if (client.servedAt != null)
                   _buildTimestamp(
                     icon: Icons.check_circle,
-                    text:
-                        '${context.loc('served_at')}: '
+                    text: '${context.loc('served_at')}: '
                         '${_formatTime(client.servedAt!)}',
                   ),
               ],
@@ -585,13 +588,11 @@ class _QueueViewState extends State<QueueView> {
                                 ),
                                 const SizedBox(height: 12),
                                 LinearProgressIndicator(
-                                  value:
-                                      currentQueue.currentSize /
+                                  value: currentQueue.currentSize /
                                       currentQueue.maxSize,
                                   backgroundColor:
                                       AppColors.buttonSecondaryLight,
-                                  color:
-                                      currentQueue.currentSize >=
+                                  color: currentQueue.currentSize >=
                                           currentQueue.maxSize
                                       ? AppColors.error
                                       : AppColors.primary,
@@ -602,17 +603,15 @@ class _QueueViewState extends State<QueueView> {
                                           currentQueue.maxSize
                                       ? context.loc('queue_full')
                                       : '${currentQueue.maxSize - currentQueue.currentSize} '
-                                            '${context.loc('spots_available')}',
+                                          '${context.loc('spots_available')}',
                                   style: AppTextStyles.getAdaptiveStyle(
                                     context,
                                     fontSize: 12,
-                                    lightColor:
-                                        currentQueue.currentSize >=
+                                    lightColor: currentQueue.currentSize >=
                                             currentQueue.maxSize
                                         ? AppColors.error
                                         : AppColors.success,
-                                    darkColor:
-                                        currentQueue.currentSize >=
+                                    darkColor: currentQueue.currentSize >=
                                             currentQueue.maxSize
                                         ? AppColors.error
                                         : AppColors.success,

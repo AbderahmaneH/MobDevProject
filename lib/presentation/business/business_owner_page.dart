@@ -3,14 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/app_colors.dart';
 import '../../core/localization.dart';
 import '../../logic/queue_cubit.dart';
-import '../../database/db_helper.dart';
-import '../../database/tables.dart';
 import '../../core/common_widgets.dart';
+import '../../database/models/queue_model.dart';
+import '../../database/models/user_model.dart';
+import '../../database/repositories/queue_repository.dart';
+import '../../database/repositories/queue_client_repository.dart';
+import '../../database/db_helper.dart';
 import '../drawer/profile_page.dart';
 import '../drawer/settings_page.dart';
 import '../drawer/about_us_page.dart';
 import '../login_signup/login_page.dart';
 import '../business/queue_page.dart';
+
 class BusinessOwnerPage extends StatelessWidget {
   final User user;
 
@@ -19,8 +23,11 @@ class BusinessOwnerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          QueueCubit(dbHelper: DatabaseHelper(), businessOwnerId: user.id),
+      create: (context) => QueueCubit(
+          queueRepository: QueueRepository(databaseHelper: DatabaseHelper()),
+          queueClientRepository:
+              QueueClientRepository(databaseHelper: DatabaseHelper()),
+          businessOwnerId: user.id),
       child: BusinessOwnerView(user: user),
     );
   }
@@ -37,22 +44,11 @@ class BusinessOwnerView extends StatefulWidget {
 
 class _BusinessOwnerViewState extends State<BusinessOwnerView> {
   final _queueNameController = TextEditingController();
-  
 
   @override
   void dispose() {
     _queueNameController.dispose();
     super.dispose();
-  }
-
-  void _refreshQueues() {
-    context.read<QueueCubit>().refreshQueues();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(context.loc('refreshed')),
-        backgroundColor: AppColors.success,
-      ),
-    );
   }
 
   void _addQueue() {
@@ -314,7 +310,7 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                    color: queue.isActive
+                  color: queue.isActive
                       ? AppColors.success.withAlpha((0.1 * 255).round())
                       : AppColors.error.withAlpha((0.1 * 255).round()),
                   borderRadius: BorderRadius.circular(4),
@@ -327,12 +323,10 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                     context,
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    lightColor: queue.isActive
-                        ? AppColors.success
-                        : AppColors.error,
-                    darkColor: queue.isActive
-                        ? AppColors.success
-                        : AppColors.error,
+                    lightColor:
+                        queue.isActive ? AppColors.success : AppColors.error,
+                    darkColor:
+                        queue.isActive ? AppColors.success : AppColors.error,
                   ),
                 ),
               ),
@@ -413,7 +407,7 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.refresh),
-                    onPressed: _refreshQueues,
+                    onPressed: () => context.read<QueueCubit>().refreshQueues(),
                   ),
                   Builder(
                     builder: (context) => IconButton(
@@ -534,7 +528,7 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
           children: [
             // Header
             DrawerHeader(
-              decoration: BoxDecoration(color: AppColors.primary),
+              decoration: const BoxDecoration(color: AppColors.primary),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -557,7 +551,8 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                     style: AppTextStyles.getAdaptiveStyle(
                       context,
                       fontSize: 14,
-                      lightColor: AppColors.white.withAlpha((0.8 * 255).round()),
+                      lightColor:
+                          AppColors.white.withAlpha((0.8 * 255).round()),
                       darkColor: AppColors.white.withAlpha((0.8 * 255).round()),
                     ),
                   ),

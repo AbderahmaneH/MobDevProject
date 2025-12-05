@@ -3,9 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/app_colors.dart';
 import '../../logic/customer_cubit.dart';
 import '../../database/db_helper.dart';
-import '../../database/tables.dart';
 import '../../core/common_widgets.dart';
 import '../../core/localization.dart';
+import '../../database/models/user_model.dart';
+import '../../database/models/queue_model.dart';
+import '../../database/repositories/queue_repository.dart';
+import '../../database/repositories/queue_client_repository.dart';
+import '../../database/repositories/user_repository.dart';
 
 class JoinQueuePage extends StatelessWidget {
   final User user;
@@ -29,7 +33,9 @@ class JoinQueuePage extends StatelessWidget {
 
     return BlocProvider(
       create: (context) => CustomerCubit(
-        dbHelper: DatabaseHelper(),
+        queueRepository: QueueRepository(databaseHelper: DatabaseHelper()),
+        queueClientRepository: QueueClientRepository(databaseHelper: DatabaseHelper()),
+        userRepository: UserRepository(databaseHelper: DatabaseHelper()),
         userId: user.id,
       )..getAvailableQueues(),
       child: JoinQueueView(user: user),
@@ -165,7 +171,7 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                   color: isFull ? AppColors.error : AppColors.primary,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.access_time,
                   color: AppColors.white,
                   size: 24,
@@ -426,7 +432,7 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                         backgroundColor: AppColors.infoLight,
                         child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.lightbulb_outline,
                               color: AppColors.info,
                             ),

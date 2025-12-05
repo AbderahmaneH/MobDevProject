@@ -5,10 +5,11 @@ import '../../core/localization.dart';
 import '../../logic/auth_cubit.dart';
 import '../../database/db_helper.dart';
 import '../../core/common_widgets.dart';
-import '../../database/tables.dart';
 import '../../presentation/login_signup/signup_page.dart';
 import '../../presentation/business/business_owner_page.dart';
 import '../../presentation/customer/customer_page.dart';
+import '../../database/models/user_model.dart';
+import '../../database/repositories/user_repository.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -16,7 +17,9 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AuthCubit(dbHelper: DatabaseHelper()),
+      create: (context) => AuthCubit(
+        userRepository: UserRepository(databaseHelper: DatabaseHelper()),
+      ),
       child: const LoginView(),
     );
   }
