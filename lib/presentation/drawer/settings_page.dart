@@ -41,7 +41,7 @@ class SettingsPage extends StatelessWidget {
                                   color: AppColors.primary.withAlpha((0.1 * 255).round()),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Icon(
+                                child: const Icon(
                                   Icons.language,
                                   color: AppColors.primary,
                                   size: 24,
@@ -207,7 +207,7 @@ class SettingsPage extends StatelessWidget {
                                   color: AppColors.primary.withAlpha((0.1 * 255).round()),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Icon(
+                                child: const Icon(
                                   Icons.dark_mode_outlined,
                                   color: AppColors.primary,
                                   size: 24,
@@ -372,7 +372,7 @@ class SettingsPage extends StatelessWidget {
                                   color: AppColors.primary.withAlpha((0.1 * 255).round()),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Icon(
+                                child: const Icon(
                                   Icons.notifications_outlined,
                                   color: AppColors.primary,
                                   size: 24,
@@ -435,7 +435,7 @@ class SettingsPage extends StatelessWidget {
                                   color: AppColors.primary.withAlpha((0.1 * 255).round()),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Icon(
+                                child: const Icon(
                                   Icons.security_outlined,
                                   color: AppColors.primary,
                                   size: 24,

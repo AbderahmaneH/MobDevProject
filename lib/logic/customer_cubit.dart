@@ -1,16 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../database/tables.dart';
 import '../core/localization.dart';
-import '../database/db_helper.dart';
+import '../database/repositories/queue_repository.dart';
+import '../database/repositories/queue_client_repository.dart';
+import '../database/repositories/user_repository.dart';
+import '../database/models/queue_client_model.dart';
+import '../database/models/queue_model.dart';
 
 part 'customer_state.dart';
 
 class CustomerCubit extends Cubit<CustomerState> {
-  final DatabaseHelper _dbHelper;
-  final int _userId;
+  final QueueRepository _queueRepository;
+  final QueueClientRepository _queueClientRepository;
+  final UserRepository _userRepository;
+  final int? _userId;
 
-  CustomerCubit({required DatabaseHelper dbHelper, required int userId})
-    : _dbHelper = dbHelper,
+  CustomerCubit({required QueueRepository queueRepository,required UserRepository userRepository, required QueueClientRepository queueClientRepository, required int? userId})
+    : _queueRepository = queueRepository,
+      _queueClientRepository = queueClientRepository,
+      _userRepository = userRepository,
       _userId = userId,
       super(CustomerInitial()) {
     loadJoinedQueues();
@@ -20,7 +27,7 @@ class CustomerCubit extends Cubit<CustomerState> {
     emit(CustomerLoading());
 
     try {
-      final queues = await _dbHelper.getQueuesByUser(_userId);
+      final queues = await _queueClientRepository.getQueuesByUser(_userId);
       emit(CustomerLoaded(joinedQueues: queues));
     } catch (e) {
       emit(CustomerError(error: 'Failed to load joined queues: $e'));
@@ -31,7 +38,7 @@ class CustomerCubit extends Cubit<CustomerState> {
     emit(CustomerLoading());
 
     try {
-      final queues = await _dbHelper.searchQueues(query);
+      final queues = await _queueRepository.searchQueues(query);
       emit(QueuesSearched(queues: queues));
     } catch (e) {
       emit(CustomerError(error: 'Search failed: $e'));
@@ -42,7 +49,7 @@ class CustomerCubit extends Cubit<CustomerState> {
     emit(CustomerLoading());
 
     try {
-      final allQueues = await _dbHelper.getAllQueues(activeOnly: true);
+      final allQueues = await _queueRepository.getAllQueues(activeOnly: true);
       final availableQueues = allQueues
           .where((queue) => queue.currentSize < queue.maxSize)
           .toList();
@@ -55,7 +62,7 @@ class CustomerCubit extends Cubit<CustomerState> {
   Future<void> joinQueue(int queueId) async {
     try {
       // Enforce maximum of 3 joined queues per customer
-      final currentlyJoinedCount = await _dbHelper.getActiveQueuesCountForUser(_userId);
+      final currentlyJoinedCount = await _queueClientRepository.getActiveQueuesCountForUser(_userId);
       if (currentlyJoinedCount >= 3) {
         emit(
           CustomerError(
@@ -65,33 +72,33 @@ class CustomerCubit extends Cubit<CustomerState> {
         return;
       }
       // First get user details
-      final user = await _dbHelper.getUserById(_userId);
+      final user = await _userRepository.getUserById(_userId);
       if (user == null) {
-        emit(CustomerError(error: 'User not found'));
+        emit(const CustomerError(error: 'User not found'));
         return;
       }
 
       // Check if already in queue
-      final existingClient = await _dbHelper.getQueueClient(queueId, _userId);
+      final existingClient = await _queueClientRepository.getQueueClient(queueId, _userId);
       if (existingClient != null) {
-        emit(CustomerError(error: 'Already in this queue'));
+        emit(const CustomerError(error: 'Already in this queue'));
         return;
       }
 
       // Check queue capacity
-      final queue = await _dbHelper.getQueueById(queueId);
+      final queue = await _queueRepository.getQueueById(queueId);
       if (queue == null) {
-        emit(CustomerError(error: 'Queue not found'));
+        emit(const CustomerError(error: 'Queue not found'));
         return;
       }
 
       if (queue.currentSize >= queue.maxSize) {
-        emit(CustomerError(error: 'Queue is full'));
+        emit(const CustomerError(error: 'Queue is full'));
         return;
       }
 
       // Get next position
-      final nextPosition = await _dbHelper.getNextPosition(queueId);
+      final nextPosition = await _queueClientRepository.getNextPosition(queueId);
 
       // Add to queue
       final client = QueueClient(
@@ -104,7 +111,7 @@ class CustomerCubit extends Cubit<CustomerState> {
         status: 'waiting',
         joinedAt: DateTime.now(),
       );
-      final newQueueId = await _dbHelper.insertQueueClient(client);
+      final newQueueId = await _queueClientRepository.insertQueueClient(client);
 
       // createdclient not used; no need to keep a duplicate object
 
@@ -118,14 +125,14 @@ class CustomerCubit extends Cubit<CustomerState> {
 
   Future<void> leaveQueue(int queueId) async {
     try {
-      final client = await _dbHelper.getQueueClient(queueId, _userId);
+      final client = await _queueClientRepository.getQueueClient(queueId, _userId);
       if (client == null) {
-        emit(CustomerError(error: 'Not in this queue'));
+        emit(const CustomerError(error: 'Not in this queue'));
         return;
       }
 
-      await _dbHelper.deleteQueueClient(client.id);
-      await _dbHelper.reorderPositions(queueId); // Reorder remaining clients
+      await _queueClientRepository.deleteQueueClient(client.id);
+      await _queueClientRepository.reorderPositions(queueId); // Reorder remaining clients
       // Notify listeners a queue was left (transient), then refresh joined queues
       emit(QueueLeft(queueId: queueId));
       await loadJoinedQueues();
@@ -136,7 +143,7 @@ class CustomerCubit extends Cubit<CustomerState> {
 
   Future<int?> getPositionInQueue(int queueId) async {
     try {
-      final client = await _dbHelper.getQueueClient(queueId, _userId);
+      final client = await _queueClientRepository.getQueueClient(queueId, _userId);
       return client?.position;
     } catch (e) {
       return null;
@@ -145,10 +152,10 @@ class CustomerCubit extends Cubit<CustomerState> {
 
   Future<int> getPeopleAheadInQueue(int queueId) async {
     try {
-      final client = await _dbHelper.getQueueClient(queueId, _userId);
+      final client = await _queueClientRepository.getQueueClient(queueId, _userId);
       if (client == null) return 0;
 
-      final allClients = await _dbHelper.getQueueClients(queueId);
+      final allClients = await _queueClientRepository.getQueueClients(queueId);
       return allClients
           .where((c) => c.position < client.position && c.status == 'waiting')
           .length;
@@ -159,7 +166,7 @@ class CustomerCubit extends Cubit<CustomerState> {
 
   Future<double> getEstimatedWaitTime(int queueId) async {
     try {
-      final queue = await _dbHelper.getQueueById(queueId);
+      final queue = await _queueRepository.getQueueById(queueId);
       if (queue == null) return 0;
 
       final peopleAhead = await getPeopleAheadInQueue(queueId);

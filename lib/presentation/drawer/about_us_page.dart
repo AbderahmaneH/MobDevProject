@@ -41,7 +41,7 @@ class AboutUsPage extends StatelessWidget {
                       context: context,
                       child: Column(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.groups_rounded,
                             size: 48,
                             color: AppColors.primary,
@@ -149,7 +149,7 @@ class AboutUsPage extends StatelessWidget {
                       backgroundColor: AppColors.primary,
                       child: Column(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.contact_mail_rounded,
                             color: AppColors.white,
                             size: 40,
@@ -292,7 +292,7 @@ class AboutUsPage extends StatelessWidget {
               color: AppColors.primary.withAlpha((0.1 * 255).round()),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.person,
               color: AppColors.primary,
             ),

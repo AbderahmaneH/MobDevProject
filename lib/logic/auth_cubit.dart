@@ -1,23 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import '../database/tables.dart';
-import '../database/db_helper.dart';
 import '../core/localization.dart';
+import '../database/models/user_model.dart';
+import '../database/repositories/user_repository.dart';
 
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  final DatabaseHelper _dbHelper;
+  final UserRepository _userRepository;
 
-  AuthCubit({required DatabaseHelper dbHelper})
-    : _dbHelper = dbHelper,
+  AuthCubit({required UserRepository userRepository})
+    : _userRepository = userRepository,
       super(AuthInitial());
 
   Future<void> login(String phone, String password, bool isBusiness) async {
     emit(AuthLoading());
 
     try {
-      final user = await _dbHelper.getUserByPhone(phone);
+      final user = await _userRepository.getUserByPhone(phone);
 
       if (user == null) {
         emit(const AuthFailure(error: 'User not found'));
@@ -30,13 +30,13 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       if (user.isBusiness != isBusiness) {
-        emit(AuthFailure(error: 'Invalid password or number'));
+        emit(const AuthFailure(error: 'Invalid password or number'));
         return;
       }
 
       emit(AuthSuccess(user: user));
     } catch (e) {
-      emit(AuthFailure(error: 'Login failed'));
+      emit(const AuthFailure(error: 'Login failed'));
     }
   }
 
@@ -52,14 +52,14 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
 
     try {
-      final phoneExists = await _dbHelper.isPhoneRegistered(phone);
+      final phoneExists = await _userRepository.isPhoneRegistered(phone);
       if (phoneExists) {
-        emit(AuthFailure(error: 'Phone number already registered'));
+        emit(const AuthFailure(error: 'Phone number already registered'));
         return;
       }
 
       final user = User(
-        id: 0, // Will be auto-generated
+        id: null, // Will be auto-generated
         name: name,
         email: email,
         phone: phone,
@@ -70,7 +70,7 @@ class AuthCubit extends Cubit<AuthState> {
         businessAddress: businessAddress,
       );
 
-      final userId = await _dbHelper.insertUser(user);
+      final userId = await _userRepository.insertUser(user);
 
       final createdUser = User(
         id: userId,
@@ -112,7 +112,7 @@ class AuthCubit extends Cubit<AuthState> {
         businessAddress: businessAddress ?? user.businessAddress,
       );
 
-      await _dbHelper.updateUser(updatedUser);
+      await _userRepository.updateUser(updatedUser);
       emit(ProfileUpdated(user: updatedUser));
     } catch (e) {
       emit(AuthFailure(error: 'Update failed: $e'));
@@ -120,21 +120,21 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> changePassword({
-    required int userId,
+    required int? userId,
     required String currentPassword,
     required String newPassword,
   }) async {
     emit(AuthLoading());
 
     try {
-      final user = await _dbHelper.getUserById(userId);
+      final user = await _userRepository.getUserById(userId);
       if (user == null) {
-        emit(AuthFailure(error: 'User not found'));
+        emit(const AuthFailure(error: 'User not found'));
         return;
       }
 
       if (user.password != currentPassword) {
-        emit(AuthFailure(error: 'Current password is incorrect'));
+        emit(const AuthFailure(error: 'Current password is incorrect'));
         return;
       }
 
@@ -150,7 +150,7 @@ class AuthCubit extends Cubit<AuthState> {
         businessAddress: user.businessAddress,
       );
 
-      await _dbHelper.updateUser(updatedUser);
+      await _userRepository.updateUser(updatedUser);
       emit(PasswordChanged());
     } catch (e) {
       emit(AuthFailure(error: 'Password change failed: $e'));

@@ -148,7 +148,7 @@ class AppColors {
 
   // Material Color generation for primary color
     static MaterialColor get primarySwatch =>
-      MaterialColor(0xFF333333, const <int, Color>{
+      const MaterialColor(0xFF333333, const <int, Color>{
         50: Color(0xFFE8EAF6),
         100: Color(0xFFC5CAE9),
         200: Color(0xFF9FA8DA),
@@ -163,7 +163,7 @@ class AppColors {
 
   // Material Color generation for secondary color
     static MaterialColor get secondarySwatch =>
-      MaterialColor(0xFF4ECDC4, const <int, Color>{
+      const MaterialColor(0xFF4ECDC4, const <int, Color>{
         50: Color(0xFFE0F2F1),
         100: Color(0xFFB2DFDB),
         200: Color(0xFF80CBC4),

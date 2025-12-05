@@ -842,7 +842,7 @@ class AppStates {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
+          const CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
           ),
           const SizedBox(height: 16),
@@ -919,7 +919,7 @@ class AppStates {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               size: 64,
               color: AppColors.error,
@@ -1035,3 +1035,6 @@ class LanguageSelector extends StatelessWidget {
     );
   }
 }
+
+
+

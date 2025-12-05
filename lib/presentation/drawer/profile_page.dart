@@ -4,8 +4,9 @@ import '../../core/app_colors.dart';
 import '../../core/localization.dart';
 import '../../logic/auth_cubit.dart';
 import '../../database/db_helper.dart';
-import '../../database/tables.dart';
+import '../../database/repositories/user_repository.dart';
 import '../../core/common_widgets.dart';
+import '../../database/models/user_model.dart';
 
 class ProfilePage extends StatelessWidget {
   final User user;
@@ -16,7 +17,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AuthCubit(
-        dbHelper: DatabaseHelper(),
+        userRepository: UserRepository(databaseHelper: DatabaseHelper()),
       ),
       child: ProfileView(user: user),
     );
@@ -434,7 +435,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 color: AppColors.primary.withAlpha((0.1 * 255).round()),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.lock_outline,
                                 color: AppColors.primary,
                                 size: 24,
@@ -454,16 +455,7 @@ class _ProfileViewState extends State<ProfileView> {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    context.loc('change_pass_description'),
-                                    style: AppTextStyles.getAdaptiveStyle(
-                                      context,
-                                      fontSize: 12,
-                                      lightColor: AppColors.textSecondaryLight,
-                                      darkColor: AppColors.textSecondaryDark,
-                                    ),
-                                  ),
-                                ],
+                                  ],
                               ),
                             ),
                             IconButton(

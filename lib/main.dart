@@ -7,6 +7,7 @@ import 'core/localization.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/app_colors.dart';
 import 'presentation/welcome_page.dart';
+import 'database/repositories/user_repository.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => AppCubit()),
-          BlocProvider(create: (context) => AuthCubit(dbHelper: databaseHelper)),
+          BlocProvider(create: (context) => AuthCubit(userRepository: UserRepository(databaseHelper: databaseHelper))),
         ],
         child: Builder(
           builder: (context) {
