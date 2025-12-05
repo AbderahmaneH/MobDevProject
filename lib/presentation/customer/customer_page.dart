@@ -355,7 +355,9 @@ class _CustomerViewState extends State<CustomerView> {
                         onChanged: _searchQueues,
                       )
                     : Text(context.loc('my_queues')),
+
                 backgroundColor: AppColors.backgroundLight,
+                automaticallyImplyLeading: false,
                 elevation: 0,
                 actions: [
                   IconButton(

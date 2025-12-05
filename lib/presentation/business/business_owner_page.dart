@@ -44,6 +44,13 @@ class BusinessOwnerView extends StatefulWidget {
 
 class _BusinessOwnerViewState extends State<BusinessOwnerView> {
   final _queueNameController = TextEditingController();
+  late QueueCubit _queueCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _queueCubit = context.read<QueueCubit>();
+  }
 
   @override
   void dispose() {
@@ -52,8 +59,8 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
   }
 
   void _addQueue() {
-    final queueCubit = context.read<QueueCubit>();
     final queueNameController = TextEditingController();
+    final queueSizeController = TextEditingController(text: '50');
     final formKey = GlobalKey<FormState>();
 
     showDialog(
@@ -64,25 +71,50 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
           title: Text(context.loc('add_queue')),
           content: Form(
             key: formKey,
-            child: AppTextFields.textField(
-              context: dialogContext,
-              hintText: context.loc('queue_name'),
-              controller: queueNameController,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return context.loc('required_field');
-                }
-                if (value.length < 2) {
-                  return context.loc('invalid_name');
-                }
-                return null;
-              },
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AppTextFields.textField(
+                    context: dialogContext,
+                    hintText: context.loc('queue_name'),
+                    controller: queueNameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return context.loc('required_field');
+                      }
+                      if (value.length < 2) {
+                        return context.loc('invalid_name');
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  AppTextFields.textField(
+                    context: dialogContext,
+                    hintText: 'Queue size (default 50)',
+                    controller: queueSizeController,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return context.loc('required_field');
+                      }
+                      final intValue = int.tryParse(value);
+                      if (intValue == null || intValue < 1) {
+                        return 'Please enter a valid number';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 queueNameController.clear();
+                queueSizeController.clear();
                 Navigator.pop(dialogContext);
               },
               child: Text(context.loc('cancel')),
@@ -90,8 +122,13 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
             ElevatedButton(
               onPressed: () {
                 if (formKey.currentState!.validate()) {
-                  queueCubit.createQueue(name: queueNameController.text.trim());
+                  final maxSize = int.parse(queueSizeController.text);
+                  _queueCubit.createQueue(
+                    name: queueNameController.text.trim(),
+                    maxSize: maxSize,
+                  );
                   queueNameController.clear();
+                  queueSizeController.clear();
                   Navigator.pop(dialogContext);
                 }
               },
@@ -106,18 +143,18 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
   void _deleteQueue(int queueId) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(context.loc('delete')),
         content: Text(context.loc('delete_queue_confirm')),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(context.loc('cancel')),
           ),
           TextButton(
             onPressed: () {
-              context.read<QueueCubit>().deleteQueue(queueId);
-              Navigator.pop(context);
+              _queueCubit.deleteQueue(queueId);
+              Navigator.pop(dialogContext);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(context.loc('queue_deleted')),
@@ -134,7 +171,7 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
   }
 
   void _toggleQueueStatus(int queueId) {
-    context.read<QueueCubit>().toggleQueueStatus(queueId);
+    _queueCubit.toggleQueueStatus(queueId);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(context.loc('queue_updated')),
@@ -208,25 +245,13 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert),
                 onSelected: (value) {
-                  if (value == 'edit') {
-                    // TODO: Implement edit queue
-                  } else if (value == 'toggle') {
+                  if (value == 'toggle') {
                     _toggleQueueStatus(queue.id);
                   } else if (value == 'delete') {
                     _deleteQueue(queue.id);
                   }
                 },
                 itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'edit',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.edit, size: 20),
-                        const SizedBox(width: 8),
-                        Text(context.loc('edit')),
-                      ],
-                    ),
-                  ),
                   PopupMenuItem(
                     value: 'toggle',
                     child: Row(
@@ -402,6 +427,7 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
               // App Bar
               SliverAppBar(
                 title: Text(context.loc('your_queues')),
+                automaticallyImplyLeading: false,
                 backgroundColor: AppColors.backgroundLight,
                 elevation: 0,
                 actions: [

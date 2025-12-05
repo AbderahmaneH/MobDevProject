@@ -84,10 +84,8 @@ class _LoginViewState extends State<LoginView> {
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              AppAppBar.sliverAppBar(
-                title: context.loc('login'),
-                onBackPressed: () => Navigator.pop(context),
-                context: context,
+              SliverAppBar(
+                title: Text(context.loc('login')),
               ),
               SliverToBoxAdapter(
                 child: Padding(

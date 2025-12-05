@@ -14,10 +14,8 @@ class AboutUsPage extends StatelessWidget {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            AppAppBar.sliverAppBar(
-              title: context.loc('about'),
-              onBackPressed: () => Navigator.pop(context),
-              context: context,
+            SliverAppBar(
+              title: Text(context.loc('about')),
             ),
             SliverToBoxAdapter(
               child: Padding(

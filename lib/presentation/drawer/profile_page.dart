@@ -302,10 +302,8 @@ class _ProfileViewState extends State<ProfileView> {
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              AppAppBar.sliverAppBar(
-                title: context.loc('profile'),
-                onBackPressed: () => Navigator.pop(context),
-                context: context,
+              SliverAppBar(
+                title: Text(context.loc('profile')),
               ),
               SliverToBoxAdapter(
                 child: Padding(

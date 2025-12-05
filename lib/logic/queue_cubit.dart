@@ -26,7 +26,8 @@ class QueueCubit extends Cubit<QueueState> {
     emit(QueueLoading());
 
     try {
-      final queues = await _queueRepository.getQueuesByBusinessOwner(_businessOwnerId);
+      final queues =
+          await _queueRepository.getQueuesByBusinessOwner(_businessOwnerId);
       emit(QueueLoaded(queues: queues));
     } catch (e) {
       emit(QueueError(error: 'Failed to load queues: $e'));
@@ -51,9 +52,11 @@ class QueueCubit extends Cubit<QueueState> {
         createdAt: DateTime.now(),
       );
 
-      await _queueRepository.insertQueue(queue);
-      await loadQueues(); // Refresh the list
+      // Emit creation event first
       emit(QueueCreated());
+      // Then insert and reload - this will emit QueueLoaded last
+      await _queueRepository.insertQueue(queue);
+      await loadQueues();
     } catch (e) {
       emit(QueueError(error: 'Failed to create queue: $e'));
     }
@@ -86,9 +89,9 @@ class QueueCubit extends Cubit<QueueState> {
         clients: existingQueue.clients,
       );
 
+      emit(QueueUpdated());
       await _queueRepository.updateQueue(updatedQueue);
       await loadQueues();
-      emit(QueueUpdated());
     } catch (e) {
       emit(QueueError(error: 'Failed to update queue: $e'));
     }
@@ -96,9 +99,9 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> deleteQueue(int queueId) async {
     try {
+      emit(QueueDeleted());
       await _queueRepository.deleteQueue(queueId);
       await loadQueues();
-      emit(QueueDeleted());
     } catch (e) {
       emit(QueueError(error: 'Failed to delete queue: $e'));
     }
@@ -143,12 +146,13 @@ class QueueCubit extends Cubit<QueueState> {
         return;
       }
 
-      final nextPosition = await _queueClientRepository.getNextPosition(queueId);
+      final nextPosition =
+          await _queueClientRepository.getNextPosition(queueId);
 
       final client = QueueClient(
         id: 0,
         queueId: queueId,
-        userId: userId ?? 0, // 0 for walk-in customers
+        userId: userId ?? 0,
         name: name,
         phone: phone,
         position: nextPosition,
@@ -156,9 +160,9 @@ class QueueCubit extends Cubit<QueueState> {
         joinedAt: DateTime.now(),
       );
 
-      await _queueClientRepository.insertQueueClient(client);
-      await loadQueues(); // Refresh to show updated queue
       emit(ClientAdded());
+      await _queueClientRepository.insertQueueClient(client);
+      await loadQueues();
     } catch (e) {
       emit(QueueError(error: 'Failed to add client: $e'));
     }
@@ -166,9 +170,9 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> removeClientFromQueue(int? clientId) async {
     try {
+      emit(ClientRemoved());
       await _queueClientRepository.deleteQueueClient(clientId);
       await loadQueues();
-      emit(ClientRemoved());
     } catch (e) {
       emit(QueueError(error: 'Failed to remove client: $e'));
     }
@@ -176,9 +180,9 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> serveClient(int? clientId) async {
     try {
+      emit(ClientServed());
       await _queueClientRepository.updateClientStatus(clientId, 'served');
       await loadQueues();
-      emit(ClientServed());
     } catch (e) {
       emit(QueueError(error: 'Failed to serve client: $e'));
     }
@@ -186,9 +190,9 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> notifyClient(int? clientId) async {
     try {
+      emit(ClientNotified());
       await _queueClientRepository.updateClientStatus(clientId, 'notified');
       await loadQueues();
-      emit(ClientNotified());
     } catch (e) {
       emit(QueueError(error: 'Failed to notify client: $e'));
     }
@@ -197,5 +201,4 @@ class QueueCubit extends Cubit<QueueState> {
   void refreshQueues() {
     loadQueues();
   }
-  
 }

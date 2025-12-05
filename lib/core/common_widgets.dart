@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'localization.dart';
 
-
 // ==============================
 // BUTTONS - Enhanced with more options
 // ==============================
@@ -21,20 +20,22 @@ class AppButtons {
     BorderRadiusGeometry? borderRadius,
     required BuildContext context,
   }) {
-    
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return SizedBox(
       width: isFullWidth ? double.infinity : width,
       height: height ?? 50,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? (isDark ? AppColors.primary : AppColors.primary),
-          disabledBackgroundColor: (backgroundColor ?? AppColors.primary).withAlpha((0.5 * 255).round()),
+          backgroundColor: backgroundColor ??
+              (isDark ? AppColors.primary : AppColors.primary),
+          disabledBackgroundColor: (backgroundColor ?? AppColors.primary)
+              .withAlpha((0.5 * 255).round()),
           foregroundColor: textColor ?? AppColors.white,
-          padding: padding ?? const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+          padding: padding ??
+              const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
           shape: RoundedRectangleBorder(
             borderRadius: borderRadius ?? BorderRadius.circular(10),
           ),
@@ -75,8 +76,6 @@ class AppButtons {
     Color? textColor,
     required BuildContext context,
   }) {
-    
-    
     return SizedBox(
       width: isFullWidth ? double.infinity : width,
       height: height ?? 50,
@@ -121,8 +120,6 @@ class AppButtons {
     bool underline = false,
     required BuildContext context,
   }) {
-    
-    
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
@@ -139,7 +136,8 @@ class AppButtons {
           lightColor: textColor ?? AppColors.primary,
           darkColor: textColor ?? AppColors.primary,
         ).copyWith(
-          decoration: underline ? TextDecoration.underline : TextDecoration.none,
+          decoration:
+              underline ? TextDecoration.underline : TextDecoration.none,
         ),
       ),
     );
@@ -221,7 +219,7 @@ class AppTextFields {
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
@@ -251,9 +249,11 @@ class AppTextFields {
         suffixIcon: suffixIcon,
         prefixIcon: prefixIcon,
         filled: true,
-        fillColor: enabled ? 
-          (isDark ? AppColors.inputBackgroundDark : AppColors.inputBackgroundLight) : 
-          AppColors.buttonDisabledLight,
+        fillColor: enabled
+            ? (isDark
+                ? AppColors.inputBackgroundDark
+                : AppColors.inputBackgroundLight)
+            : AppColors.buttonDisabledLight,
         contentPadding: const EdgeInsets.symmetric(
           vertical: 14,
           horizontal: 16,
@@ -262,7 +262,8 @@ class AppTextFields {
         enabledBorder: _inputBorder(context, isEnabled: true),
         focusedBorder: _inputBorder(context, isFocused: true),
         errorBorder: _inputBorder(context, hasError: true),
-        focusedErrorBorder: _inputBorder(context, isFocused: true, hasError: true),
+        focusedErrorBorder:
+            _inputBorder(context, isFocused: true, hasError: true),
         disabledBorder: _inputBorder(context, isEnabled: false),
       ),
     );
@@ -309,12 +310,10 @@ class AppTextFields {
       controller: controller,
       onChanged: onChanged,
       onSubmitted: onChanged,
-      prefixIcon: Icon(
-        Icons.search, 
-        color: Theme.of(context).brightness == Brightness.dark 
-          ? AppColors.textSecondaryDark 
-          : AppColors.textSecondaryLight
-      ),
+      prefixIcon: Icon(Icons.search,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.textSecondaryDark
+              : AppColors.textSecondaryLight),
     );
   }
 
@@ -335,9 +334,11 @@ class AppTextFields {
       borderColor = AppColors.primary;
       borderWidth = 2.0;
     } else if (!isEnabled) {
-      borderColor = isDark ? AppColors.inputBorderDark : AppColors.inputBorderLight;
+      borderColor =
+          isDark ? AppColors.inputBorderDark : AppColors.inputBorderLight;
     } else {
-      borderColor = isDark ? AppColors.inputBorderDark : AppColors.inputBorderLight;
+      borderColor =
+          isDark ? AppColors.inputBorderDark : AppColors.inputBorderLight;
     }
 
     return OutlineInputBorder(
@@ -414,16 +415,21 @@ class AppLabels {
     );
   }
 
-  static Widget chipLabel(BuildContext context, String text, {
+  static Widget chipLabel(
+    BuildContext context,
+    String text, {
     Color? backgroundColor,
     Color? textColor,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-      color: backgroundColor ?? (isDark ? AppColors.primary.withAlpha((0.2 * 255).round()) : AppColors.primary.withAlpha((0.1 * 255).round())),
+        color: backgroundColor ??
+            (isDark
+                ? AppColors.primary.withAlpha((0.2 * 255).round())
+                : AppColors.primary.withAlpha((0.1 * 255).round())),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -455,18 +461,20 @@ class AppContainers {
     required BuildContext context,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: padding ?? const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: backgroundColor ?? (isDark ? AppColors.cardDark : AppColors.cardLight),
+          color: backgroundColor ??
+              (isDark ? AppColors.cardDark : AppColors.cardLight),
           borderRadius: borderRadius ?? BorderRadius.circular(12),
           boxShadow: shadow ??
               [
                 BoxShadow(
-                  color: Colors.black.withAlpha(isDark ? (0.2 * 255).round() : (0.05 * 255).round()),
+                  color: Colors.black.withAlpha(
+                      isDark ? (0.2 * 255).round() : (0.05 * 255).round()),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -485,15 +493,17 @@ class AppContainers {
     required BuildContext context,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: backgroundColor ?? (isDark ? AppColors.primary : AppColors.primary),
+        color:
+            backgroundColor ?? (isDark ? AppColors.primary : AppColors.primary),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(isDark ? (0.2 * 255).round() : (0.1 * 255).round()),
+            color: Colors.black
+                .withAlpha(isDark ? (0.2 * 255).round() : (0.1 * 255).round()),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -518,8 +528,10 @@ class AppContainers {
             style: AppTextStyles.getAdaptiveStyle(
               context,
               fontSize: 12,
-              lightColor: textColor?.withAlpha((0.8 * 255).round()) ?? AppColors.textSecondaryDark,
-              darkColor: textColor?.withAlpha((0.8 * 255).round()) ?? AppColors.textSecondaryDark,
+              lightColor: textColor?.withAlpha((0.8 * 255).round()) ??
+                  AppColors.textSecondaryDark,
+              darkColor: textColor?.withAlpha((0.8 * 255).round()) ??
+                  AppColors.textSecondaryDark,
             ),
           ),
         ],
@@ -601,11 +613,13 @@ class RoleToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return AnimatedContainer(
       duration: animationDuration,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.buttonSecondaryDark : AppColors.buttonSecondaryLight,
+        color: isDark
+            ? AppColors.buttonSecondaryDark
+            : AppColors.buttonSecondaryLight,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -650,102 +664,16 @@ class RoleToggle extends StatelessWidget {
                 fontFamily: AppFonts.body,
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
-                color: isSelected ? AppColors.white : 
-                  (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
+                color: isSelected
+                    ? AppColors.white
+                    : (isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondaryLight),
               ),
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-// ==============================
-// APP BAR - Enhanced with more customization
-// ==============================
-
-class AppAppBar {
-  static AppBar customAppBar({
-    required String title,
-    bool backarrow = true,
-    VoidCallback? onBackPressed,
-    List<Widget>? actions,
-    Color? backgroundColor,
-    Color? titleColor,
-    bool centerTitle = true,
-    double? elevation,
-    required BuildContext context,
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return AppBar(
-      backgroundColor: backgroundColor ?? (isDark ? AppColors.backgroundDark : AppColors.backgroundLight),
-      surfaceTintColor: Colors.transparent,
-      elevation: elevation ?? 0,
-      leading: backarrow
-          ? IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-              ),
-              onPressed: onBackPressed,
-            )
-          : null,
-      centerTitle: centerTitle,
-      title: Text(
-        title,
-        style: AppTextStyles.getAdaptiveStyle(
-          context,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          lightColor: titleColor ?? AppColors.textPrimaryLight,
-          darkColor: titleColor ?? AppColors.textPrimaryDark,
-        ),
-      ),
-      actions: actions,
-    );
-  }
-
-  static SliverAppBar sliverAppBar({
-    required String title,
-    bool backarrow = true,
-    VoidCallback? onBackPressed,
-    List<Widget>? actions,
-    Color? backgroundColor,
-    bool floating = true,
-    bool snap = true,
-    bool pinned = false,
-    required BuildContext context,
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return SliverAppBar(
-      backgroundColor: backgroundColor ?? (isDark ? AppColors.backgroundDark : AppColors.backgroundLight),
-      surfaceTintColor: Colors.transparent,
-      elevation: 0,
-      floating: floating,
-      snap: snap,
-      pinned: pinned,
-      leading: backarrow
-          ? IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-              ),
-              onPressed: onBackPressed,
-            )
-          : null,
-      centerTitle: true,
-      title: Text(
-        title,
-        style: AppTextStyles.getAdaptiveStyle(
-          context,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      actions: actions,
     );
   }
 }
@@ -777,7 +705,7 @@ class LogoHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Center(
       child: Column(
         children: [
@@ -788,7 +716,8 @@ class LogoHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(isDark ? (0.3 * 255).round() : (0.2 * 255).round()),
+                  color: Colors.black.withAlpha(
+                      isDark ? (0.3 * 255).round() : (0.2 * 255).round()),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -837,7 +766,6 @@ class AppStates {
     String message = 'Loading...',
     required BuildContext context,
   }) {
-    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -865,7 +793,7 @@ class AppStates {
     required BuildContext context,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -875,7 +803,9 @@ class AppStates {
             Icon(
               icon,
               size: 64,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondaryLight,
             ),
             const SizedBox(height: 16),
             Text(
@@ -912,7 +842,6 @@ class AppStates {
     VoidCallback? onRetry,
     required BuildContext context,
   }) {
-    
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -970,7 +899,7 @@ class AppStates {
 class LanguageSelector extends StatelessWidget {
   final Locale currentLocale;
   final ValueChanged<Locale> onLocaleChanged;
-  
+
   const LanguageSelector({
     super.key,
     required this.currentLocale,
@@ -998,12 +927,14 @@ class LanguageSelector extends StatelessWidget {
             return GestureDetector(
               onTap: () => onLocaleChanged(Locale(lang['code']!)),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : 
-                    (Theme.of(context).brightness == Brightness.dark 
-                      ? AppColors.buttonSecondaryDark 
-                      : AppColors.buttonSecondaryLight),
+                  color: isSelected
+                      ? AppColors.primary
+                      : (Theme.of(context).brightness == Brightness.dark
+                          ? AppColors.buttonSecondaryDark
+                          : AppColors.buttonSecondaryLight),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isSelected ? AppColors.primary : Colors.transparent,
@@ -1018,11 +949,13 @@ class LanguageSelector extends StatelessWidget {
                     Text(
                       lang['name']!,
                       style: TextStyle(
-                        color: isSelected ? AppColors.white : 
-                          (Theme.of(context).brightness == Brightness.dark 
-                            ? AppColors.textPrimaryDark 
-                            : AppColors.textPrimaryLight),
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                        color: isSelected
+                            ? AppColors.white
+                            : (Theme.of(context).brightness == Brightness.dark
+                                ? AppColors.textPrimaryDark
+                                : AppColors.textPrimaryLight),
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w400,
                       ),
                     ),
                   ],
@@ -1035,6 +968,3 @@ class LanguageSelector extends StatelessWidget {
     );
   }
 }
-
-
-

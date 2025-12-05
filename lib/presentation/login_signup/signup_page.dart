@@ -4,7 +4,6 @@ import '../../core/app_colors.dart';
 import '../../core/localization.dart';
 import '../../logic/auth_cubit.dart';
 import '../../database/db_helper.dart';
-import '../../database/tables.dart';
 import '../../core/common_widgets.dart';
 import '../../presentation/login_signup/login_page.dart';
 import '../../presentation/business/business_owner_page.dart';
@@ -107,10 +106,8 @@ class _SignupViewState extends State<SignupView> {
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              AppAppBar.sliverAppBar(
-                title: context.loc('signup'),
-                onBackPressed: () => Navigator.pop(context),
-                context: context,
+              SliverAppBar(
+                title: Text(context.loc('signup')),
               ),
               SliverToBoxAdapter(
                 child: Padding(

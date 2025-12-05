@@ -14,7 +14,6 @@ class QueueRepository {
     return await db.insert(
       DatabaseTables.queues,
       queue.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
@@ -39,6 +38,7 @@ class QueueRepository {
       DatabaseTables.queues,
       where: 'business_owner_id = ?',
       whereArgs: [businessOwnerId],
+      orderBy: 'created_at DESC, id DESC',
     );
 
     final queues = maps.map((map) => Queue.fromMap(map)).toList();
@@ -101,6 +101,13 @@ class QueueRepository {
 
   Future<int> deleteQueue(int id) async {
     final db = await databaseHelper.database;
+    // Delete associated queue clients first
+    await db.delete(
+      DatabaseTables.queueClients,
+      where: 'queue_id = ?',
+      whereArgs: [id],
+    );
+    // Then delete the queue
     return await db.delete(
       DatabaseTables.queues,
       where: 'id = ?',
