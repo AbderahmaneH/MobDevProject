@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../logic/app_cubit.dart';
 
 class AppColors {
   // Primary Colors - Modern Blue
@@ -27,7 +26,7 @@ class AppColors {
   // Status Colors
   static const Color success = Color(0xFF28A745); // Green
   static const Color successLight = Color(0xFFD4EDDA);
-  static const Color warning = Color(0xFFFFC107); // Amber/Yellow
+  static const Color warning = Color(0xFFFFC107); // Amber yellow
   static const Color warningLight = Color(0xFFFFF3CD);
   static const Color error = Color(0xFFDC3545); // Red
   static const Color errorLight = Color(0xFFF8D7DA);
@@ -116,7 +115,7 @@ class AppColors {
     return borderLight;
   }
 
-  // Material Color generation for primary color
+  // Material Color for primary color
   static MaterialColor get primarySwatch =>
       const MaterialColor(0xFF333333, <int, Color>{
         50: Color(0xFFE8EAF6),
@@ -131,7 +130,7 @@ class AppColors {
         900: Color(0xFF1A237E),
       });
 
-  // Material Color generation for secondary color
+  // Material Color for secondary color
   static MaterialColor get secondarySwatch =>
       const MaterialColor(0xFF4ECDC4, <int, Color>{
         50: Color(0xFFE0F2F1),
@@ -148,7 +147,6 @@ class AppColors {
 }
 
 class AppFonts {
-  // Modern font stack
   static const String heading = 'Inter'; // Modern sans-serif for headings
   static const String body = 'Roboto'; // Clean sans-serif for body
   static const String mono = 'RobotoMono'; // Monospace for code/numbers
@@ -264,7 +262,7 @@ class AppTextStyles {
     fontWeight: AppFonts.regular,
     color: AppColors.textTertiaryLight,
   );
-  // Helper methods to get appropriate style
+
   static TextStyle displayLarge(BuildContext context) {
     return displayLargeLight;
   }

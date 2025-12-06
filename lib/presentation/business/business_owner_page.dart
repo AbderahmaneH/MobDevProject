@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qnow/presentation/drawer/help_support_page.dart';
 import '../../core/app_colors.dart';
 import '../../core/localization.dart';
 import '../../logic/queue_cubit.dart';
@@ -186,7 +187,12 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => QueuePage(queue: queue)),
+          MaterialPageRoute(
+            builder: (context) => QueuePage(
+              queue: queue,
+              parentCubit: _queueCubit,
+            ),
+          ),
         );
       },
       padding: const EdgeInsets.all(16),
@@ -195,7 +201,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
         children: [
           Row(
             children: [
-              // Queue icon
               Container(
                 width: 48,
                 height: 48,
@@ -210,8 +215,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                 ),
               ),
               const SizedBox(width: 12),
-
-              // Queue info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,8 +242,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                   ],
                 ),
               ),
-
-              // Actions
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert),
                 onSelected: (value) {
@@ -286,8 +287,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
             ],
           ),
           const SizedBox(height: 16),
-
-          // Queue stats
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -308,8 +307,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
               ),
             ],
           ),
-
-          // Status bar
           const SizedBox(height: 12),
           LinearProgressIndicator(
             value: queue.currentSize / queue.maxSize,
@@ -419,7 +416,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              // App Bar
               SliverAppBar(
                 title: Text(context.loc('your_queues')),
                 automaticallyImplyLeading: false,
@@ -438,8 +434,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                   ),
                 ],
               ),
-
-              // Queues List
               BlocBuilder<QueueCubit, QueueState>(
                 builder: (context, state) {
                   if (state is QueueError) {
@@ -454,8 +448,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                     final queues = state.queues;
                     final activeQueues = queues.where((q) => q.isActive).length;
 
-                    // Stats will be rendered as the first child of the SliverList below
-
                     if (queues.isEmpty) {
                       return SliverToBoxAdapter(
                         child: AppStates.emptyState(
@@ -466,7 +458,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                       );
                     }
 
-                    // Render stats as the first child, then queue cards.
                     return SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -546,7 +537,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            // Header
             DrawerHeader(
               decoration: const BoxDecoration(color: AppColors.primary),
               child: Column(
@@ -577,8 +567,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                 ],
               ),
             ),
-
-            // Menu Items
             _buildDrawerItem(
               context: context,
               icon: Icons.business,
@@ -622,7 +610,8 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AboutUsPage()),
+                  MaterialPageRoute(
+                      builder: (context) => const HelpSupportPage()),
                 );
               },
             ),

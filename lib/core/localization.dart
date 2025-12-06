@@ -1,29 +1,21 @@
 import 'package:flutter/material.dart';
 
-// ==============================
-// IMPROVED LOCALIZATION MANAGER
-// ==============================
-
 class QNowLocalizations {
-  // Singleton instance
   static final QNowLocalizations _instance = QNowLocalizations._internal();
   factory QNowLocalizations() => _instance;
   QNowLocalizations._internal();
 
-  // Current locale
   Locale _currentLocale = const Locale('en');
 
-  // Supported locales
   static const List<Locale> supportedLocales = [
     Locale('en'),
     Locale('fr'),
     Locale('ar'),
   ];
 
-  // Localized values
   static const Map<String, Map<String, String>> _localizedValues = {
     'en': {
-      // App & General
+      // App and General
       'app_title': 'QNow',
       'welcome': 'Welcome',
       'loading': 'Loading...',
@@ -58,7 +50,7 @@ class QNowLocalizations {
       'language': 'Language',
       'get_started': 'Get Started',
 
-      // Authentication & Roles
+      // Authentication and Roles
       'login': 'Login',
       'signup': 'Sign Up',
       'sign_out': 'Sign Out',
@@ -73,7 +65,7 @@ class QNowLocalizations {
       'create_account': 'Create Account',
       'reset_password': 'Reset Password',
 
-      // User Info
+      // User Information
       'name': 'Name',
       'full_name': 'Full Name',
       'first_name': 'First Name',
@@ -89,6 +81,7 @@ class QNowLocalizations {
       'personal_info': 'Personal Information',
 
       // Queue Management
+      'available': 'Available',
       'add_queue': 'Add Queue',
       'create_queue': 'Create Queue',
       'your_queues': 'Your Queues',
@@ -147,12 +140,15 @@ class QNowLocalizations {
       'capacity': 'Capacity',
       'avg_time': 'Avg. Time',
       'max_queues_reached': 'You can join up to 3 queues only',
+      'already_served_and_joined':
+          'You have already joined this queue and have been served',
+      'already_in_queue': 'You are already in this queue',
       'queue_details': 'Queue Details',
       'queue_settings': 'Queue Settings',
       'manage_queue': 'Manage Queue',
       'manage_your_queues': 'Manage Your Queues',
 
-      // Search & Discovery
+      // Search and Discovery
       'search_hint': 'Search for business...',
       'search_queues': 'Search queues...',
       'search_businesses': 'Search businesses...',
@@ -166,7 +162,24 @@ class QNowLocalizations {
           'We respect your privacy. This app stores necessary user data (name, phone, and optional email/business info) locally to provide queue services. Data is used only for functionality and not shared externally.',
       'terms_of_service_message':
           'By using QNow, you agree to join, leave, and manage queues responsibly. Do not misuse the app or provide false information. We may update these terms as needed.',
-      // Notifications & Status
+
+      // Help and About (About page texts)
+      'smart_queue_title': 'Smart Queue Management System',
+      'smart_queue_description':
+          'QNow revolutionizes the way people wait in queues. Our digital solution eliminates physical waiting, saving time and improving customer experience.',
+      'key_features': 'Key Features',
+      'feature_realtime': 'Real-time Queue Tracking',
+      'feature_realtime_desc': 'Monitor your position in real-time',
+      'feature_notifications': 'Smart Notifications',
+      'feature_notifications_desc': 'Get notified when your turn is near',
+      'feature_business_management': 'Business Management',
+      'feature_business_management_desc': 'Manage multiple queues efficiently',
+      'feature_multilanguage': 'Multi-language Support',
+      'feature_multilanguage_desc': 'Available in English, French, and Arabic',
+      'contact_us': 'Contact Us',
+      'copyright_text': '© 2025 QNow. All rights reserved.',
+
+      // Notifications and Status
       'queue_created': 'Queue created successfully',
       'queue_deleted': 'Queue deleted successfully',
       'queue_updated': 'Queue updated successfully',
@@ -188,13 +201,13 @@ class QNowLocalizations {
       'sound_alerts': 'Sound Alerts',
       'sound_alerts_subtitle': 'Play sound for notifications',
 
-      // Settings & Help
+      // Settings and Help
       'privacy_policy': 'Privacy Policy',
       'terms_of_service': 'Terms of Service',
       'settings': 'Settings',
-      'privacy_security': 'Privacy & Security',
+      'privacy_security': 'Privacy and Security',
       'delete_account': 'Delete Account',
-      'help': 'Help & Support',
+      'help': 'Help and Support',
       'about': 'About Us',
       'contact_support': 'Contact Support',
       'email_support': 'Email Support',
@@ -211,7 +224,7 @@ class QNowLocalizations {
       'password_changed': 'Password changed successfully',
       'change': 'Change',
 
-      // Help & Support
+      // Help and Support
       'additional_resources': 'Additional Resources',
       'user_guide': 'User Guide',
       'report_bug': 'Report a Bug',
@@ -242,7 +255,7 @@ class QNowLocalizations {
       'business_settings': 'Business Settings',
       'business_profile': 'Business Profile',
 
-      // Time & Status
+      // Time and Status
       'active': 'Active',
       'inactive': 'Inactive',
       'paused': 'Paused',
@@ -258,7 +271,7 @@ class QNowLocalizations {
       'cancelled': 'Cancelled',
       'missed': 'Missed',
       'total_customers': 'Total Customers',
-
+      'analytics': 'Analytics',
       // Validation Messages
       'required_field': 'This field is required',
       'invalid_email': 'Invalid email address',
@@ -282,7 +295,7 @@ class QNowLocalizations {
       'paste': 'Paste',
     },
     'fr': {
-      // App & General
+      // App and General
       'app_title': 'QNow',
       'welcome': 'Bienvenue',
       'loading': 'Chargement...',
@@ -317,7 +330,7 @@ class QNowLocalizations {
       'language': 'Langue',
       'get_started': 'Commencer',
 
-      // Authentication & Roles
+      // Authentication and Roles
       'login': 'Connexion',
       'signup': 'S\'inscrire',
       'sign_out': 'Déconnexion',
@@ -348,6 +361,7 @@ class QNowLocalizations {
       'personal_info': 'Informations personnelles',
 
       // Queue Management
+      'available': 'Disponible',
       'add_queue': 'Ajouter une file',
       'create_queue': 'Créer une file',
       'your_queues': 'Vos files',
@@ -409,11 +423,14 @@ class QNowLocalizations {
       'capacity': 'Capacité',
       'avg_time': 'Temps moyen',
       'max_queues_reached': 'Vous pouvez rejoindre au maximum 3 files',
+      'already_served_and_joined':
+          'Vous avez déjà rejoint cette file et avez été servi',
+      'already_in_queue': 'Vous êtes déjà dans cette file',
       'manage_queue': 'Gérer la file',
       'manage_your_queues': 'Gérer vos files',
       'total_customers': 'Total Clients',
 
-      // Search & Discovery
+      // Search and Discovery
       'search_hint': 'Rechercher une entreprise...',
       'search_queues': 'Rechercher des files...',
       'search_businesses': 'Rechercher des entreprises...',
@@ -427,8 +444,25 @@ class QNowLocalizations {
           'Nous respectons votre vie privée. Cette application stocke localement les données utilisateur nécessaires (nom, téléphone et informations facultatives sur l\'e-mail/l\'entreprise) pour fournir des services de file d\'attente. Les données sont utilisées uniquement pour la fonctionnalité et ne sont pas partagées à l\'extérieur.',
       'terms_of_service_message':
           'En utilisant QNow, vous acceptez de rejoindre, quitter et gérer les files de manière responsable. N\'abusez pas de l\'application et ne fournissez pas de fausses informations. Nous pouvons mettre à jour ces conditions si nécessaire.',
+      // Help and About (About page texts)
+      'smart_queue_title':
+          'Système de gestion intelligente de files d\'attente',
+      'smart_queue_description':
+          'QNow révolutionne la façon dont les gens attendent dans les files. Notre solution digitale élimine l\'attente physique, faisant gagner du temps et améliorant l\'expérience client.',
+      'key_features': 'Fonctionnalités clés',
+      'feature_realtime': 'Suivi des files en temps réel',
+      'feature_realtime_desc': 'Surveillez votre position en temps réel',
+      'feature_notifications': 'Notifications intelligentes',
+      'feature_notifications_desc':
+          'Recevez une notification lorsque votre tour approche',
+      'feature_business_management': 'Gestion des entreprises',
+      'feature_business_management_desc': 'Gérez plusieurs files efficacement',
+      'feature_multilanguage': 'Support multilingue',
+      'feature_multilanguage_desc': 'Disponible en anglais, français et arabe',
+      'contact_us': 'Contactez-nous',
+      'copyright_text': '© 2025 QNow. Tous droits réservés.',
 
-      // Notifications & Status
+      // Notifications and Status
       'queue_created': 'File créée avec succès',
       'queue_deleted': 'File supprimée avec succès',
       'queue_updated': 'File mise à jour avec succès',
@@ -451,13 +485,13 @@ class QNowLocalizations {
       'sound_alerts': 'Alertes sonores',
       'sound_alerts_subtitle': 'Jouer un son pour les notifications',
 
-      // Settings & Help
+      // Settings and Help
       'privacy_policy': 'Politique de confidentialité',
       'terms_of_service': 'Conditions d\'utilisation',
       'settings': 'Paramètres',
       'privacy_security': 'Confidentialité et sécurité',
       'delete_account': 'Supprimer le compte',
-      'help': 'Aide & Support',
+      'help': 'Aide and Support',
       'about': 'À propos',
       'contact_support': 'Contacter le support',
       'email_support': 'Email Support',
@@ -473,6 +507,27 @@ class QNowLocalizations {
       'profile_updated': 'Profil changé',
       'password_changed': 'Mot de passe changé avec succès',
       'change': 'Changer',
+      'analytics': 'Analytique',
+
+      // Help and Support
+      'additional_resources': 'Ressources supplémentaires',
+      'user_guide': 'Guide de l\'utilisateur',
+      'report_bug': 'Signaler un bug',
+      'send_feedback': 'Envoyer des commentaires',
+      'how_do_i_join_queue': 'Comment rejoindre une file ?',
+      'join_queue_answer':
+          'Pour rejoindre une file, accédez à l\'entreprise que vous souhaitez visiter, trouvez la file et appuyez sur "Rejoindre la file". Vous recevrez des notifications lorsque votre tour approche.',
+      'can_i_leave_queue': 'Puis-je quitter une file ?',
+      'leave_queue_answer':
+          'Oui, vous pouvez quitter une file à tout moment en appuyant sur "Quitter la file".',
+      'manage_notifications': 'Comment gérer les notifications ?',
+      'manage_notifications_answer':
+          'Allez dans Paramètres > Notifications pour gérer toutes les préférences de notification. Vous pouvez activer ou désactiver les notifications de file, les messages promotionnels et les alertes sonores.',
+      'data_security': 'Mes données sont-elles sécurisées ?',
+      'data_security_answer':
+          'Oui, nous utilisons un cryptage standard de l\'industrie pour protéger vos données personnelles. Consultez notre politique de confidentialité pour plus de détails sur la façon dont nous gérons vos informations.',
+      'learn_more': 'En savoir plus',
+      'help_center': 'Centre d\'aide',
 
       // Business Specific
       'business_info': 'Informations de l\'entreprise',
@@ -485,7 +540,7 @@ class QNowLocalizations {
       'business_settings': 'Paramètres de l\'entreprise',
       'business_profile': 'Profil de l\'entreprise',
 
-      // Time & Status
+      // Time and Status
       'active': 'Actif',
       'inactive': 'Inactif',
       'paused': 'En pause',
@@ -525,7 +580,7 @@ class QNowLocalizations {
       'paste': 'Coller',
     },
     'ar': {
-      // App & General
+      // App and General
       'app_title': 'كيو ناو',
       'welcome': 'مرحباً',
       'loading': 'جاري التحميل...',
@@ -543,6 +598,9 @@ class QNowLocalizations {
       'notify': 'تنبيه',
       'notified': 'تم التنبيه',
       'served': 'تمت الخدمة',
+      'already_served_and_joined':
+          'لقد انضممت بالفعل إلى هذه الطابور وتمت خدمتك',
+      'already_in_queue': 'أنت بالفعل في هذا الطابور',
       'try_again': 'حاول مرة أخرى',
       'retry': 'إعادة المحاولة',
       'close': 'إغلاق',
@@ -560,7 +618,7 @@ class QNowLocalizations {
       'language': 'اللغة',
       'get_started': 'البدء',
 
-      // Authentication & Roles
+      // Authentication and Roles
       'login': 'تسجيل الدخول',
       'signup': 'إنشاء حساب',
       'sign_out': 'تسجيل الخروج',
@@ -591,6 +649,7 @@ class QNowLocalizations {
       'personal_info': 'المعلومات الشخصية',
 
       // Queue Management
+      'available': 'متاح',
       'add_queue': 'إضافة طابور',
       'create_queue': 'إنشاء طابور',
       'your_queues': 'طوابيرك',
@@ -653,7 +712,7 @@ class QNowLocalizations {
       'manage_queue': 'إدارة الطابور',
       'manage_your_queues': 'إدارة طوابيرك',
 
-      // Search & Discovery
+      // Search and Discovery
       'search_hint': 'ابحث عن عمل...',
       'search_queues': 'ابحث في الطوابير...',
       'search_businesses': 'ابحث عن الأعمال...',
@@ -669,7 +728,24 @@ class QNowLocalizations {
       'terms_of_service_message':
           'باستخدام QNow، فإنك توافق على الانضمام، والمغادرة، وإدارة الطوابير بمسؤولية. لا تسيء استخدام التطبيق أو تقدم معلومات خاطئة. قد نقوم بتحديث هذه الشروط حسب الحاجة.',
 
-      // Notifications & Status
+      // Help and About (About page texts)
+      'smart_queue_title': 'نظام إدارة الطوابير الذكي',
+      'smart_queue_description':
+          'QNow يُحدث ثورة في طريقة انتظار الناس في الطوابير. تزيل حلنا الرقمي الانتظار المادي، مما يوفر الوقت ويحسن تجربة العملاء.',
+      'key_features': 'الميزات الرئيسية',
+      'feature_realtime': 'تتبع الطابور في الوقت الحقيقي',
+      'feature_realtime_desc': 'راقب موقعك في الوقت الحقيقي',
+      'feature_notifications': 'إشعارات ذكية',
+      'feature_notifications_desc': 'ستتلقى إشعارًا عند اقتراب دورك',
+      'feature_business_management': 'إدارة الأعمال',
+      'feature_business_management_desc': 'إدارة طوابير متعددة بكفاءة',
+      'feature_multilanguage': 'دعم متعدد اللغات',
+      'feature_multilanguage_desc': 'متاح بالإنجليزية والفرنسية والعربية',
+      'contact_us': 'اتصل بنا',
+      'copyright_text': '© 2025 QNow. كل الحقوق محفوظة.',
+      'analytics': 'التحليلات',
+
+      // Notifications and Status
       'queue_created': 'تم إنشاء الطابور بنجاح',
       'queue_deleted': 'تم حذف الطابور بنجاح',
       'queue_updated': 'تم تحديث الطابور بنجاح',
@@ -691,7 +767,7 @@ class QNowLocalizations {
       'sound_alerts': 'التنبيهات الصوتية',
       'sound_alerts_subtitle': 'تشغيل الصوت للإشعارات',
 
-      // Settings & Help
+      // Settings and Help
       'privacy_policy': 'سياسة الخصوصية',
       'terms_of_service': 'شروط الخدمة',
       'settings': 'الإعدادات',
@@ -714,6 +790,26 @@ class QNowLocalizations {
       'password_changed': 'تم تغيير كلمة المرور بنجاح',
       'change': 'تغيير',
 
+      // Help and Support
+      'additional_resources': 'موارد إضافية',
+      'user_guide': 'دليل المستخدم',
+      'report_bug': 'الإبلاغ عن خطأ',
+      'send_feedback': 'إرسال ملاحظات',
+      'how_do_i_join_queue': 'كيف أنضم إلى طابور؟',
+      'join_queue_answer':
+          'للإنضمام إلى طابور، انتقل إلى العمل الذي ترغب في زيارته، ابحث عن الطابور، واضغط على "انضم إلى الطابور". ستتلقى إشعارات عندما يقترب دورك.',
+      'can_i_leave_queue': 'هل يمكنني مغادرة الطابور؟',
+      'leave_queue_answer':
+          'نعم، يمكنك مغادرة الطابور في أي وقت من خلال الذهاب إلى الطوابير النشطة الخاصة بك والنقر على زر "غادر". سيتم تحرير موقعك للعملاء الآخرين.',
+      'manage_notifications': 'كيف أدير الإشعارات؟',
+      'manage_notifications_answer':
+          'اذهب إلى الإعدادات > الإشعارات لإدارة جميع تفضيلات الإشعارات. يمكنك تمكين أو تعطيل إشعارات الطابور، الرسائل الترويجية، والتنبيهات الصوتية.',
+      'data_security': 'هل بياناتي آمنة؟',
+      'data_security_answer':
+          'نعم، نحن نستخدم تشفيرًا قياسيًا في الصناعة لحماية بياناتك الشخصية. راجع سياسة الخصوصية الخاصة بنا لمزيد من التفاصيل حول كيفية تعاملنا مع معلوماتك.',
+      'learn_more': 'تعرف على المزيد',
+      'help_center': 'مركز المساعدة',
+
       // Business Specific
       'business_info': 'معلومات العمل',
       'business_type': 'نوع العمل',
@@ -725,7 +821,7 @@ class QNowLocalizations {
       'business_settings': 'إعدادات العمل',
       'business_profile': 'ملف العمل',
 
-      // Time & Status
+      // Time and Status
       'active': 'نشط',
       'inactive': 'غير نشط',
       'paused': 'متوقف',
@@ -764,7 +860,6 @@ class QNowLocalizations {
     },
   };
 
-  // Set the current locale
   void setLocale(Locale locale) {
     if (supportedLocales.any((l) => l.languageCode == locale.languageCode)) {
       _currentLocale = locale;
@@ -773,7 +868,6 @@ class QNowLocalizations {
     }
   }
 
-  // Get translation for a key
   String get(String key) {
     try {
       return _localizedValues[_currentLocale.languageCode]?[key] ??
@@ -784,7 +878,6 @@ class QNowLocalizations {
     }
   }
 
-  // Static method to get translation (for convenience)
   static String getTranslation(String key) {
     try {
       return _localizedValues[_instance._currentLocale.languageCode]?[key] ??
@@ -795,16 +888,12 @@ class QNowLocalizations {
     }
   }
 
-  // Get current locale
   Locale get currentLocale => _currentLocale;
 
-  // Check if current locale is RTL
   bool get isRTL => _currentLocale.languageCode == 'ar';
 
-  // Get supported locales
   List<Locale> get supportedLocalesList => supportedLocales;
 
-  // Get language name for a locale code
   String getLanguageName(String languageCode) {
     switch (languageCode) {
       case 'en':
@@ -818,7 +907,6 @@ class QNowLocalizations {
     }
   }
 
-  // Get language flag for a locale code
   String getLanguageFlag(String languageCode) {
     switch (languageCode) {
       case 'en':
@@ -832,18 +920,13 @@ class QNowLocalizations {
     }
   }
 
-  // Get QNowLocalizations instance from context
   static QNowLocalizations of(BuildContext context) {
     return _instance;
   }
 
-  // Clear all translations (for testing)
-  static void clear() {
-    // This is useful for testing purposes
-  }
+  static void clear() {}
 }
 
-// Simple extension for easy access in widgets
 extension LocalizationExtension on BuildContext {
   String loc(String key) {
     return QNowLocalizations.getTranslation(key);
@@ -852,7 +935,7 @@ extension LocalizationExtension on BuildContext {
   QNowLocalizations get localizations => QNowLocalizations.of(this);
 }
 
-// Localized Text Widget
+// Text Widget
 class LocalizedText extends StatelessWidget {
   final String ke;
   final TextStyle? style;
@@ -881,7 +964,7 @@ class LocalizedText extends StatelessWidget {
   }
 }
 
-// Localized Button Widget
+// Button Widget
 class LocalizedButton extends StatelessWidget {
   final String textKey;
   final VoidCallback onPressed;
@@ -908,7 +991,7 @@ class LocalizedButton extends StatelessWidget {
   }
 }
 
-// Localized Input Field Widget
+// Input Field Widget
 class LocalizedTextField extends StatelessWidget {
   final String hintKey;
   final TextEditingController? controller;
@@ -942,9 +1025,6 @@ class LocalizedTextField extends StatelessWidget {
   }
 }
 
-// Also provide the same helper on Element and State so calls that have
-// a more specific static type (e.g. StatefulElement) still resolve to
-// a localization helper when using the dot syntax.
 extension LocalizationOnElement on Element {
   String loc(String key) => QNowLocalizations.getTranslation(key);
 }

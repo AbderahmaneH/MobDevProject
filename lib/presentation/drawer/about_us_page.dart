@@ -15,22 +15,20 @@ class AboutUsPage extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverAppBar(
-                backgroundColor: AppColors.backgroundLight,
-                surfaceTintColor: AppColors.transparent,
-                elevation: 0,
-                centerTitle: true,
-                title: Text(
-                  context.loc('about'),
-                  style: AppTextStyles.titleLarge(context),
-                ),
+              backgroundColor: AppColors.backgroundLight,
+              surfaceTintColor: AppColors.transparent,
+              elevation: 0,
+              centerTitle: true,
+              title: Text(
+                context.loc('about'),
+                style: AppTextStyles.titleLarge(context),
               ),
-              
+            ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                    // App Logo and Info
                     LogoHeader(
                       title: context.loc('app_title'),
                       subtitle: context.loc('version'),
@@ -39,9 +37,8 @@ class AboutUsPage extends StatelessWidget {
                       iconContainerSize: 30,
                     ),
                     const SizedBox(height: 32),
-
-                    // About The Project
-                    AppLabels.sectionTitle(context, context.loc('about_project')),
+                    AppLabels.sectionTitle(
+                        context, context.loc('about_project')),
                     const SizedBox(height: 16),
                     AppContainers.card(
                       context: context,
@@ -54,7 +51,7 @@ class AboutUsPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Smart Queue Management System',
+                            context.loc('smart_queue_title'),
                             style: AppTextStyles.getAdaptiveStyle(
                               context,
                               fontSize: 18,
@@ -64,9 +61,7 @@ class AboutUsPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'QNow revolutionizes the way people wait in queues. '
-                            'Our digital solution eliminates physical waiting, '
-                            'saving time and improving customer experience.',
+                            context.loc('smart_queue_description'),
                             style: AppTextStyles.getAdaptiveStyle(
                               context,
                               fontSize: 14,
@@ -79,76 +74,74 @@ class AboutUsPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    // Features
-                    AppLabels.sectionTitle(context, 'Key Features'),
+                    AppLabels.sectionTitle(
+                        context, context.loc('key_features')),
                     const SizedBox(height: 16),
                     Column(
                       children: [
                         _buildFeatureItem(
                           context: context,
                           icon: Icons.access_time,
-                          title: 'Real-time Queue Tracking',
-                          description: 'Monitor your position in real-time',
+                          title: context.loc('feature_realtime'),
+                          description: context.loc('feature_realtime_desc'),
                         ),
                         const SizedBox(height: 12),
                         _buildFeatureItem(
                           context: context,
                           icon: Icons.notifications_active,
-                          title: 'Smart Notifications',
-                          description: 'Get notified when your turn is near',
+                          title: context.loc('feature_notifications'),
+                          description:
+                              context.loc('feature_notifications_desc'),
                         ),
                         const SizedBox(height: 12),
                         _buildFeatureItem(
                           context: context,
                           icon: Icons.business,
-                          title: 'Business Management',
-                          description: 'Manage multiple queues efficiently',
+                          title: context.loc('feature_business_management'),
+                          description:
+                              context.loc('feature_business_management_desc'),
                         ),
                         const SizedBox(height: 12),
                         _buildFeatureItem(
                           context: context,
                           icon: Icons.language,
-                          title: 'Multi-language Support',
-                          description: 'Available in English, French, and Arabic',
+                          title: context.loc('feature_multilanguage'),
+                          description:
+                              context.loc('feature_multilanguage_desc'),
                         ),
                       ],
                     ),
                     const SizedBox(height: 32),
-
-                    // Development Team
                     AppLabels.sectionTitle(context, context.loc('dev_team')),
                     const SizedBox(height: 16),
                     Column(
                       children: [
                         _buildTeamMember(
                           name: 'Abderrahmane Hababela',
-                          role: 'Team Leader',
+                          role: 'Contact : 0553 72 90 19',
                           context: context,
                         ),
                         const SizedBox(height: 12),
                         _buildTeamMember(
                           name: 'Mohamed Sahnoune Toubal',
-                          role: 'Lead Developer',
+                          role: 'Contact : 0794 32 40 12',
                           context: context,
                         ),
                         const SizedBox(height: 12),
                         _buildTeamMember(
                           name: 'Ahmed Ouassim Kacher',
-                          role: 'UI/UX Designer',
+                          role: 'Contact : 0770 10 56 28',
                           context: context,
                         ),
                         const SizedBox(height: 12),
                         _buildTeamMember(
                           name: 'Hassane Ait Ahmad Lamara',
-                          role: 'Backend Developer',
+                          role: 'Contact : +33 7 51 31 72 65',
                           context: context,
                         ),
                       ],
                     ),
                     const SizedBox(height: 32),
-
-                    // Contact Information
                     AppContainers.card(
                       context: context,
                       backgroundColor: AppColors.primary,
@@ -161,7 +154,7 @@ class AboutUsPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Contact Us',
+                            context.loc('contact_us'),
                             style: AppTextStyles.getAdaptiveStyle(
                               context,
                               fontSize: 20,
@@ -172,13 +165,13 @@ class AboutUsPage extends StatelessWidget {
                           const SizedBox(height: 16),
                           _buildContactInfo(
                             icon: Icons.email,
-                            text: 'qnowteam@gmail.com',
+                            text: 'support@qnow.com',
                             context: context,
                           ),
                           const SizedBox(height: 8),
                           _buildContactInfo(
                             icon: Icons.phone,
-                            text: '+213 555 555 555',
+                            text: '+213 553 72 90 19',
                             context: context,
                           ),
                           const SizedBox(height: 8),
@@ -191,10 +184,8 @@ class AboutUsPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 32),
-
-                    // App Version and Copyright
                     Text(
-                      'Version 1.0.0',
+                      context.loc('version'),
                       style: AppTextStyles.getAdaptiveStyle(
                         context,
                         fontSize: 12,
@@ -203,7 +194,7 @@ class AboutUsPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '© 2024 QNow. All rights reserved.',
+                      context.loc('copyright_text'),
                       style: AppTextStyles.getAdaptiveStyle(
                         context,
                         fontSize: 12,

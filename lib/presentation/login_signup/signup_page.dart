@@ -41,7 +41,7 @@ class _SignupViewState extends State<SignupView> {
   final _confirmPasswordController = TextEditingController();
   final _businessNameController = TextEditingController();
   final _businessAddressController = TextEditingController();
-  
+
   bool _isBusiness = false;
   bool _showPassword = false;
   bool _showConfirmPassword = false;
@@ -57,16 +57,6 @@ class _SignupViewState extends State<SignupView> {
     _businessAddressController.dispose();
     super.dispose();
   }
-
-  
-
-
-
-
-
-
-
-
 
   void _navigateToHome(User user) {
     Navigator.pushReplacement(
@@ -117,7 +107,8 @@ class _SignupViewState extends State<SignupView> {
                   style: AppTextStyles.titleLarge(context),
                 ),
                 leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: AppColors.textPrimaryLight),
+                  icon: const Icon(Icons.arrow_back,
+                      color: AppColors.textPrimaryLight),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
@@ -133,15 +124,11 @@ class _SignupViewState extends State<SignupView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 6),
-
-                        // Logo Header
                         LogoHeader(
                           title: context.loc('app_title'),
                           subtitle: context.loc('signup'),
                         ),
                         const SizedBox(height: 24),
-
-                        // Role Toggle
                         RoleToggle(
                           isBusinessOwner: _isBusiness,
                           onChanged: (isBusiness) {
@@ -151,8 +138,6 @@ class _SignupViewState extends State<SignupView> {
                           },
                         ),
                         const SizedBox(height: 20),
-
-                        // Name
                         AppLabels.label(context, context.loc('name')),
                         const SizedBox(height: 6),
                         AppTextFields.textField(
@@ -164,8 +149,6 @@ class _SignupViewState extends State<SignupView> {
                               .validateName(value, context),
                         ),
                         const SizedBox(height: 14),
-
-                        // Phone
                         AppLabels.label(context, context.loc('phone')),
                         const SizedBox(height: 6),
                         AppTextFields.textField(
@@ -178,8 +161,6 @@ class _SignupViewState extends State<SignupView> {
                               .validatePhone(value, context),
                         ),
                         const SizedBox(height: 14),
-
-                        // Business fields (only if selected)
                         if (_isBusiness) ...[
                           AppLabels.label(context, context.loc('email')),
                           const SizedBox(height: 6),
@@ -193,8 +174,8 @@ class _SignupViewState extends State<SignupView> {
                                 .validateEmail(value, context, _isBusiness),
                           ),
                           const SizedBox(height: 14),
-                          
-                          AppLabels.label(context, context.loc('business_name')),
+                          AppLabels.label(
+                              context, context.loc('business_name')),
                           const SizedBox(height: 6),
                           AppTextFields.textField(
                             context: context,
@@ -202,10 +183,10 @@ class _SignupViewState extends State<SignupView> {
                             controller: _businessNameController,
                             validator: (value) => context
                                 .read<AuthCubit>()
-                                .validateBusinessName(value, context, _isBusiness),
+                                .validateBusinessName(
+                                    value, context, _isBusiness),
                           ),
                           const SizedBox(height: 14),
-                          
                           AppLabels.label(context, context.loc('address')),
                           const SizedBox(height: 6),
                           AppTextFields.textField(
@@ -214,12 +195,11 @@ class _SignupViewState extends State<SignupView> {
                             controller: _businessAddressController,
                             validator: (value) => context
                                 .read<AuthCubit>()
-                                .validateBusinessAddress(value, context, _isBusiness),
+                                .validateBusinessAddress(
+                                    value, context, _isBusiness),
                           ),
                           const SizedBox(height: 14),
                         ],
-
-                        // Password
                         AppLabels.label(context, context.loc('password')),
                         const SizedBox(height: 6),
                         AppTextFields.passwordField(
@@ -234,9 +214,8 @@ class _SignupViewState extends State<SignupView> {
                               .validatePassword(value, context),
                         ),
                         const SizedBox(height: 14),
-
-                        // Confirm Password
-                        AppLabels.label(context, context.loc('confirm_password')),
+                        AppLabels.label(
+                            context, context.loc('confirm_password')),
                         const SizedBox(height: 6),
                         AppTextFields.passwordField(
                           context: context,
@@ -246,43 +225,48 @@ class _SignupViewState extends State<SignupView> {
                           onToggleVisibility: () => setState(
                             () => _showConfirmPassword = !_showConfirmPassword,
                           ),
-                          validator: (value) => context
-                              .read<AuthCubit>()
-                              .validateConfirmPassword(
-                                value,
-                                context,
-                                _passwordController.text.trim(),
-                              ),
+                          validator: (value) =>
+                              context.read<AuthCubit>().validateConfirmPassword(
+                                    value,
+                                    context,
+                                    _passwordController.text.trim(),
+                                  ),
                         ),
                         const SizedBox(height: 20),
-
-                        // Sign Up Button
                         BlocBuilder<AuthCubit, AuthState>(
                           builder: (context, state) {
                             final isLoading = state is AuthLoading;
                             return AppButtons.primaryButton(
                               text: context.loc('signup'),
-                              onPressed: isLoading ? () {} : () {
-                                if (_formKey.currentState!.validate()) {
-                                  context.read<AuthCubit>().signup(
-                                        name: _nameController.text.trim(),
-                                        phone: _phoneController.text.trim(),
-                                        email: _emailController.text.trim(),
-                                        password: _passwordController.text.trim(),
-                                        isBusiness: _isBusiness,
-                                        businessName: _businessNameController.text.trim(),
-                                        businessAddress: _businessAddressController.text.trim(),
-                                      );
-                                }
-                              },
+                              onPressed: isLoading
+                                  ? () {}
+                                  : () {
+                                      if (_formKey.currentState!.validate()) {
+                                        context.read<AuthCubit>().signup(
+                                              name: _nameController.text.trim(),
+                                              phone:
+                                                  _phoneController.text.trim(),
+                                              email:
+                                                  _emailController.text.trim(),
+                                              password: _passwordController.text
+                                                  .trim(),
+                                              isBusiness: _isBusiness,
+                                              businessName:
+                                                  _businessNameController.text
+                                                      .trim(),
+                                              businessAddress:
+                                                  _businessAddressController
+                                                      .text
+                                                      .trim(),
+                                            );
+                                      }
+                                    },
                               isLoading: isLoading,
                               context: context,
                             );
                           },
                         ),
                         const SizedBox(height: 18),
-
-                        // Already have account
                         Center(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

@@ -107,15 +107,11 @@ class _LoginViewState extends State<LoginView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 6),
-
-                        // Logo Header
                         LogoHeader(
                           title: context.loc('app_title'),
                           subtitle: context.loc('login'),
                         ),
                         const SizedBox(height: 24),
-
-                        // Role Toggle
                         RoleToggle(
                           isBusinessOwner: _isBusiness,
                           onChanged: (isBusiness) {
@@ -125,8 +121,6 @@ class _LoginViewState extends State<LoginView> {
                           },
                         ),
                         const SizedBox(height: 24),
-
-                        // Phone Field
                         AppLabels.label(context, context.loc('phone')),
                         const SizedBox(height: 6),
                         AppTextFields.textField(
@@ -139,8 +133,6 @@ class _LoginViewState extends State<LoginView> {
                               .validatePhone(value, context),
                         ),
                         const SizedBox(height: 16),
-
-                        // Password Field
                         AppLabels.label(context, context.loc('password')),
                         const SizedBox(height: 6),
                         AppTextFields.passwordField(
@@ -155,8 +147,6 @@ class _LoginViewState extends State<LoginView> {
                               .validatePassword(value, context),
                         ),
                         const SizedBox(height: 20),
-
-                        // Login Button
                         BlocBuilder<AuthCubit, AuthState>(
                           builder: (context, state) {
                             final isLoading = state is AuthLoading;
@@ -167,10 +157,10 @@ class _LoginViewState extends State<LoginView> {
                                   : () {
                                       if (_formKey.currentState!.validate()) {
                                         context.read<AuthCubit>().login(
-                                          _phoneController.text.trim(),
-                                          _passwordController.text.trim(),
-                                          _isBusiness,
-                                        );
+                                              _phoneController.text.trim(),
+                                              _passwordController.text.trim(),
+                                              _isBusiness,
+                                            );
                                       }
                                     },
                               isLoading: isLoading,
@@ -179,8 +169,6 @@ class _LoginViewState extends State<LoginView> {
                           },
                         ),
                         const SizedBox(height: 16),
-
-                        // Sign Up Link
                         Center(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

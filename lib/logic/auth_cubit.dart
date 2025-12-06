@@ -3,15 +3,14 @@ import 'package:flutter/material.dart';
 import '../core/localization.dart';
 import '../database/models/user_model.dart';
 import '../database/repositories/user_repository.dart';
-
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final UserRepository _userRepository;
 
   AuthCubit({required UserRepository userRepository})
-    : _userRepository = userRepository,
-      super(AuthInitial());
+      : _userRepository = userRepository,
+        super(AuthInitial());
 
   Future<void> login(String phone, String password, bool isBusiness) async {
     emit(AuthLoading());
@@ -59,7 +58,7 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       final user = User(
-        id: null, // Will be auto-generated
+        id: null,
         name: name,
         email: email,
         phone: phone,
@@ -186,7 +185,8 @@ class AuthCubit extends Cubit<AuthState> {
     }
     return null;
   }
-  String? validateEmail(String? value , BuildContext context, bool isBusiness) {
+
+  String? validateEmail(String? value, BuildContext context, bool isBusiness) {
     if (isBusiness && (value == null || value.isEmpty)) {
       return context.loc('required_field');
     }
@@ -195,7 +195,9 @@ class AuthCubit extends Cubit<AuthState> {
     }
     return null;
   }
-    String? validateConfirmPassword(String? value , BuildContext context , String password) {
+
+  String? validateConfirmPassword(
+      String? value, BuildContext context, String password) {
     if (value == null || value.isEmpty) {
       return context.loc('required_field');
     }
@@ -204,32 +206,46 @@ class AuthCubit extends Cubit<AuthState> {
     }
     return null;
   }
-  String? validateBusinessName(String? value , BuildContext context, bool isBusiness) {
+
+  String? validateBusinessName(
+      String? value, BuildContext context, bool isBusiness) {
     if (isBusiness && (value == null || value.isEmpty)) {
       return context.loc('required_field');
     }
     return null;
   }
-  String? validateBusinessAddress(String? value , BuildContext context, bool isBusiness) {
+
+  String? validateBusinessAddress(
+      String? value, BuildContext context, bool isBusiness) {
     if (isBusiness && (value == null || value.isEmpty)) {
       return context.loc('required_field');
     }
     return null;
   }
-  
+
   void logout() {
     emit(AuthInitial());
   }
 
-  Future<void> deleteAccount(int? userId) async {
+  Future<void> deleteAccountWithPassword(int? userId, String password) async {
     if (userId == null) {
       emit(const AuthFailure(error: 'User not found'));
       return;
     }
     emit(AuthLoading());
     try {
+      final user = await _userRepository.getUserById(userId);
+      if (user == null) {
+        emit(const AuthFailure(error: 'User not found'));
+        return;
+      }
+
+      if (user.password != password) {
+        emit(const AuthFailure(error: 'Current password is incorrect'));
+        return;
+      }
+
       await _userRepository.deleteUser(userId);
-      // After deletion, return to unauthenticated state
       emit(AuthInitial());
     } catch (e) {
       emit(AuthFailure(error: 'Delete failed: $e'));

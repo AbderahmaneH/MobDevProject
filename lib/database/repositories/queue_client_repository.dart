@@ -29,15 +29,15 @@ class QueueClientRepository {
     return maps.map((map) => QueueClient.fromMap(map)).toList();
   }
 
-  Future<List<Queue>> getQueuesByUser(int? userId) async {
+  Future<List<Queue>> getQueuesByUser(int? userId,
+      {bool includeServed = false}) async {
     final db = await databaseHelper.database;
 
-    // Get all queue IDs where user is a client
     final clientMaps = await db.query(
       DatabaseTables.queueClients,
       columns: ['queue_id'],
-      where: 'user_id = ? AND status != ?',
-      whereArgs: [userId, 'served'],
+      where: includeServed ? 'user_id = ?' : 'user_id = ? AND status != ?',
+      whereArgs: includeServed ? [userId] : [userId, 'served'],
       distinct: true,
     );
 
@@ -45,7 +45,6 @@ class QueueClientRepository {
 
     if (queueIds.isEmpty) return [];
 
-    // Get all queues where user is a client
     final queueMaps = await db.query(
       DatabaseTables.queues,
       where: 'id IN (${queueIds.map((_) => '?').join(',')})',
@@ -54,7 +53,6 @@ class QueueClientRepository {
 
     final queues = queueMaps.map((map) => Queue.fromMap(map)).toList();
 
-    // Load clients for each queue
     for (final queue in queues) {
       queue.clients = await getQueueClients(queue.id);
     }

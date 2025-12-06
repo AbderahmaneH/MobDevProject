@@ -39,7 +39,7 @@ class QueueClient {
       'joined_at': joinedAt.millisecondsSinceEpoch,
       'served_at': servedAt?.millisecondsSinceEpoch,
       'notified_at': notifiedAt?.millisecondsSinceEpoch,
-      if(id != null) 'id': id,
+      if (id != null) 'id': id,
     };
   }
 
@@ -53,7 +53,7 @@ class QueueClient {
       position: map['position'],
       status: map['status'],
       joinedAt: DateTime.fromMillisecondsSinceEpoch(map['joined_at']),
-      servedAt: map['served_at'] != null 
+      servedAt: map['served_at'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['served_at'])
           : null,
       notifiedAt: map['notified_at'] != null

@@ -29,17 +29,14 @@ class DatabaseHelper {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    // Create all tables
     for (final query in DatabaseTables.createTableQueries) {
       await db.execute(query);
     }
 
-    // Create all indexes
     for (final query in DatabaseIndexes.createIndexQueries) {
       await db.execute(query);
     }
 
-    // Insert dummy data for testing
     await insertDummyData(db);
   }
 
@@ -61,7 +58,7 @@ class DatabaseHelper {
     final path = join(databasesPath, 'qnow.db');
     await deleteDatabase(path);
     _database = null;
-    await database; // Reinitialize database
+    await database;
   }
 
   Future<void> close() async {

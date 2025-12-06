@@ -10,7 +10,8 @@ class TermsOfServicePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(title: Text(context.loc('terms_of_service')),
+      appBar: AppBar(
+        title: Text(context.loc('terms_of_service')),
         backgroundColor: AppColors.backgroundLight,
       ),
       body: Padding(
@@ -18,7 +19,8 @@ class TermsOfServicePage extends StatelessWidget {
         child: AppContainers.card(
           context: context,
           padding: const EdgeInsets.all(16),
-          child: Text(context.loc('terms_of_service_message'),
+          child: Text(
+            context.loc('terms_of_service_message'),
             style: AppTextStyles.getAdaptiveStyle(context, fontSize: 14),
           ),
         ),

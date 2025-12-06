@@ -4,8 +4,8 @@ import 'logic/app_cubit.dart';
 import 'logic/auth_cubit.dart';
 import 'database/db_helper.dart';
 import 'core/localization.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/app_colors.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'presentation/welcome_page.dart';
 import 'database/repositories/user_repository.dart';
 
@@ -40,6 +40,33 @@ class MyApp extends StatelessWidget {
 
                 return MaterialApp(
                   debugShowCheckedModeBanner: false,
+                  theme: ThemeData(
+                    elevatedButtonTheme: ElevatedButtonThemeData(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.white,
+                        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    outlinedButtonTheme: OutlinedButtonThemeData(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: const BorderSide(color: AppColors.primary),
+                        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    textButtonTheme: TextButtonThemeData(
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    floatingActionButtonTheme:
+                        const FloatingActionButtonThemeData(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
+                    ),
+                  ),
                   title: QNowLocalizations.getTranslation('app_title'),
                   supportedLocales: QNowLocalizations().supportedLocalesList,
                   locale: locale,

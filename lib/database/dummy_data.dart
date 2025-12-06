@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'tables.dart';
 
 Future<void> insertDummyData(Database db) async {
-  // Insert dummy users
+  // Users
   await db.insert(DatabaseTables.users, {
     'id': 0,
     'name': 'Abderrahmane',
@@ -47,7 +47,7 @@ Future<void> insertDummyData(Database db) async {
     'is_business': 0,
     'created_at': DateTime.now().millisecondsSinceEpoch,
   });
-  // Insert dummy business owners
+  // Business owners
   await db.insert(DatabaseTables.users, {
     'id': 5,
     'name': 'Mohamed Business',
@@ -85,7 +85,7 @@ Future<void> insertDummyData(Database db) async {
     'business_address': 'Sidi Abdellah',
   });
 
-  // Insert dummy queues
+  // Queues
   await db.insert(DatabaseTables.queues, {
     'id': 1,
     'business_owner_id': 5,

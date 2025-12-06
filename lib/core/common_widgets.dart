@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'localization.dart';
 
-// ==============================
-// BUTTONS - Enhanced with more options
-// ==============================
+// Buttons
 
 class AppButtons {
   static Widget primaryButton({
@@ -186,9 +184,7 @@ class AppButtons {
   }
 }
 
-// ==============================
-// TEXT FIELDS - Enhanced with more options
-// ==============================
+// Text fields
 
 class AppTextFields {
   static Widget textField({
@@ -328,9 +324,7 @@ class AppTextFields {
   }
 }
 
-// ==============================
-// LABELS - Enhanced with more variants
-// ==============================
+// Labels
 
 class AppLabels {
   static Widget label(
@@ -419,9 +413,7 @@ class AppLabels {
   }
 }
 
-// ==============================
-// CARDS & CONTAINERS - Enhanced with more variants
-// ==============================
+// Cards and containers
 
 class AppContainers {
   static Widget card({
@@ -555,9 +547,7 @@ class AppContainers {
   }
 }
 
-// ==============================
-// ROLE TOGGLE - Enhanced with animations
-// ==============================
+// Role toggle
 
 class RoleToggle extends StatelessWidget {
   final bool isBusinessOwner;
@@ -630,9 +620,7 @@ class RoleToggle extends StatelessWidget {
   }
 }
 
-// ==============================
-// LOGO HEADER - Enhanced with more customization
-// ==============================
+// Logo header
 
 class LogoHeader extends StatelessWidget {
   final String title;
@@ -705,9 +693,7 @@ class LogoHeader extends StatelessWidget {
   }
 }
 
-// ==============================
-// NEW: LOADING & EMPTY STATES
-// ==============================
+// Loading and empty states
 
 class AppStates {
   static Widget loadingState({

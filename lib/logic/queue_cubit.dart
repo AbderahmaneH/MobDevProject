@@ -3,7 +3,6 @@ import '../database/repositories/queue_repository.dart';
 import '../database/repositories/queue_client_repository.dart';
 import '../database/models/queue_client_model.dart';
 import '../database/models/queue_model.dart';
-
 part 'queue_state.dart';
 
 class QueueCubit extends Cubit<QueueState> {
@@ -52,9 +51,7 @@ class QueueCubit extends Cubit<QueueState> {
         createdAt: DateTime.now(),
       );
 
-      // Emit creation event first
       emit(QueueCreated());
-      // Then insert and reload - this will emit QueueLoaded last
       await _queueRepository.insertQueue(queue);
       await loadQueues();
     } catch (e) {

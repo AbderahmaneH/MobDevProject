@@ -19,10 +19,7 @@ class WelcomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Language selector
               _buildLanguageSelector(context),
-
-              // Main content
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -38,7 +35,6 @@ class WelcomePage extends StatelessWidget {
 
                     const SizedBox(height: 40),
 
-                    // App description
                     Text(
                       context.loc('manage_your_queues'),
                       style: AppTextStyles.getAdaptiveStyle(
@@ -53,7 +49,6 @@ class WelcomePage extends StatelessWidget {
 
                     const SizedBox(height: 60),
 
-                    // Buttons
                     Column(
                       children: [
                         AppButtons.primaryButton(
@@ -68,7 +63,6 @@ class WelcomePage extends StatelessWidget {
                           },
                           context: context,
                         ),
-
                         const SizedBox(height: 16),
                       ],
                     ),

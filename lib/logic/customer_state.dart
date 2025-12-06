@@ -20,6 +20,12 @@ class CustomerError extends CustomerState {
   const CustomerError({required this.error});
 }
 
+class CustomerNotification extends CustomerState {
+  final String message;
+
+  const CustomerNotification({required this.message});
+}
+
 class QueuesSearched extends CustomerState {
   final List<Queue> queues;
 

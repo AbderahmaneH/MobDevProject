@@ -12,11 +12,20 @@ import '../../database/db_helper.dart';
 
 class QueuePage extends StatelessWidget {
   final Queue queue;
+  final QueueCubit? parentCubit;
 
-  const QueuePage({super.key, required this.queue});
+  const QueuePage({super.key, required this.queue, this.parentCubit});
 
   @override
   Widget build(BuildContext context) {
+    if (parentCubit != null) {
+      parentCubit!.loadQueues();
+      return BlocProvider.value(
+        value: parentCubit!,
+        child: QueueView(queue: queue),
+      );
+    }
+
     return BlocProvider(
       create: (context) => QueueCubit(
         queueRepository: QueueRepository(databaseHelper: DatabaseHelper()),
@@ -118,7 +127,6 @@ class _QueueViewState extends State<QueueView> {
             ElevatedButton(
               onPressed: () {
                 if (_addClientFormKey.currentState!.validate()) {
-                  // Use the outer context to access QueueCubit
                   context.read<QueueCubit>().addClientToQueue(
                         queueId: widget.queue.id,
                         name: _nameController.text.trim(),
@@ -148,7 +156,7 @@ class _QueueViewState extends State<QueueView> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text(context.loc('serve_customer')),
+          title: Text(context.loc('serve')),
           content: Text('${context.loc('serve_confirm')} ${client.name}?'),
           actions: [
             TextButton(
@@ -157,7 +165,6 @@ class _QueueViewState extends State<QueueView> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Use context from QueueView, not dialog context
                 context.read<QueueCubit>().serveClient(client.id);
                 Navigator.pop(dialogContext);
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -243,7 +250,6 @@ class _QueueViewState extends State<QueueView> {
         children: [
           Row(
             children: [
-              // Client avatar
               Container(
                 width: 40,
                 height: 40,
@@ -251,11 +257,10 @@ class _QueueViewState extends State<QueueView> {
                   color: _getStatusColor(client.status),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(Icons.person, color: AppColors.white, size: 20),
+                child:
+                    const Icon(Icons.person, color: AppColors.white, size: 20),
               ),
               const SizedBox(width: 12),
-
-              // Client info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,8 +315,6 @@ class _QueueViewState extends State<QueueView> {
                   ],
                 ),
               ),
-
-              // Position
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -334,8 +337,6 @@ class _QueueViewState extends State<QueueView> {
             ],
           ),
           const SizedBox(height: 16),
-
-          // Actions
           Row(
             children: [
               Expanded(
@@ -389,8 +390,6 @@ class _QueueViewState extends State<QueueView> {
               ),
             ],
           ),
-
-          // Timestamps
           if (client.notifiedAt != null || client.servedAt != null)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -498,7 +497,6 @@ class _QueueViewState extends State<QueueView> {
               return CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: [
-                  // App Bar
                   SliverAppBar(
                     title: Text(currentQueue.name),
                     backgroundColor: AppColors.backgroundLight,
@@ -514,8 +512,6 @@ class _QueueViewState extends State<QueueView> {
                       ),
                     ],
                   ),
-
-                  // Queue Info
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -552,7 +548,6 @@ class _QueueViewState extends State<QueueView> {
                           ),
                           const SizedBox(height: 20),
 
-                          // Capacity Info
                           AppContainers.card(
                             context: context,
                             padding: const EdgeInsets.all(16),
@@ -616,8 +611,6 @@ class _QueueViewState extends State<QueueView> {
                       ),
                     ),
                   ),
-
-                  // Clients List Header
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -647,8 +640,6 @@ class _QueueViewState extends State<QueueView> {
                       ),
                     ),
                   ),
-
-                  // Clients List
                   if (currentQueue.clients.isEmpty)
                     SliverToBoxAdapter(
                       child: AppStates.emptyState(
@@ -671,8 +662,6 @@ class _QueueViewState extends State<QueueView> {
                         childCount: currentQueue.clients.length,
                       ),
                     ),
-
-                  // Bottom padding
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
               );

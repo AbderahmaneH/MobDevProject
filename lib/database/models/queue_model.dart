@@ -38,7 +38,6 @@ class Queue {
       'is_active': isActive ? 1 : 0,
       'created_at': createdAt.millisecondsSinceEpoch,
     };
-    // Only include id if it's not 0 (for updates)
     if (id != 0) {
       map['id'] = id;
     }

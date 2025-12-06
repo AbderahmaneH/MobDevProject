@@ -11,7 +11,6 @@ import '../../database/models/user_model.dart';
 class ProfilePage extends StatelessWidget {
   final User user;
   const ProfilePage({super.key, required this.user});
-  
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +38,7 @@ class _ProfileViewState extends State<ProfileView> {
   final _phoneController = TextEditingController();
   final _businessNameController = TextEditingController();
   final _businessAddressController = TextEditingController();
-  
+
   bool _isEditing = false;
   late User _currentUser;
 
@@ -72,7 +71,6 @@ class _ProfileViewState extends State<ProfileView> {
     setState(() {
       _isEditing = !_isEditing;
       if (!_isEditing) {
-        // Cancel editing - reload original data
         _loadUserData();
       }
     });
@@ -81,22 +79,21 @@ class _ProfileViewState extends State<ProfileView> {
   void _saveProfile() {
     if (_isEditing) {
       context.read<AuthCubit>().updateProfile(
-        user: _currentUser,
-        name: _nameController.text.trim(),
-        email: _emailController.text.trim().isNotEmpty
-            ? _emailController.text.trim()
-            : null,
-        businessName: _currentUser.isBusiness
-            ? _businessNameController.text.trim()
-            : null,
-        businessAddress: _currentUser.isBusiness
-            ? _businessAddressController.text.trim()
-            : null,
-      );
+            user: _currentUser,
+            name: _nameController.text.trim(),
+            email: _emailController.text.trim().isNotEmpty
+                ? _emailController.text.trim()
+                : null,
+            businessName: _currentUser.isBusiness
+                ? _businessNameController.text.trim()
+                : null,
+            businessAddress: _currentUser.isBusiness
+                ? _businessAddressController.text.trim()
+                : null,
+          );
     }
     _toggleEditMode();
   }
-
 
   Widget _buildInfoField({
     required String displayLabel,
@@ -190,10 +187,9 @@ class _ProfileViewState extends State<ProfileView> {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
-          child: BlocListener<AuthCubit, AuthState>(
+        child: BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is ProfileUpdated) {
-              // Update local user and controllers so UI reflects DB changes
               setState(() {
                 _currentUser = state.user;
                 _loadUserData();
@@ -233,13 +229,11 @@ class _ProfileViewState extends State<ProfileView> {
                   style: AppTextStyles.titleLarge(context),
                 ),
               ),
-              
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
                     children: [
-                      // Profile Header
                       AppContainers.card(
                         context: context,
                         backgroundColor: AppColors.primary,
@@ -250,8 +244,8 @@ class _ProfileViewState extends State<ProfileView> {
                               backgroundColor: AppColors.white,
                               child: Icon(
                                 _currentUser.isBusiness
-                                  ? Icons.business
-                                  : Icons.person,
+                                    ? Icons.business
+                                    : Icons.person,
                                 size: 40,
                                 color: AppColors.primary,
                               ),
@@ -269,40 +263,38 @@ class _ProfileViewState extends State<ProfileView> {
                             const SizedBox(height: 8),
                             Text(
                               _currentUser.isBusiness
-                                  ? (_currentUser.businessName ?? 'Business Owner')
+                                  ? (_currentUser.businessName ??
+                                      'Business Owner')
                                   : 'Customer',
                               style: AppTextStyles.getAdaptiveStyle(
                                 context,
                                 fontSize: 14,
-                                lightColor: AppColors.white.withAlpha((0.8 * 255).round()),
+                                lightColor: AppColors.white
+                                    .withAlpha((0.8 * 255).round()),
                               ),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 24),
-
-                      // Edit Button
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           AppButtons.iconButton(
                             icon: _isEditing ? Icons.save : Icons.edit,
                             onPressed: _saveProfile,
-                            backgroundColor: AppColors.primary.withAlpha((0.1 * 255).round()),
+                            backgroundColor: AppColors.primary
+                                .withAlpha((0.1 * 255).round()),
                             iconColor: AppColors.primary,
                           ),
                         ],
                       ),
                       const SizedBox(height: 16),
-
-                      // Personal Information
                       AppLabels.sectionTitle(
                         context,
                         context.loc('personal_info'),
                       ),
                       const SizedBox(height: 16),
-
                       _buildInfoField(
                         displayLabel: context.loc('name'),
                         fieldKey: 'name',
@@ -310,7 +302,6 @@ class _ProfileViewState extends State<ProfileView> {
                         icon: Icons.person_outline,
                       ),
                       const SizedBox(height: 12),
-
                       _buildInfoField(
                         displayLabel: context.loc('email'),
                         fieldKey: 'email',
@@ -318,24 +309,20 @@ class _ProfileViewState extends State<ProfileView> {
                         icon: Icons.email_outlined,
                       ),
                       const SizedBox(height: 12),
-
                       _buildInfoField(
                         displayLabel: context.loc('phone'),
                         fieldKey: 'phone',
                         value: _phoneController.text,
                         icon: Icons.phone_outlined,
-                        isEditable: false, // Phone shouldn't be editable
+                        isEditable: false,
                       ),
                       const SizedBox(height: 24),
-
-                      // Business Information (if business user)
                       if (_currentUser.isBusiness) ...[
                         AppLabels.sectionTitle(
                           context,
                           context.loc('business_info'),
                         ),
                         const SizedBox(height: 16),
-
                         _buildInfoField(
                           displayLabel: context.loc('business_name'),
                           fieldKey: 'business_name',
@@ -343,7 +330,6 @@ class _ProfileViewState extends State<ProfileView> {
                           icon: Icons.business_outlined,
                         ),
                         const SizedBox(height: 12),
-
                         _buildInfoField(
                           displayLabel: context.loc('address'),
                           fieldKey: 'business_address',
@@ -352,8 +338,6 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                         const SizedBox(height: 24),
                       ],
-
-                      // Change Password moved to Settings Page
                     ],
                   ),
                 ),

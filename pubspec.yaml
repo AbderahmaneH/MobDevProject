@@ -1,4 +1,4 @@
-name: QNow
+name: qnow
 description: A queue management app for businesses and customers.
 
 publish_to: 'none'
@@ -16,7 +16,7 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.8.3
   cupertino_icons: ^1.0.2
-  flutter_localizations:    # This package
+  flutter_localizations:
     sdk: flutter
   url_launcher: ^6.2.0
 

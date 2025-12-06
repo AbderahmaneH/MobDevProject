@@ -44,28 +44,33 @@ class _SettingsPageState extends State<SettingsPage> {
                     backgroundColor: AppColors.error,
                   ),
                 );
+              } else if (state is AuthInitial) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const WelcomePage()),
+                    (route) => false,
+                  );
+                });
               }
             },
             child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverAppBar(
-                backgroundColor: AppColors.backgroundLight,
-                surfaceTintColor: AppColors.transparent,
-                elevation: 0,
-                centerTitle: true,
-                title: Text(
-                  context.loc('settings'),
-                  style: AppTextStyles.titleLarge(context),
+                  backgroundColor: AppColors.backgroundLight,
+                  surfaceTintColor: AppColors.transparent,
+                  elevation: 0,
+                  centerTitle: true,
+                  title: Text(
+                    context.loc('settings'),
+                    style: AppTextStyles.titleLarge(context),
+                  ),
                 ),
-              ),
-              
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
                       children: [
-                        // Language Settings
                         AppContainers.card(
                           context: context,
                           padding: const EdgeInsets.all(16),
@@ -106,8 +111,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                         ),
                         const SizedBox(height: 16),
-
-                        // Notifications Settings
                         AppContainers.card(
                           context: context,
                           padding: const EdgeInsets.all(16),
@@ -184,7 +187,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        // Privacy Settings
                         AppContainers.card(
                           context: context,
                           padding: const EdgeInsets.all(16),
@@ -240,7 +242,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                 onTap: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (_) => const TermsOfServicePage(),
+                                      builder: (_) =>
+                                          const TermsOfServicePage(),
                                     ),
                                   );
                                 },
@@ -278,133 +281,162 @@ class _SettingsPageState extends State<SettingsPage> {
     final newPasswordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
-    bool showPassword1 = false;
-    bool showPassword2 = false;
-    bool showPassword3 = false;
-
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.adaptiveCardColor(context),
-          title: Text(context.loc('change_pass')),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AppTextFields.passwordField(
-                  context: context,
-                  hintText: context.loc('current_password'),
-                  controller: currentPasswordController,
-                  isVisible: showPassword1,
-                  onToggleVisibility: () =>
-                      setState(() => showPassword1 = !showPassword1),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return context.loc('required_field');
-                    }
-                    return null;
-                  },
+      builder: (dialogContext) {
+        bool showPassword1 = false;
+        bool showPassword2 = false;
+        bool showPassword3 = false;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: AppColors.adaptiveCardColor(context),
+              title: Text(context.loc('change_pass')),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    AppTextFields.passwordField(
+                      context: context,
+                      hintText: context.loc('current_password'),
+                      controller: currentPasswordController,
+                      isVisible: showPassword1,
+                      onToggleVisibility: () =>
+                          setState(() => showPassword1 = !showPassword1),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return context.loc('required_field');
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    AppTextFields.passwordField(
+                      context: context,
+                      hintText: context.loc('new_password'),
+                      controller: newPasswordController,
+                      isVisible: showPassword2,
+                      onToggleVisibility: () =>
+                          setState(() => showPassword2 = !showPassword2),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return context.loc('required_field');
+                        }
+                        if (value.length < 6) {
+                          return context.loc('password_too_short');
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    AppTextFields.passwordField(
+                      context: context,
+                      hintText: context.loc('confirm_new_password'),
+                      controller: confirmPasswordController,
+                      isVisible: showPassword3,
+                      onToggleVisibility: () =>
+                          setState(() => showPassword3 = !showPassword3),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return context.loc('required_field');
+                        }
+                        if (value != newPasswordController.text) {
+                          return context.loc('passwords_not_match');
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                AppTextFields.passwordField(
-                  context: context,
-                  hintText: context.loc('new_password'),
-                  controller: newPasswordController,
-                  isVisible: showPassword2,
-                  onToggleVisibility: () =>
-                      setState(() => showPassword2 = !showPassword2),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return context.loc('required_field');
-                    }
-                    if (value.length < 6) {
-                      return context.loc('password_too_short');
-                    }
-                    return null;
-                  },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(context.loc('cancel')),
                 ),
-                const SizedBox(height: 16),
-                AppTextFields.passwordField(
-                  context: context,
-                  hintText: context.loc('confirm_new_password'),
-                  controller: confirmPasswordController,
-                  isVisible: showPassword3,
-                  onToggleVisibility: () =>
-                      setState(() => showPassword3 = !showPassword3),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return context.loc('required_field');
+                ElevatedButton(
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      context.read<AuthCubit>().changePassword(
+                            userId: widget.user.id,
+                            currentPassword: currentPasswordController.text,
+                            newPassword: newPasswordController.text,
+                          );
+                      Navigator.pop(context);
                     }
-                    if (value != newPasswordController.text) {
-                      return context.loc('passwords_not_match');
-                    }
-                    return null;
                   },
+                  child: Text(context.loc('change')),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(context.loc('cancel')),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  context.read<AuthCubit>().changePassword(
-                        userId: widget.user.id,
-                        currentPassword: currentPasswordController.text,
-                        newPassword: newPasswordController.text,
-                      );
-                  Navigator.pop(context);
-                }
-              },
-              child: Text(context.loc('change')),
-            ),
-          ],
+            );
+          },
         );
       },
     );
   }
 
   void _showDeleteAccountDialog() {
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool showPassword = false;
     showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
-          title: Text(context.loc('delete_account')),
-          content: const Text(
-            'This will permanently delete your account and data. Are you sure?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(context.loc('cancel')),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-              onPressed: () async {
-                await context.read<AuthCubit>().deleteAccount(widget.user.id);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const WelcomePage(),
-                  ),
-                );
-                // Optional: show feedback
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Account deleted'),
-                    backgroundColor: AppColors.error,
-                  ),
-                );
-              },
-              child: Text(context.loc('delete')),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(context.loc('delete_account')),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'This will permanently delete your account and data.\nPlease re-enter your password to confirm.',
+                    ),
+                    const SizedBox(height: 12),
+                    AppTextFields.passwordField(
+                      context: context,
+                      hintText: context.loc('password'),
+                      controller: passwordController,
+                      isVisible: showPassword,
+                      onToggleVisibility: () =>
+                          setState(() => showPassword = !showPassword),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return context.loc('required_field');
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text(context.loc('cancel')),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.error),
+                  onPressed: () async {
+                    if (!formKey.currentState!.validate()) return;
+
+                    await context.read<AuthCubit>().deleteAccountWithPassword(
+                          widget.user.id,
+                          passwordController.text,
+                        );
+
+                    Navigator.pop(ctx);
+                  },
+                  child: Text(context.loc('delete')),
+                ),
+              ],
+            );
+          },
         );
       },
     );

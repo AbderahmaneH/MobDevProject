@@ -42,7 +42,6 @@ class QueueRepository {
 
     final queues = maps.map((map) => Queue.fromMap(map)).toList();
 
-    // Load clients for each queue
     for (final queue in queues) {
       queue.clients = await _getQueueClients(queue.id);
     }
@@ -62,7 +61,6 @@ class QueueRepository {
 
     final queues = maps.map((map) => Queue.fromMap(map)).toList();
 
-    // Load clients for each queue
     for (final queue in queues) {
       queue.clients = await _getQueueClients(queue.id);
     }
@@ -80,7 +78,6 @@ class QueueRepository {
 
     final queues = maps.map((map) => Queue.fromMap(map)).toList();
 
-    // Load clients for each queue
     for (final queue in queues) {
       queue.clients = await _getQueueClients(queue.id);
     }
@@ -100,13 +97,11 @@ class QueueRepository {
 
   Future<int> deleteQueue(int id) async {
     final db = await databaseHelper.database;
-    // Delete associated queue clients first
     await db.delete(
       DatabaseTables.queueClients,
       where: 'queue_id = ?',
       whereArgs: [id],
     );
-    // Then delete the queue
     return await db.delete(
       DatabaseTables.queues,
       where: 'id = ?',
@@ -114,7 +109,6 @@ class QueueRepository {
     );
   }
 
-  // Helper to load clients for a queue
   Future<List<QueueClient>> _getQueueClients(int queueId) async {
     final db = await databaseHelper.database;
     final maps = await db.query(

@@ -1,4 +1,4 @@
-import 'package:QNow/presentation/drawer/help_support_page.dart';
+import '../drawer/help_support_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/app_colors.dart';
@@ -92,12 +92,6 @@ class _CustomerViewState extends State<CustomerView> {
               onPressed: () {
                 customerCubit.leaveQueue(queueId);
                 Navigator.pop(dialogContext);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(context.loc('left_queue')),
-                    backgroundColor: AppColors.success,
-                  ),
-                );
               },
               style: TextButton.styleFrom(foregroundColor: AppColors.error),
               child: Text(context.loc('leave')),
@@ -109,7 +103,6 @@ class _CustomerViewState extends State<CustomerView> {
   }
 
   Widget _buildQueueCard(Queue queue) {
-    // Find user's position in this queue
     final userClient = queue.clients.firstWhere(
       (client) => client.userId == widget.user.id,
       orElse: () => QueueClient(
@@ -135,16 +128,13 @@ class _CustomerViewState extends State<CustomerView> {
 
     return AppContainers.card(
       context: context,
-      onTap: () {
-        // Show queue details
-      },
+      onTap: () {},
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              // Queue icon
               Container(
                 width: 48,
                 height: 48,
@@ -159,8 +149,6 @@ class _CustomerViewState extends State<CustomerView> {
                 ),
               ),
               const SizedBox(width: 12),
-
-              // Queue info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,8 +175,6 @@ class _CustomerViewState extends State<CustomerView> {
                   ],
                 ),
               ),
-
-              // Status badge
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -216,8 +202,6 @@ class _CustomerViewState extends State<CustomerView> {
             ],
           ),
           const SizedBox(height: 16),
-
-          // Queue stats
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -238,8 +222,6 @@ class _CustomerViewState extends State<CustomerView> {
             ],
           ),
           const SizedBox(height: 16),
-
-          // Actions - only show if user is in this queue
           if (position != null)
             Row(
               children: [
@@ -283,9 +265,9 @@ class _CustomerViewState extends State<CustomerView> {
       endDrawer: _buildDrawer(context),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          // Capture objects that will be used after the async gap
           final customerCubit = context.read<CustomerCubit>();
           final messenger = ScaffoldMessenger.of(context);
+          final joinedMsg = context.loc('joined_queue');
 
           final result = await Navigator.push<bool?>(
             context,
@@ -296,7 +278,6 @@ class _CustomerViewState extends State<CustomerView> {
 
           if (!mounted) return;
 
-          // If joined (true), refresh joined queues to show the newly-joined queue
           if (result == true) {
             try {
               await customerCubit.loadJoinedQueues();
@@ -304,7 +285,7 @@ class _CustomerViewState extends State<CustomerView> {
             if (!mounted) return;
             messenger.showSnackBar(
               SnackBar(
-                content: Text(context.loc('joined_queue')),
+                content: Text(joinedMsg),
                 backgroundColor: AppColors.success,
               ),
             );
@@ -344,7 +325,6 @@ class _CustomerViewState extends State<CustomerView> {
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              // App Bar
               SliverAppBar(
                 title: _isSearching
                     ? AppTextFields.searchField(
@@ -370,8 +350,6 @@ class _CustomerViewState extends State<CustomerView> {
                   ),
                 ],
               ),
-
-              // Content
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -381,7 +359,6 @@ class _CustomerViewState extends State<CustomerView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Welcome message
                       Text(
                         '${context.loc('welcome')}, ${widget.user.name}!',
                         style: AppTextStyles.getAdaptiveStyle(
@@ -391,8 +368,6 @@ class _CustomerViewState extends State<CustomerView> {
                         ),
                       ),
                       const SizedBox(height: 24),
-
-                      // Stats - Will be populated dynamically
                       BlocBuilder<CustomerCubit, CustomerState>(
                         builder: (context, state) {
                           if (state is CustomerLoaded) {
@@ -446,8 +421,6 @@ class _CustomerViewState extends State<CustomerView> {
                   ),
                 ),
               ),
-
-              // Queues List
               BlocBuilder<CustomerCubit, CustomerState>(
                 builder: (context, state) {
                   if (state is CustomerLoading) {
@@ -532,7 +505,6 @@ class _CustomerViewState extends State<CustomerView> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            // Header
             DrawerHeader(
               decoration: const BoxDecoration(color: AppColors.primary),
               child: Column(
@@ -568,8 +540,6 @@ class _CustomerViewState extends State<CustomerView> {
                 ],
               ),
             ),
-
-            // Menu Items
             _buildDrawerItem(
               context: context,
               icon: Icons.person,
@@ -579,8 +549,7 @@ class _CustomerViewState extends State<CustomerView> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        ProfilePage(user: widget.user), // Pass actual user
+                    builder: (context) => ProfilePage(user: widget.user),
                   ),
                 );
               },
@@ -594,8 +563,7 @@ class _CustomerViewState extends State<CustomerView> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          SettingsPage(user: widget.user)), // Pass actual user
+                      builder: (context) => SettingsPage(user: widget.user)),
                 );
               },
             ),

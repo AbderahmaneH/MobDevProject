@@ -18,8 +18,6 @@ class JoinQueuePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // If an ancestor CustomerCubit exists, use it so state updates are shared.
-    // Otherwise create a local CustomerCubit so the page still works standalone.
     var hasAncestor = true;
     try {
       context.read<CustomerCubit>();
@@ -34,7 +32,8 @@ class JoinQueuePage extends StatelessWidget {
     return BlocProvider(
       create: (context) => CustomerCubit(
         queueRepository: QueueRepository(databaseHelper: DatabaseHelper()),
-        queueClientRepository: QueueClientRepository(databaseHelper: DatabaseHelper()),
+        queueClientRepository:
+            QueueClientRepository(databaseHelper: DatabaseHelper()),
         userRepository: UserRepository(databaseHelper: DatabaseHelper()),
         userId: user.id,
       )..getAvailableQueues(),
@@ -64,13 +63,10 @@ class _JoinQueueViewState extends State<JoinQueueView> {
         context.read<CustomerCubit>().searchQueues(_searchController.text);
       }
     });
-    // Load available queues using the ancestor CustomerCubit (if present).
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
         context.read<CustomerCubit>().getAvailableQueues();
-      } catch (_) {
-        // If no ancestor CustomerCubit is provided, ignore.
-      }
+      } catch (_) {}
     });
   }
 
@@ -105,6 +101,9 @@ class _JoinQueueViewState extends State<JoinQueueView> {
   }
 
   void _joinQueue(int queueId) {
+    final cancelLabel = context.loc('cancel');
+    final joinLabel = context.loc('join');
+
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -113,37 +112,42 @@ class _JoinQueueViewState extends State<JoinQueueView> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(context.loc('cancel')),
+            child: Text(cancelLabel),
           ),
-              ElevatedButton(
-                onPressed: () async {
-                  // Capture references before the async gap
-                  final customerCubit = context.read<CustomerCubit>();
-                  final navigator = Navigator.of(context);
-                  final messenger = ScaffoldMessenger.of(context);
-                  final canPopNow = Navigator.canPop(context);
-                  try {
-                    await customerCubit.joinQueue(queueId);
-                    if (!mounted) return;
-                    // Close dialog then pop page returning a true result to indicate join
-                    Navigator.pop(dialogContext);
-                    if (canPopNow) {
-                      navigator.pop(true);
-                    } else {
-                      navigator.pop();
-                    }
-                  } catch (_) {
-                    Navigator.pop(dialogContext);
-                    if (!mounted) return;
-                    messenger.showSnackBar(
-                      SnackBar(
-                        content: Text(context.loc('error')),
-                        backgroundColor: AppColors.error,
-                      ),
-                    );
-                  }
+          ElevatedButton(
+            onPressed: () async {
+              final customerCubit = context.read<CustomerCubit>();
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
+              final canPopNow = navigator.canPop();
+              final errorMsg = context.loc('error');
+              try {
+                final joined = await customerCubit.joinQueue(queueId);
+                if (!mounted) return;
+
+                if (!joined) {
+                  Navigator.pop(dialogContext);
+                  return;
+                }
+
+                Navigator.pop(dialogContext);
+                if (canPopNow) {
+                  navigator.pop(true);
+                } else {
+                  navigator.pop();
+                }
+              } catch (_) {
+                Navigator.pop(dialogContext);
+                if (!mounted) return;
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(errorMsg),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              }
             },
-            child: Text(context.loc('join')),
+            child: Text(joinLabel),
           ),
         ],
       ),
@@ -163,7 +167,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
         children: [
           Row(
             children: [
-              // Queue icon
               Container(
                 width: 48,
                 height: 48,
@@ -178,8 +181,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                 ),
               ),
               const SizedBox(width: 12),
-
-              // Queue info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,31 +207,28 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                   ],
                 ),
               ),
-
-              // Status badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: isFull
-                          ? AppColors.error.withAlpha((0.1 * 255).round())
-                          : AppColors.success.withAlpha((0.1 * 255).round()),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      isFull ? context.loc('full') : context.loc('available'),
-                      style: AppTextStyles.getAdaptiveStyle(
-                        context,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        lightColor: isFull ? AppColors.error : AppColors.success,
-                      ),
-                    ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isFull
+                      ? AppColors.error.withAlpha((0.1 * 255).round())
+                      : AppColors.success.withAlpha((0.1 * 255).round()),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  isFull ? context.loc('full') : context.loc('available'),
+                  style: AppTextStyles.getAdaptiveStyle(
+                    context,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    lightColor: isFull ? AppColors.error : AppColors.success,
                   ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
-
-          // Queue details
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -238,7 +236,8 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                 future: UserRepository(databaseHelper: DatabaseHelper())
                     .getUserById(queue.businessOwnerId),
                 builder: (context, snapshot) {
-                  final businessName = snapshot.data?.businessName ?? snapshot.data?.name ?? '—';
+                  final businessName =
+                      snapshot.data?.businessName ?? snapshot.data?.name ?? '—';
                   return _buildDetailItem(
                     icon: Icons.business,
                     text: businessName,
@@ -260,8 +259,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
             ],
           ),
           const SizedBox(height: 16),
-
-          // Queue stats
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -283,8 +280,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
             ],
           ),
           const SizedBox(height: 16),
-
-          // Join button
           if (!isFull)
             AppButtons.primaryButton(
               text: context.loc('join_queue'),
@@ -373,12 +368,17 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                   backgroundColor: AppColors.error,
                 ),
               );
+            } else if (state is CustomerNotification) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                ),
+              );
             }
           },
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              // App Bar
               SliverAppBar(
                 title: _isSearching
                     ? AppTextFields.searchField(
@@ -404,8 +404,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                   ),
                 ],
               ),
-
-              // Content
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -435,7 +433,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Tips
                       AppContainers.card(
                         context: context,
                         backgroundColor: AppColors.infoLight,
@@ -464,8 +461,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                   ),
                 ),
               ),
-
-              // Queues List
               BlocBuilder<CustomerCubit, CustomerState>(
                 builder: (context, state) {
                   if (state is CustomerLoading) {
@@ -476,9 +471,8 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                     return SliverToBoxAdapter(
                       child: AppStates.errorState(
                         message: state.error,
-                        onRetry: () => context
-                            .read<CustomerCubit>()
-                            .getAvailableQueues(),
+                        onRetry: () =>
+                            context.read<CustomerCubit>().getAvailableQueues(),
                         context: context,
                       ),
                     );
@@ -522,8 +516,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                   );
                 },
               ),
-
-              // Bottom padding
               const SliverToBoxAdapter(
                 child: SizedBox(height: 100),
               ),
