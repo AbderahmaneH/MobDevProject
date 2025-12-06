@@ -1,3 +1,4 @@
+import 'package:QNow/presentation/drawer/help_support_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/app_colors.dart';
@@ -25,8 +26,12 @@ class CustomerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          CustomerCubit(queueRepository: QueueRepository(databaseHelper: DatabaseHelper()), queueClientRepository: QueueClientRepository(databaseHelper: DatabaseHelper()),userRepository: UserRepository(databaseHelper: DatabaseHelper()), userId: user.id),
+      create: (context) => CustomerCubit(
+          queueRepository: QueueRepository(databaseHelper: DatabaseHelper()),
+          queueClientRepository:
+              QueueClientRepository(databaseHelper: DatabaseHelper()),
+          userRepository: UserRepository(databaseHelper: DatabaseHelper()),
+          userId: user.id),
       child: CustomerView(user: user),
     );
   }
@@ -122,8 +127,8 @@ class _CustomerViewState extends State<CustomerView> {
     final position = userClient.position > 0 ? userClient.position : null;
     final peopleAhead = position != null
         ? queue.clients
-              .where((c) => c.position < position && c.status == 'waiting')
-              .length
+            .where((c) => c.position < position && c.status == 'waiting')
+            .length
         : 0;
 
     final estimatedWait = peopleAhead * queue.estimatedWaitTime;
@@ -177,7 +182,6 @@ class _CustomerViewState extends State<CustomerView> {
                         context,
                         fontSize: 14,
                         lightColor: AppColors.textSecondaryLight,
-                        darkColor: AppColors.textSecondaryDark,
                       ),
                     ),
                   ],
@@ -204,12 +208,8 @@ class _CustomerViewState extends State<CustomerView> {
                     context,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    lightColor: queue.isActive
-                        ? AppColors.success
-                        : AppColors.error,
-                    darkColor: queue.isActive
-                        ? AppColors.success
-                        : AppColors.error,
+                    lightColor:
+                        queue.isActive ? AppColors.success : AppColors.error,
                   ),
                 ),
               ),
@@ -270,7 +270,6 @@ class _CustomerViewState extends State<CustomerView> {
             context,
             fontSize: 12,
             lightColor: AppColors.textSecondaryLight,
-            darkColor: AppColors.textSecondaryDark,
           ),
         ),
       ],
@@ -355,7 +354,6 @@ class _CustomerViewState extends State<CustomerView> {
                         onChanged: _searchQueues,
                       )
                     : Text(context.loc('my_queues')),
-
                 backgroundColor: AppColors.backgroundLight,
                 automaticallyImplyLeading: false,
                 elevation: 0,
@@ -390,7 +388,6 @@ class _CustomerViewState extends State<CustomerView> {
                           context,
                           fontSize: 16,
                           lightColor: AppColors.textSecondaryLight,
-                          darkColor: AppColors.textSecondaryDark,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -400,9 +397,8 @@ class _CustomerViewState extends State<CustomerView> {
                         builder: (context, state) {
                           if (state is CustomerLoaded) {
                             final joinedQueues = state.joinedQueues;
-                            final activeQueues = joinedQueues
-                                .where((q) => q.isActive)
-                                .length;
+                            final activeQueues =
+                                joinedQueues.where((q) => q.isActive).length;
 
                             return Row(
                               children: [
@@ -556,7 +552,6 @@ class _CustomerViewState extends State<CustomerView> {
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       lightColor: AppColors.white,
-                      darkColor: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -568,7 +563,6 @@ class _CustomerViewState extends State<CustomerView> {
                       lightColor: AppColors.white.withAlpha(
                         (0.8 * 255).round(),
                       ),
-                      darkColor: AppColors.white.withAlpha((0.8 * 255).round()),
                     ),
                   ),
                 ],
@@ -599,7 +593,9 @@ class _CustomerViewState extends State<CustomerView> {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          SettingsPage(user: widget.user)), // Pass actual user
                 );
               },
             ),
@@ -608,7 +604,12 @@ class _CustomerViewState extends State<CustomerView> {
               icon: Icons.help,
               title: context.loc('help'),
               onTap: () {
-                // TODO: Navigate to help page
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const HelpSupportPage()),
+                );
               },
             ),
             _buildDrawerItem(
@@ -660,7 +661,6 @@ class _CustomerViewState extends State<CustomerView> {
           context,
           fontSize: 16,
           lightColor: textColor ?? AppColors.textPrimaryLight,
-          darkColor: textColor ?? AppColors.textPrimaryDark,
         ),
       ),
       onTap: onTap,

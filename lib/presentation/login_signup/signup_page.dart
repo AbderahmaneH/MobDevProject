@@ -107,7 +107,19 @@ class _SignupViewState extends State<SignupView> {
             physics: const BouncingScrollPhysics(),
             slivers: [
               SliverAppBar(
-                title: Text(context.loc('signup')),
+                automaticallyImplyLeading: true,
+                backgroundColor: AppColors.backgroundLight,
+                surfaceTintColor: AppColors.transparent,
+                elevation: 0,
+                centerTitle: true,
+                title: Text(
+                  context.loc('signup'),
+                  style: AppTextStyles.titleLarge(context),
+                ),
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: AppColors.textPrimaryLight),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
               SliverToBoxAdapter(
                 child: Padding(
@@ -281,7 +293,6 @@ class _SignupViewState extends State<SignupView> {
                                   context,
                                   fontSize: 14,
                                   lightColor: AppColors.textSecondaryLight,
-                                  darkColor: AppColors.textSecondaryDark,
                                 ),
                               ),
                               AppButtons.textButton(

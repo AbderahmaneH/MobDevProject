@@ -220,4 +220,19 @@ class AuthCubit extends Cubit<AuthState> {
   void logout() {
     emit(AuthInitial());
   }
+
+  Future<void> deleteAccount(int? userId) async {
+    if (userId == null) {
+      emit(const AuthFailure(error: 'User not found'));
+      return;
+    }
+    emit(AuthLoading());
+    try {
+      await _userRepository.deleteUser(userId);
+      // After deletion, return to unauthenticated state
+      emit(AuthInitial());
+    } catch (e) {
+      emit(AuthFailure(error: 'Delete failed: $e'));
+    }
+  }
 }

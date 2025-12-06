@@ -10,41 +10,41 @@ class AppCubit extends Cubit<AppState> {
 
   void changeLanguage(Locale locale) {
     QNowLocalizations().setLocale(locale);
-    emit(LanguageChanged(locale: locale));
+    final currentState = state;
+    if (currentState is AppLoaded) {
+      emit(currentState.copyWith());
+    } else {
+      emit(const AppLoaded());
+    }
   }
 
   void changeTheme(AppThemeMode themeMode) {
     final currentState = state;
-    final isDarkMode = themeMode != AppThemeMode.light;
     if (currentState is AppLoaded) {
       emit(currentState.copyWith(
-        themeMode: themeMode,
-        isDarkMode: isDarkMode,
+        themeMode: AppThemeMode.light,
       ));
     } else {
-      emit(AppLoaded(
-        isDarkMode: isDarkMode,
-        themeMode: themeMode,
+      emit(const AppLoaded(
+        themeMode: AppThemeMode.light,
       ));
-    }
-  }
-
-  void toggleTheme() {
-    final currentState = state;
-    if (currentState is AppLoaded) {
-      final nextTheme = currentState.isDarkMode ? AppThemeMode.light : AppThemeMode.dark;
-      changeTheme(nextTheme);
-    } else {
-      changeTheme(AppThemeMode.dark);
     }
   }
 
   void setUserLoggedIn(bool isLoggedIn, {User? user}) {
-    emit(AppLoaded(
-      isLoggedIn: isLoggedIn,
-      user: user,
-      isDarkMode: state is AppLoaded ? (state as AppLoaded).isDarkMode : false,
-    ));
+    final currentState = state;
+    if (currentState is AppLoaded) {
+      emit(currentState.copyWith(
+        isLoggedIn: isLoggedIn,
+        user: user,
+      ));
+    } else {
+      emit(AppLoaded(
+        isLoggedIn: isLoggedIn,
+        user: user,
+        themeMode: AppThemeMode.light,
+      ));
+    }
   }
 
   void updateUser(User user) {

@@ -5,36 +5,24 @@ class AppColors {
   // Primary Colors - Modern Blue
   static const Color primary = Color(0xFF333333); // Deep Blue
   static const Color primaryLight = Color(0xFF6B8BC8);
-  static const Color primaryDark = Color(0xFF2A4A82);
 
   // Secondary Colors - Teal/Green
   static const Color secondary = Color(0xFF4ECDC4); // Teal
   static const Color secondaryLight = Color(0xFF7BEFE8);
-  static const Color secondaryDark = Color(0xFF2A9D93);
 
   // Background Colors
   static const Color backgroundLight = Color(0xFFF8F9FA); // Very Light Gray
-  static const Color backgroundDark = Color(0xFF121212); // Dark Mode Background
   static const Color surfaceLight = Color(0xFFFFFFFF);
-  static const Color surfaceDark = Color(0xFF1E1E1E);
 
-  // Text Colors - Light Theme
+  // Text Colors
   static const Color textPrimaryLight = Color(0xFF212529); // Almost Black
   static const Color textSecondaryLight = Color(0xFF6C757D); // Gray
   static const Color textTertiaryLight = Color(0xFFADB5BD); // Light Gray
 
-  // Text Colors - Dark Theme
-  static const Color textPrimaryDark = Color(0xFFF8F9FA); // Almost White
-  static const Color textSecondaryDark = Color(0xFFCED4DA); // Light Gray
-  static const Color textTertiaryDark = Color(0xFFADB5BD); // Medium Gray
-
   // Button Colors
   static const Color buttonPrimaryLight = primary;
-  static const Color buttonPrimaryDark = primary;
   static const Color buttonSecondaryLight = Color(0xFFE9ECEF);
-  static const Color buttonSecondaryDark = Color(0xFF343A40);
   static const Color buttonDisabledLight = Color(0xFFDEE2E6);
-  static const Color buttonDisabledDark = Color(0xFF495057);
 
   // Status Colors
   static const Color success = Color(0xFF28A745); // Green
@@ -62,7 +50,6 @@ class AppColors {
 
   // Border Colors
   static const Color borderLight = Color(0xFFE0E0E0);
-  static const Color borderDark = Color(0xFF424242);
 
   // Shadow Colors
   static const Color shadowLight = Color(0x0A000000);
@@ -71,17 +58,13 @@ class AppColors {
 
   // Card Colors
   static const Color cardLight = Color(0xFFFFFFFF);
-  static const Color cardDark = Color(0xFF2D2D2D);
 
   // Input Field Colors
   static const Color inputBackgroundLight = Color(0xFFFFFFFF);
-  static const Color inputBackgroundDark = Color(0xFF2D2D2D);
   static const Color inputBorderLight = Color(0xFFCED4DA);
-  static const Color inputBorderDark = Color(0xFF495057);
 
   // Divider Colors
   static const Color dividerLight = Color(0xFFE0E0E0);
-  static const Color dividerDark = Color(0xFF424242);
 
   // Neutral Colors
   static const Color white = Color(0xFFFFFFFF);
@@ -98,27 +81,17 @@ class AppColors {
   static const Color grey800 = Color(0xFF424242);
   static const Color grey900 = Color(0xFF212121);
 
-  // Ocean Theme Colors
-  static const Color oceanPrimary = Color(0xFF0077BE); // Deep Ocean Blue
-  static const Color oceanPrimaryLight = Color(0xFF00B4D8);
-  static const Color oceanPrimaryDark = Color(0xFF005A87);
-  static const Color oceanBackgroundLight = Color(0xFFF0F8FF); // Alice Blue
-  static const Color oceanBackgroundDark = Color(0xFF001F3F); // Very Dark Ocean Blue
-  static const Color oceanSurfaceLight = Color(0xFFFFFFFF);
-  static const Color oceanSurfaceDark = Color(0xFF00293C);
-  static const Color oceanSecondary = Color(0xFF00D4FF); // Cyan/Turquoise
-
   // Gradient Colors
   static const Gradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [primary, primaryDark],
+    colors: [primary],
   );
 
   static const Gradient secondaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [secondary, secondaryDark],
+    colors: [secondary],
   );
 
   static const Gradient successGradient = LinearGradient(
@@ -127,39 +100,25 @@ class AppColors {
     colors: [success, Color(0xFF1E7E34)],
   );
 
-  // Helper methods for theme adaptation
-  static Color getTextColorForBackground(Color backgroundColor) {
-    final brightness = ThemeData.estimateBrightnessForColor(backgroundColor);
-    return brightness == Brightness.dark ? white : textPrimaryLight;
-  }
-
   static Color adaptiveTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? textPrimaryDark
-        : textPrimaryLight;
+    return textPrimaryLight;
   }
 
   static Color adaptiveBackgroundColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? backgroundDark
-        : backgroundLight;
+    return backgroundLight;
   }
 
   static Color adaptiveCardColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? cardDark
-        : cardLight;
+    return cardLight;
   }
 
   static Color adaptiveBorderColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? borderDark
-        : borderLight;
+    return borderLight;
   }
 
   // Material Color generation for primary color
-    static MaterialColor get primarySwatch =>
-      const MaterialColor(0xFF333333, const <int, Color>{
+  static MaterialColor get primarySwatch =>
+      const MaterialColor(0xFF333333, <int, Color>{
         50: Color(0xFFE8EAF6),
         100: Color(0xFFC5CAE9),
         200: Color(0xFF9FA8DA),
@@ -173,8 +132,8 @@ class AppColors {
       });
 
   // Material Color generation for secondary color
-    static MaterialColor get secondarySwatch =>
-      const MaterialColor(0xFF4ECDC4, const <int, Color>{
+  static MaterialColor get secondarySwatch =>
+      const MaterialColor(0xFF4ECDC4, <int, Color>{
         50: Color(0xFFE0F2F1),
         100: Color(0xFFB2DFDB),
         200: Color(0xFF80CBC4),
@@ -212,18 +171,14 @@ class AppTextStyles {
     double? fontSize,
     FontWeight? fontWeight,
     Color? lightColor,
-    Color? darkColor,
     double? height,
     String? fontFamily,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return TextStyle(
-      fontFamily: fontFamily ?? (isDark ? AppFonts.body : AppFonts.body),
+      fontFamily: fontFamily ?? (AppFonts.body),
       fontSize: fontSize ?? 14,
       fontWeight: fontWeight ?? FontWeight.w400,
-      color: isDark
-          ? (darkColor ?? AppColors.textPrimaryDark)
-          : (lightColor ?? AppColors.textPrimaryLight),
+      color: (lightColor ?? AppColors.textPrimaryLight),
       height: height,
     );
   }
@@ -234,11 +189,10 @@ class AppTextStyles {
       fontSize: 16,
       fontWeight: FontWeight.w600,
       lightColor: AppColors.white,
-      darkColor: AppColors.white,
     );
   }
 
-  // Light theme text styles
+  // Text styles
   static TextStyle displayLargeLight = const TextStyle(
     fontFamily: AppFonts.heading,
     fontSize: 32,
@@ -310,377 +264,44 @@ class AppTextStyles {
     fontWeight: AppFonts.regular,
     color: AppColors.textTertiaryLight,
   );
-
-  // Dark theme text styles
-  static TextStyle displayLargeDark = displayLargeLight.copyWith(
-    color: AppColors.textPrimaryDark,
-  );
-  static TextStyle displayMediumDark = displayMediumLight.copyWith(
-    color: AppColors.textPrimaryDark,
-  );
-  static TextStyle titleLargeDark = titleLargeLight.copyWith(
-    color: AppColors.textPrimaryDark,
-  );
-  static TextStyle titleMediumDark = titleMediumLight.copyWith(
-    color: AppColors.textPrimaryDark,
-  );
-  static TextStyle bodyLargeDark = bodyLargeLight.copyWith(
-    color: AppColors.textPrimaryDark,
-  );
-  static TextStyle bodyMediumDark = bodyMediumLight.copyWith(
-    color: AppColors.textSecondaryDark,
-  );
-  static TextStyle bodySmallDark = bodySmallLight.copyWith(
-    color: AppColors.textTertiaryDark,
-  );
-  static TextStyle buttonLargeDark = buttonLargeLight;
-  static TextStyle buttonMediumDark = buttonMediumLight;
-  static TextStyle captionDark = captionLight.copyWith(
-    color: AppColors.textTertiaryDark,
-  );
-
-  // Helper methods to get appropriate style based on theme
+  // Helper methods to get appropriate style
   static TextStyle displayLarge(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? displayLargeDark
-        : displayLargeLight;
+    return displayLargeLight;
   }
 
   static TextStyle displayMedium(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? displayMediumDark
-        : displayMediumLight;
+    return displayMediumLight;
   }
 
   static TextStyle titleLarge(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? titleLargeDark
-        : titleLargeLight;
+    return titleLargeLight;
   }
 
   static TextStyle titleMedium(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? titleMediumDark
-        : titleMediumLight;
+    return titleMediumLight;
   }
 
   static TextStyle bodyLarge(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? bodyLargeDark
-        : bodyLargeLight;
+    return bodyLargeLight;
   }
 
   static TextStyle bodyMedium(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? bodyMediumDark
-        : bodyMediumLight;
+    return bodyMediumLight;
   }
 
   static TextStyle bodySmall(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? bodySmallDark
-        : bodySmallLight;
+    return bodySmallLight;
   }
 
   static TextStyle buttonLarge(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? buttonLargeDark
-        : buttonLargeLight;
+    return buttonLargeLight;
   }
 
   static TextStyle buttonMedium(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? buttonMediumDark
-        : buttonMediumLight;
+    return buttonMediumLight;
   }
 
   static TextStyle caption(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? captionDark
-        : captionLight;
+    return captionLight;
   }
 }
-
-// Theme data for easy app theming
-class AppTheme {
-  static ThemeData getThemeData(AppThemeMode themeMode) {
-    switch (themeMode) {
-      case AppThemeMode.light:
-        return lightTheme;
-      case AppThemeMode.dark:
-        return darkTheme;
-      case AppThemeMode.ocean:
-        return oceanTheme;
-    }
-  }
-
-  static ThemeData get lightTheme => ThemeData(
-    useMaterial3: true,
-    primarySwatch: AppColors.primarySwatch,
-    primaryColor: AppColors.primary,
-    scaffoldBackgroundColor: AppColors.backgroundLight,
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.backgroundLight,
-      surfaceTintColor: AppColors.transparent,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: AppTextStyles.titleLargeLight,
-      iconTheme: const IconThemeData(color: AppColors.textPrimaryLight),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: AppColors.inputBackgroundLight,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.inputBorderLight),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.inputBorderLight),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.primary, width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.error),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: AppTextStyles.buttonMediumLight,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.primary,
-        side: const BorderSide(color: AppColors.primary),
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: AppTextStyles.buttonMediumLight.copyWith(
-          color: AppColors.primary,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ),
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: AppColors.primary,
-        textStyle: AppTextStyles.bodyMediumLight.copyWith(
-          color: AppColors.primary,
-        ),
-      ),
-    ),
-    dividerTheme: const DividerThemeData(
-      color: AppColors.dividerLight,
-      thickness: 1,
-      space: 0,
-    ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.white,
-    ),
-    snackBarTheme: SnackBarThemeData(
-      backgroundColor: AppColors.grey800,
-      contentTextStyle: AppTextStyles.bodyMediumLight.copyWith(
-        color: AppColors.white,
-      ),
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    ),
-  );
-
-  static ThemeData get darkTheme => ThemeData(
-    useMaterial3: true,
-    primaryColor: AppColors.black,
-    scaffoldBackgroundColor: AppColors.black,
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.black,
-      surfaceTintColor: AppColors.transparent,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: AppTextStyles.titleLargeDark.copyWith(
-        color: AppColors.white,
-      ),
-      iconTheme: const IconThemeData(color: AppColors.white),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: AppColors.grey900,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.grey700),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.grey700),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.white, width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.error),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      labelStyle: const TextStyle(color: AppColors.grey400),
-      hintStyle: const TextStyle(color: AppColors.grey500),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.white,
-        foregroundColor: AppColors.black,
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: AppTextStyles.buttonMediumDark.copyWith(
-          color: AppColors.black,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.white,
-        side: const BorderSide(color: AppColors.white),
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: AppTextStyles.buttonMediumDark.copyWith(
-          color: AppColors.white,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ),
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: AppColors.white,
-        textStyle: AppTextStyles.bodyMediumDark.copyWith(
-          color: AppColors.white,
-        ),
-      ),
-    ),
-    dividerTheme: const DividerThemeData(
-      color: AppColors.grey800,
-      thickness: 1,
-      space: 0,
-    ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: AppColors.white,
-      foregroundColor: AppColors.black,
-    ),
-    snackBarTheme: SnackBarThemeData(
-      backgroundColor: AppColors.grey900,
-      contentTextStyle: AppTextStyles.bodyMediumDark.copyWith(
-        color: AppColors.white,
-      ),
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    ),
-    cardTheme: const CardThemeData(
-      color: AppColors.grey900,
-      elevation: 2,
-    ),
-    iconTheme: const IconThemeData(
-      color: AppColors.white,
-    ),
-    textTheme: TextTheme(
-      bodyLarge: AppTextStyles.bodyLargeDark.copyWith(color: AppColors.white),
-      bodyMedium: AppTextStyles.bodyMediumDark.copyWith(color: AppColors.white),
-      bodySmall: AppTextStyles.bodySmallDark.copyWith(color: AppColors.grey400),
-      titleLarge: AppTextStyles.titleLargeDark.copyWith(color: AppColors.white),
-      titleMedium: AppTextStyles.titleMediumDark.copyWith(color: AppColors.white),
-    ),
-  );
-
-  static ThemeData get oceanTheme => ThemeData(
-    useMaterial3: true,
-    primaryColor: AppColors.oceanPrimary,
-    scaffoldBackgroundColor: AppColors.oceanBackgroundDark,
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.oceanBackgroundDark,
-      surfaceTintColor: AppColors.transparent,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: AppTextStyles.titleLargeDark.copyWith(
-        color: AppColors.oceanPrimaryLight,
-      ),
-      iconTheme: const IconThemeData(color: AppColors.oceanPrimaryLight),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: AppColors.oceanSurfaceDark,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.oceanPrimary),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.oceanPrimary),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.oceanSecondary, width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.error),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.oceanPrimary,
-        foregroundColor: AppColors.white,
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: AppTextStyles.buttonMediumDark,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.oceanPrimary,
-        side: const BorderSide(color: AppColors.oceanPrimary),
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: AppTextStyles.buttonMediumDark.copyWith(
-          color: AppColors.oceanPrimary,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ),
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: AppColors.oceanPrimary,
-        textStyle: AppTextStyles.bodyMediumDark.copyWith(
-          color: AppColors.oceanPrimary,
-        ),
-      ),
-    ),
-    dividerTheme: const DividerThemeData(
-      color: AppColors.oceanPrimary,
-      thickness: 1,
-      space: 0,
-    ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: AppColors.oceanPrimary,
-      foregroundColor: AppColors.white,
-    ),
-    snackBarTheme: SnackBarThemeData(
-      backgroundColor: AppColors.oceanBackgroundDark,
-      contentTextStyle: AppTextStyles.bodyMediumDark.copyWith(
-        color: AppColors.oceanSecondary,
-      ),
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    ),
-  );
-}
-

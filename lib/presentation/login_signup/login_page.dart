@@ -85,7 +85,15 @@ class _LoginViewState extends State<LoginView> {
             physics: const BouncingScrollPhysics(),
             slivers: [
               SliverAppBar(
-                title: Text(context.loc('login')),
+                automaticallyImplyLeading: false,
+                backgroundColor: AppColors.backgroundLight,
+                surfaceTintColor: AppColors.transparent,
+                elevation: 0,
+                centerTitle: true,
+                title: Text(
+                  context.loc('login'),
+                  style: AppTextStyles.titleLarge(context),
+                ),
               ),
               SliverToBoxAdapter(
                 child: Padding(
@@ -183,7 +191,6 @@ class _LoginViewState extends State<LoginView> {
                                   context,
                                   fontSize: 14,
                                   lightColor: AppColors.textSecondaryLight,
-                                  darkColor: AppColors.textSecondaryDark,
                                 ),
                               ),
                               AppButtons.textButton(

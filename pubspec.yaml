@@ -18,6 +18,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_localizations:    # This package
     sdk: flutter
+  url_launcher: ^6.2.0
 
 dev_dependencies:
   flutter_test:

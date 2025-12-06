@@ -97,96 +97,6 @@ class _ProfileViewState extends State<ProfileView> {
     _toggleEditMode();
   }
 
-  void _showChangePasswordDialog() {
-    final currentPasswordController = TextEditingController();
-    final newPasswordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.backgroundLight,
-          title: Text(context.loc('change_pass')),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AppTextFields.passwordField(
-                  context: context,
-                  hintText: context.loc('current_password'),
-                  controller: currentPasswordController,
-                  isVisible: false,
-                  onToggleVisibility: () {},
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return context.loc('required_field');
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                AppTextFields.passwordField(
-                  context: context,
-                  hintText: context.loc('new_password'),
-                  controller: newPasswordController,
-                  isVisible: false,
-                  onToggleVisibility: () {},
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return context.loc('required_field');
-                    }
-                    if (value.length < 6) {
-                      return context.loc('password_too_short');
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                AppTextFields.passwordField(
-                  context: context,
-                  hintText: context.loc('confirm_new_password'),
-                  controller: confirmPasswordController,
-                  isVisible: false,
-                  onToggleVisibility: () {},
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return context.loc('required_field');
-                    }
-                    if (value != newPasswordController.text) {
-                      return context.loc('passwords_not_match');
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(context.loc('cancel')),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  context.read<AuthCubit>().changePassword(
-                    userId: _currentUser.id,
-                    currentPassword: currentPasswordController.text,
-                    newPassword: newPasswordController.text,
-                  );
-                  Navigator.pop(context);
-                }
-              },
-              child: Text(context.loc('change')),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   Widget _buildInfoField({
     required String displayLabel,
@@ -222,7 +132,6 @@ class _ProfileViewState extends State<ProfileView> {
                     context,
                     fontSize: 12,
                     lightColor: AppColors.textSecondaryLight,
-                    darkColor: AppColors.textSecondaryDark,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -315,8 +224,16 @@ class _ProfileViewState extends State<ProfileView> {
             physics: const BouncingScrollPhysics(),
             slivers: [
               SliverAppBar(
-                title: Text(context.loc('profile')),
+                backgroundColor: AppColors.backgroundLight,
+                surfaceTintColor: AppColors.transparent,
+                elevation: 0,
+                centerTitle: true,
+                title: Text(
+                  context.loc('profile'),
+                  style: AppTextStyles.titleLarge(context),
+                ),
               ),
+              
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -347,7 +264,6 @@ class _ProfileViewState extends State<ProfileView> {
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 lightColor: AppColors.white,
-                                darkColor: AppColors.white,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -359,7 +275,6 @@ class _ProfileViewState extends State<ProfileView> {
                                 context,
                                 fontSize: 14,
                                 lightColor: AppColors.white.withAlpha((0.8 * 255).round()),
-                                darkColor: AppColors.white.withAlpha((0.8 * 255).round()),
                               ),
                             ),
                           ],
@@ -438,48 +353,7 @@ class _ProfileViewState extends State<ProfileView> {
                         const SizedBox(height: 24),
                       ],
 
-                      // Change Password
-                      AppContainers.card(
-                        context: context,
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withAlpha((0.1 * 255).round()),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.lock_outline,
-                                color: AppColors.primary,
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    context.loc('change_pass'),
-                                    style: AppTextStyles.getAdaptiveStyle(
-                                      context,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.arrow_forward_ios),
-                              onPressed: _showChangePasswordDialog,
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Change Password moved to Settings Page
                     ],
                   ),
                 ),

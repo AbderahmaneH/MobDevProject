@@ -68,9 +68,9 @@ Future<void> insertDummyData(Database db) async {
     'password': '123456',
     'is_business': 1,
     'created_at': DateTime.now().millisecondsSinceEpoch,
-    'business_name': 'Super Store',
+    'business_name': 'Aghiles Cafe',
     'business_type': 'Retail',
-    'business_address': '123 Main St',
+    'business_address': 'Mehalma',
   });
   await db.insert(DatabaseTables.users, {
     'id': 7,
@@ -80,9 +80,9 @@ Future<void> insertDummyData(Database db) async {
     'password': '123456',
     'is_business': 1,
     'created_at': DateTime.now().millisecondsSinceEpoch,
-    'business_name': 'Super Store',
+    'business_name': 'Haircut Place',
     'business_type': 'Retail',
-    'business_address': '123 Main St',
+    'business_address': 'Sidi Abdellah',
   });
 
   // Insert dummy queues

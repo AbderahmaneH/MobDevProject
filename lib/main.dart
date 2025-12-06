@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final databaseHelper = DatabaseHelper();
-    
+
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: databaseHelper),
@@ -27,52 +27,45 @@ class MyApp extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => AppCubit()),
-          BlocProvider(create: (context) => AuthCubit(userRepository: UserRepository(databaseHelper: databaseHelper))),
+          BlocProvider(
+              create: (context) => AuthCubit(
+                  userRepository:
+                      UserRepository(databaseHelper: databaseHelper))),
         ],
         child: Builder(
           builder: (context) {
             return BlocBuilder<AppCubit, AppState>(
               builder: (context, state) {
-                Locale currentLocale = QNowLocalizations().currentLocale;
-                AppThemeMode currentThemeMode = AppThemeMode.light;
-                
-                // Update locale if state has changed
-                if (state is LanguageChanged) {
-                  currentLocale = state.locale;
-                }
-                
-                // Get theme mode from state
-                if (state is AppLoaded) {
-                  currentThemeMode = state.themeMode;
-                }
-                
+                final locale = QNowLocalizations().currentLocale;
+
                 return MaterialApp(
                   debugShowCheckedModeBanner: false,
                   title: QNowLocalizations.getTranslation('app_title'),
-                  theme: AppTheme.lightTheme,
-                  darkTheme: AppTheme.darkTheme,
-                  themeMode: currentThemeMode == AppThemeMode.dark ? ThemeMode.dark : ThemeMode.light,
                   supportedLocales: QNowLocalizations().supportedLocalesList,
-                  locale: currentLocale,
-                    localizationsDelegates: [
-                      GlobalMaterialLocalizations.delegate,
-                      GlobalWidgetsLocalizations.delegate,
-                      GlobalCupertinoLocalizations.delegate,
-                    ],
-                    localeResolutionCallback: (locale, supported) {
-                      if (locale == null) return QNowLocalizations().currentLocale;
-                      for (final supportedLocale in supported) {
-                        if (supportedLocale.languageCode == locale.languageCode) {
-                          return supportedLocale;
-                        }
-                      }
+                  locale: locale,
+                  localizationsDelegates: const [
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  localeResolutionCallback: (locale, supported) {
+                    if (locale == null) {
                       return QNowLocalizations().currentLocale;
-                    },
+                    }
+                    for (final supportedLocale in supported) {
+                      if (supportedLocale.languageCode == locale.languageCode) {
+                        return supportedLocale;
+                      }
+                    }
+                    return QNowLocalizations().currentLocale;
+                  },
                   builder: (context, child) {
                     return BlocListener<AuthCubit, AuthState>(
                       listener: (context, state) {
                         if (state is AuthSuccess) {
-                          context.read<AppCubit>().setUserLoggedIn(true, user: state.user);
+                          context
+                              .read<AppCubit>()
+                              .setUserLoggedIn(true, user: state.user);
                         } else if (state is AuthInitial) {
                           context.read<AppCubit>().setUserLoggedIn(false);
                         }

@@ -12,7 +12,7 @@ class QNowLocalizations {
 
   // Current locale
   Locale _currentLocale = const Locale('en');
-  
+
   // Supported locales
   static const List<Locale> supportedLocales = [
     Locale('en'),
@@ -57,7 +57,7 @@ class QNowLocalizations {
       'refresh': 'Refresh',
       'language': 'Language',
       'get_started': 'Get Started',
-      
+
       // Authentication & Roles
       'login': 'Login',
       'signup': 'Sign Up',
@@ -72,7 +72,7 @@ class QNowLocalizations {
       'already_have_account': 'Already have an account?',
       'create_account': 'Create Account',
       'reset_password': 'Reset Password',
-      
+
       // User Info
       'name': 'Name',
       'full_name': 'Full Name',
@@ -87,7 +87,7 @@ class QNowLocalizations {
       'confirm_new_password': 'Confirm New Password',
       'update_profile': 'Update Profile',
       'personal_info': 'Personal Information',
-      
+
       // Queue Management
       'add_queue': 'Add Queue',
       'create_queue': 'Create Queue',
@@ -120,8 +120,10 @@ class QNowLocalizations {
       'join_queue': 'Join Queue',
       'leave_queue': 'Leave Queue',
       'join_queue_confirm': 'Are you sure you want to join this queue?',
-      'join_queue_description': 'Browse available queues and join the ones you need.',
-      'queue_tips': 'Tip: Arrive on time and keep your phone handy for notifications.',
+      'join_queue_description':
+          'Browse available queues and join the ones you need.',
+      'queue_tips':
+          'Tip: Arrive on time and keep your phone handy for notifications.',
       'refreshed': 'Refreshed',
       'leave_queue_confirm': 'Are you sure you want to leave this queue?',
       'position': 'Position',
@@ -149,7 +151,7 @@ class QNowLocalizations {
       'queue_settings': 'Queue Settings',
       'manage_queue': 'Manage Queue',
       'manage_your_queues': 'Manage Your Queues',
-      
+
       // Search & Discovery
       'search_hint': 'Search for business...',
       'search_queues': 'Search queues...',
@@ -158,7 +160,12 @@ class QNowLocalizations {
       'popular_queues': 'Popular Queues',
       'recommended': 'Recommended',
       'recent': 'Recent',
-      
+
+      // Large Messages
+      'privacy_policy_message':
+          'We respect your privacy. This app stores necessary user data (name, phone, and optional email/business info) locally to provide queue services. Data is used only for functionality and not shared externally.',
+      'terms_of_service_message':
+          'By using QNow, you agree to join, leave, and manage queues responsibly. Do not misuse the app or provide false information. We may update these terms as needed.',
       // Notifications & Status
       'queue_created': 'Queue created successfully',
       'queue_deleted': 'Queue deleted successfully',
@@ -180,8 +187,10 @@ class QNowLocalizations {
       'promotional_notifications_subtitle': 'Receive offers and updates',
       'sound_alerts': 'Sound Alerts',
       'sound_alerts_subtitle': 'Play sound for notifications',
-      
+
       // Settings & Help
+      'privacy_policy': 'Privacy Policy',
+      'terms_of_service': 'Terms of Service',
       'settings': 'Settings',
       'privacy_security': 'Privacy & Security',
       'delete_account': 'Delete Account',
@@ -193,15 +202,35 @@ class QNowLocalizations {
       'dev_team': 'Development Team',
       'about_project': 'About The Project',
       'version': 'Version 1.0.0',
-      'privacy_policy': 'Privacy Policy',
-      'terms_of_service': 'Terms of Service',
       'faq': 'FAQ',
       'support': 'Support',
       'feedback': 'Feedback',
       'rate_app': 'Rate App',
       'share_app': 'Share App',
-      'profile_updated' : 'Profile Updated',
-      
+      'profile_updated': 'Profile Updated',
+      'password_changed': 'Password changed successfully',
+      'change': 'Change',
+
+      // Help & Support
+      'additional_resources': 'Additional Resources',
+      'user_guide': 'User Guide',
+      'report_bug': 'Report a Bug',
+      'send_feedback': 'Send Feedback',
+      'how_do_i_join_queue': 'How do I join a queue?',
+      'join_queue_answer':
+          'To join a queue, navigate to the business you want to visit, find the queue, and tap "Join Queue". You will receive notifications when your turn is approaching.',
+      'can_i_leave_queue': 'Can I leave a queue?',
+      'leave_queue_answer':
+          'Yes, you can leave a queue at any time by going to your active queues and tapping the "Leave" button. Your position will be freed up for other customers.',
+      'manage_notifications': 'How do I manage notifications?',
+      'manage_notifications_answer':
+          'Go to Settings > Notifications to manage all notification preferences. You can enable or disable queue notifications, promotional messages, and sound alerts.',
+      'data_security': 'Is my data secure?',
+      'data_security_answer':
+          'Yes, we use industry-standard encryption to protect your personal data. See our Privacy Policy for more details on how we handle your information.',
+      'learn_more': 'Learn More',
+      'help_center': 'Help Center',
+
       // Business Specific
       'business_info': 'Business Information',
       'business_type': 'Business Type',
@@ -212,7 +241,7 @@ class QNowLocalizations {
       'customer_management': 'Customer Management',
       'business_settings': 'Business Settings',
       'business_profile': 'Business Profile',
-      
+
       // Time & Status
       'active': 'Active',
       'inactive': 'Inactive',
@@ -229,7 +258,7 @@ class QNowLocalizations {
       'cancelled': 'Cancelled',
       'missed': 'Missed',
       'total_customers': 'Total Customers',
-      
+
       // Validation Messages
       'required_field': 'This field is required',
       'invalid_email': 'Invalid email address',
@@ -238,7 +267,7 @@ class QNowLocalizations {
       'password_too_short': 'Password must be at least 6 characters',
       'passwords_not_match': 'Passwords do not match',
       'invalid_name': 'Name must be at least 3 characters',
-      
+
       // Actions
       'view': 'View',
       'remove': 'Remove',
@@ -287,7 +316,7 @@ class QNowLocalizations {
       'refresh': 'Actualiser',
       'language': 'Langue',
       'get_started': 'Commencer',
-      
+
       // Authentication & Roles
       'login': 'Connexion',
       'signup': 'S\'inscrire',
@@ -302,7 +331,7 @@ class QNowLocalizations {
       'already_have_account': 'Vous avez déjà un compte ?',
       'create_account': 'Créer un compte',
       'reset_password': 'Réinitialiser le mot de passe',
-      
+
       // User Info
       'name': 'Nom',
       'full_name': 'Nom complet',
@@ -317,7 +346,7 @@ class QNowLocalizations {
       'confirm_new_password': 'Confirmer le nouveau mot de passe',
       'update_profile': 'Mettre à jour le profil',
       'personal_info': 'Informations personnelles',
-      
+
       // Queue Management
       'add_queue': 'Ajouter une file',
       'create_queue': 'Créer une file',
@@ -352,8 +381,10 @@ class QNowLocalizations {
       'queue_details': 'Détails de la file',
       'queue_settings': 'Paramètres de file',
       'join_queue_confirm': 'Êtes-vous sûr de vouloir rejoindre cette file ?',
-      'join_queue_description': 'Parcourez les files disponibles et rejoignez celles dont vous avez besoin.',
-      'queue_tips': 'Conseil : Arrivez à l’heure et gardez votre téléphone à portée de main pour les notifications.',
+      'join_queue_description':
+          'Parcourez les files disponibles et rejoignez celles dont vous avez besoin.',
+      'queue_tips':
+          'Conseil : Arrivez à l’heure et gardez votre téléphone à portée de main pour les notifications.',
       'refreshed': 'Actualisé',
       'leave_queue_confirm': 'Êtes-vous sûr de vouloir quitter cette file ?',
       'position': 'Position',
@@ -363,7 +394,8 @@ class QNowLocalizations {
       'no_available_queues': 'Aucune file disponible pour le moment',
       'try_different_search': 'Essayez un terme de recherche différent',
       'check_back_later': 'Veuillez revenir plus tard',
-      'add_queue_hint': 'Créez votre première file pour commencer à servir des clients',
+      'add_queue_hint':
+          'Créez votre première file pour commencer à servir des clients',
       'delete_queue_confirm': 'Êtes-vous sûr de vouloir supprimer cette file ?',
       'serve_confirm': 'Servir',
       'notify_confirm': 'Notifier',
@@ -380,7 +412,7 @@ class QNowLocalizations {
       'manage_queue': 'Gérer la file',
       'manage_your_queues': 'Gérer vos files',
       'total_customers': 'Total Clients',
-      
+
       // Search & Discovery
       'search_hint': 'Rechercher une entreprise...',
       'search_queues': 'Rechercher des files...',
@@ -389,7 +421,13 @@ class QNowLocalizations {
       'popular_queues': 'Files populaires',
       'recommended': 'Recommandé',
       'recent': 'Récent',
-      
+
+      // Large Messages
+      'privacy_policy_message':
+          'Nous respectons votre vie privée. Cette application stocke localement les données utilisateur nécessaires (nom, téléphone et informations facultatives sur l\'e-mail/l\'entreprise) pour fournir des services de file d\'attente. Les données sont utilisées uniquement pour la fonctionnalité et ne sont pas partagées à l\'extérieur.',
+      'terms_of_service_message':
+          'En utilisant QNow, vous acceptez de rejoindre, quitter et gérer les files de manière responsable. N\'abusez pas de l\'application et ne fournissez pas de fausses informations. Nous pouvons mettre à jour ces conditions si nécessaire.',
+
       // Notifications & Status
       'queue_created': 'File créée avec succès',
       'queue_deleted': 'File supprimée avec succès',
@@ -408,11 +446,14 @@ class QNowLocalizations {
       'queue_notifications': 'Notifications de file',
       'queue_notifications_subtitle': 'Être averti quand votre tour approche',
       'promotional_notifications': 'Notifications promotionnelles',
-      'promotional_notifications_subtitle': 'Recevoir des offres et mises à jour',
+      'promotional_notifications_subtitle':
+          'Recevoir des offres et mises à jour',
       'sound_alerts': 'Alertes sonores',
       'sound_alerts_subtitle': 'Jouer un son pour les notifications',
-      
+
       // Settings & Help
+      'privacy_policy': 'Politique de confidentialité',
+      'terms_of_service': 'Conditions d\'utilisation',
       'settings': 'Paramètres',
       'privacy_security': 'Confidentialité et sécurité',
       'delete_account': 'Supprimer le compte',
@@ -424,15 +465,15 @@ class QNowLocalizations {
       'dev_team': 'Équipe de développement',
       'about_project': 'À propos du projet',
       'version': 'Version 1.0.0',
-      'privacy_policy': 'Politique de confidentialité',
-      'terms_of_service': 'Conditions d\'utilisation',
       'faq': 'FAQ',
       'support': 'Support',
       'feedback': 'Retour',
       'rate_app': 'Noter l\'app',
       'share_app': 'Partager l\'app',
-      'profile_updated' : 'Profil changé',
-      
+      'profile_updated': 'Profil changé',
+      'password_changed': 'Mot de passe changé avec succès',
+      'change': 'Changer',
+
       // Business Specific
       'business_info': 'Informations de l\'entreprise',
       'business_type': 'Type d\'entreprise',
@@ -443,7 +484,7 @@ class QNowLocalizations {
       'customer_management': 'Gestion des clients',
       'business_settings': 'Paramètres de l\'entreprise',
       'business_profile': 'Profil de l\'entreprise',
-      
+
       // Time & Status
       'active': 'Actif',
       'inactive': 'Inactif',
@@ -459,16 +500,17 @@ class QNowLocalizations {
       'waiting': 'En attente',
       'cancelled': 'Annulé',
       'missed': 'Manqué',
-      
+
       // Validation Messages
       'required_field': 'Ce champ est obligatoire',
       'invalid_email': 'Adresse e-mail invalide',
       'invalid_phone': 'Numéro de téléphone invalide',
       'phone_too_short': 'Numéro de téléphone trop court',
-      'password_too_short': 'Le mot de passe doit contenir au moins 6 caractères',
+      'password_too_short':
+          'Le mot de passe doit contenir au moins 6 caractères',
       'passwords_not_match': 'Les mots de passe ne correspondent pas',
       'invalid_name': 'Le nom doit contenir au moins 3 caractères',
-      
+
       // Actions
       'view': 'Voir',
       'remove': 'Supprimer',
@@ -517,7 +559,7 @@ class QNowLocalizations {
       'refresh': 'تحديث',
       'language': 'اللغة',
       'get_started': 'البدء',
-      
+
       // Authentication & Roles
       'login': 'تسجيل الدخول',
       'signup': 'إنشاء حساب',
@@ -532,7 +574,7 @@ class QNowLocalizations {
       'already_have_account': 'لديك حساب بالفعل؟',
       'create_account': 'إنشاء حساب',
       'reset_password': 'إعادة تعيين كلمة المرور',
-      
+
       // User Info
       'name': 'الاسم',
       'full_name': 'الاسم الكامل',
@@ -547,7 +589,7 @@ class QNowLocalizations {
       'confirm_new_password': 'تأكيد كلمة المرور الجديدة',
       'update_profile': 'تحديث الملف الشخصي',
       'personal_info': 'المعلومات الشخصية',
-      
+
       // Queue Management
       'add_queue': 'إضافة طابور',
       'create_queue': 'إنشاء طابور',
@@ -583,7 +625,8 @@ class QNowLocalizations {
       'queue_settings': 'إعدادات الطابور',
       'join_queue_confirm': 'هل أنت متأكد أنك تريد الانضمام إلى هذا الطابور؟',
       'join_queue_description': 'تصفّح الطوابير المتاحة وانضم إلى ما تحتاجه.',
-      'queue_tips': 'معلومة: احرص على الحضور في الوقت المحدد وتحقق من هاتفك للإشعارات.',
+      'queue_tips':
+          'معلومة: احرص على الحضور في الوقت المحدد وتحقق من هاتفك للإشعارات.',
       'refreshed': 'تم التحديث',
       'leave_queue_confirm': 'هل أنت متأكد أنك تريد مغادرة هذا الطابور؟',
       'position': 'الموضع',
@@ -609,7 +652,7 @@ class QNowLocalizations {
       'max_queues_reached': 'يمكنك الانضمام إلى 3 طوابير كحد أقصى',
       'manage_queue': 'إدارة الطابور',
       'manage_your_queues': 'إدارة طوابيرك',
-      
+
       // Search & Discovery
       'search_hint': 'ابحث عن عمل...',
       'search_queues': 'ابحث في الطوابير...',
@@ -619,7 +662,13 @@ class QNowLocalizations {
       'recommended': 'موصى به',
       'recent': 'الأخيرة',
       'total_customers': 'إجمالي العملاء',
-      
+
+      // Large Messages
+      'privacy_policy_message':
+          'نحن نحترم خصوصيتك. يقوم هذا التطبيق بتخزين بيانات المستخدم الضرورية (الاسم، الهاتف، ومعلومات البريد الإلكتروني/العمل الاختيارية) محليًا لتوفير خدمات الطابور. تُستخدم البيانات فقط للوظائف ولا تتم مشاركتها خارجيًا.',
+      'terms_of_service_message':
+          'باستخدام QNow، فإنك توافق على الانضمام، والمغادرة، وإدارة الطوابير بمسؤولية. لا تسيء استخدام التطبيق أو تقدم معلومات خاطئة. قد نقوم بتحديث هذه الشروط حسب الحاجة.',
+
       // Notifications & Status
       'queue_created': 'تم إنشاء الطابور بنجاح',
       'queue_deleted': 'تم حذف الطابور بنجاح',
@@ -641,8 +690,10 @@ class QNowLocalizations {
       'promotional_notifications_subtitle': 'تلقي العروض والتحديثات',
       'sound_alerts': 'التنبيهات الصوتية',
       'sound_alerts_subtitle': 'تشغيل الصوت للإشعارات',
-      
+
       // Settings & Help
+      'privacy_policy': 'سياسة الخصوصية',
+      'terms_of_service': 'شروط الخدمة',
       'settings': 'الإعدادات',
       'privacy_security': 'الخصوصية والأمان',
       'delete_account': 'حذف الحساب',
@@ -654,15 +705,15 @@ class QNowLocalizations {
       'dev_team': 'فريق التطوير',
       'about_project': 'حول المشروع',
       'version': 'إصدار 1.0.0',
-      'privacy_policy': 'سياسة الخصوصية',
-      'terms_of_service': 'شروط الخدمة',
       'faq': 'الأسئلة الشائعة',
       'support': 'الدعم',
       'feedback': 'التقييم',
       'rate_app': 'قيم التطبيق',
       'share_app': 'شارك التطبيق',
-      'profile_updated' : 'تم تحديث الملف الشخصي',
-      
+      'profile_updated': 'تم تحديث الملف الشخصي',
+      'password_changed': 'تم تغيير كلمة المرور بنجاح',
+      'change': 'تغيير',
+
       // Business Specific
       'business_info': 'معلومات العمل',
       'business_type': 'نوع العمل',
@@ -673,7 +724,7 @@ class QNowLocalizations {
       'customer_management': 'إدارة العملاء',
       'business_settings': 'إعدادات العمل',
       'business_profile': 'ملف العمل',
-      
+
       // Time & Status
       'active': 'نشط',
       'inactive': 'غير نشط',
@@ -688,7 +739,7 @@ class QNowLocalizations {
       'status': 'الحالة',
       'cancelled': 'ملغي',
       'missed': 'فات',
-      
+
       // Validation Messages
       'required_field': 'هذا الحقل مطلوب',
       'invalid_email': 'بريد إلكتروني غير صالح',
@@ -697,7 +748,7 @@ class QNowLocalizations {
       'password_too_short': 'كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل',
       'passwords_not_match': 'كلمات المرور غير متطابقة',
       'invalid_name': 'الاسم يجب أن يحتوي على 3 أحرف على الأقل',
-      
+
       // Actions
       'view': 'عرض',
       'remove': 'إزالة',
@@ -725,9 +776,9 @@ class QNowLocalizations {
   // Get translation for a key
   String get(String key) {
     try {
-      return _localizedValues[_currentLocale.languageCode]?[key] ?? 
-             _localizedValues['en']?[key] ?? 
-             key;
+      return _localizedValues[_currentLocale.languageCode]?[key] ??
+          _localizedValues['en']?[key] ??
+          key;
     } catch (e) {
       return key;
     }
@@ -737,8 +788,8 @@ class QNowLocalizations {
   static String getTranslation(String key) {
     try {
       return _localizedValues[_instance._currentLocale.languageCode]?[key] ??
-             _localizedValues['en']?[key] ??
-             key;
+          _localizedValues['en']?[key] ??
+          key;
     } catch (e) {
       return key;
     }
@@ -756,20 +807,28 @@ class QNowLocalizations {
   // Get language name for a locale code
   String getLanguageName(String languageCode) {
     switch (languageCode) {
-      case 'en': return 'English';
-      case 'fr': return 'Français';
-      case 'ar': return 'العربية';
-      default: return 'English';
+      case 'en':
+        return 'English';
+      case 'fr':
+        return 'Français';
+      case 'ar':
+        return 'العربية';
+      default:
+        return 'English';
     }
   }
 
   // Get language flag for a locale code
   String getLanguageFlag(String languageCode) {
     switch (languageCode) {
-      case 'en': return '🇺🇸';
-      case 'fr': return '🇫🇷';
-      case 'ar': return '🇸🇦';
-      default: return '🇺🇸';
+      case 'en':
+        return '🇺🇸';
+      case 'fr':
+        return '🇫🇷';
+      case 'ar':
+        return '🇩🇿';
+      default:
+        return '🇺🇸';
     }
   }
 
@@ -802,8 +861,7 @@ class LocalizedText extends StatelessWidget {
   final TextOverflow? overflow;
 
   const LocalizedText(
-    this.ke
-    , {
+    this.ke, {
     super.key,
     this.style,
     this.textAlign,

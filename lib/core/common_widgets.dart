@@ -20,17 +20,13 @@ class AppButtons {
     BorderRadiusGeometry? borderRadius,
     required BuildContext context,
   }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return SizedBox(
       width: isFullWidth ? double.infinity : width,
       height: height ?? 50,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ??
-              (isDark ? AppColors.primary : AppColors.primary),
+          backgroundColor: backgroundColor ?? (AppColors.primary),
           disabledBackgroundColor: (backgroundColor ?? AppColors.primary)
               .withAlpha((0.5 * 255).round()),
           foregroundColor: textColor ?? AppColors.white,
@@ -58,7 +54,6 @@ class AppButtons {
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   lightColor: textColor ?? AppColors.white,
-                  darkColor: textColor ?? AppColors.white,
                 ),
               ),
       ),
@@ -106,7 +101,6 @@ class AppButtons {
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   lightColor: textColor ?? AppColors.primary,
-                  darkColor: textColor ?? AppColors.primary,
                 ),
               ),
       ),
@@ -134,7 +128,6 @@ class AppButtons {
           fontSize: 14,
           fontWeight: FontWeight.w600,
           lightColor: textColor ?? AppColors.primary,
-          darkColor: textColor ?? AppColors.primary,
         ).copyWith(
           decoration:
               underline ? TextDecoration.underline : TextDecoration.none,
@@ -187,7 +180,6 @@ class AppButtons {
           fontSize: 14,
           fontWeight: FontWeight.w600,
           lightColor: iconColor ?? AppColors.white,
-          darkColor: iconColor ?? AppColors.white,
         ),
       ),
     );
@@ -217,9 +209,6 @@ class AppTextFields {
     FocusNode? focusNode,
     required BuildContext context,
   }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
@@ -244,15 +233,12 @@ class AppTextFields {
           context,
           fontSize: 14,
           lightColor: AppColors.textSecondaryLight,
-          darkColor: AppColors.textSecondaryDark,
         ),
         suffixIcon: suffixIcon,
         prefixIcon: prefixIcon,
         filled: true,
         fillColor: enabled
-            ? (isDark
-                ? AppColors.inputBackgroundDark
-                : AppColors.inputBackgroundLight)
+            ? (AppColors.inputBackgroundLight)
             : AppColors.buttonDisabledLight,
         contentPadding: const EdgeInsets.symmetric(
           vertical: 14,
@@ -310,10 +296,7 @@ class AppTextFields {
       controller: controller,
       onChanged: onChanged,
       onSubmitted: onChanged,
-      prefixIcon: Icon(Icons.search,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? AppColors.textSecondaryDark
-              : AppColors.textSecondaryLight),
+      prefixIcon: const Icon(Icons.search, color: AppColors.textSecondaryLight),
     );
   }
 
@@ -323,7 +306,6 @@ class AppTextFields {
     bool isFocused = false,
     bool hasError = false,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     Color borderColor;
     double borderWidth = 1.0;
 
@@ -334,11 +316,9 @@ class AppTextFields {
       borderColor = AppColors.primary;
       borderWidth = 2.0;
     } else if (!isEnabled) {
-      borderColor =
-          isDark ? AppColors.inputBorderDark : AppColors.inputBorderLight;
+      borderColor = AppColors.inputBorderLight;
     } else {
-      borderColor =
-          isDark ? AppColors.inputBorderDark : AppColors.inputBorderLight;
+      borderColor = AppColors.inputBorderLight;
     }
 
     return OutlineInputBorder(
@@ -394,7 +374,6 @@ class AppLabels {
         context,
         fontSize: 12,
         lightColor: AppColors.textSecondaryLight,
-        darkColor: AppColors.textSecondaryDark,
       ),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
@@ -408,7 +387,6 @@ class AppLabels {
         context,
         fontSize: 12,
         lightColor: AppColors.error,
-        darkColor: AppColors.error,
       ),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
@@ -421,15 +399,11 @@ class AppLabels {
     Color? backgroundColor,
     Color? textColor,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: backgroundColor ??
-            (isDark
-                ? AppColors.primary.withAlpha((0.2 * 255).round())
-                : AppColors.primary.withAlpha((0.1 * 255).round())),
+            (AppColors.primary.withAlpha((0.1 * 255).round())),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -439,7 +413,6 @@ class AppLabels {
           fontSize: 12,
           fontWeight: FontWeight.w500,
           lightColor: textColor ?? AppColors.primary,
-          darkColor: textColor ?? AppColors.primary,
         ),
       ),
     );
@@ -460,21 +433,17 @@ class AppContainers {
     List<BoxShadow>? shadow,
     required BuildContext context,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: padding ?? const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: backgroundColor ??
-              (isDark ? AppColors.cardDark : AppColors.cardLight),
+          color: backgroundColor ?? (AppColors.cardLight),
           borderRadius: borderRadius ?? BorderRadius.circular(12),
           boxShadow: shadow ??
               [
                 BoxShadow(
-                  color: Colors.black.withAlpha(
-                      isDark ? (0.2 * 255).round() : (0.05 * 255).round()),
+                  color: Colors.black.withAlpha((0.05 * 255).round()),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -492,18 +461,14 @@ class AppContainers {
     Color? textColor,
     required BuildContext context,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color:
-            backgroundColor ?? (isDark ? AppColors.primary : AppColors.primary),
+        color: backgroundColor ?? (AppColors.primary),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black
-                .withAlpha(isDark ? (0.2 * 255).round() : (0.1 * 255).round()),
+            color: Colors.black.withAlpha((0.1 * 255).round()),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -519,7 +484,6 @@ class AppContainers {
               fontSize: 24,
               fontWeight: FontWeight.bold,
               lightColor: textColor ?? AppColors.white,
-              darkColor: textColor ?? AppColors.white,
             ),
           ),
           const SizedBox(height: 4),
@@ -529,9 +493,7 @@ class AppContainers {
               context,
               fontSize: 12,
               lightColor: textColor?.withAlpha((0.8 * 255).round()) ??
-                  AppColors.textSecondaryDark,
-              darkColor: textColor?.withAlpha((0.8 * 255).round()) ??
-                  AppColors.textSecondaryDark,
+                  AppColors.textSecondaryLight,
             ),
           ),
         ],
@@ -578,7 +540,6 @@ class AppContainers {
                     context,
                     fontSize: 12,
                     lightColor: AppColors.textSecondaryLight,
-                    darkColor: AppColors.textSecondaryDark,
                   ),
                 ),
               ],
@@ -612,14 +573,10 @@ class RoleToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return AnimatedContainer(
       duration: animationDuration,
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.buttonSecondaryDark
-            : AppColors.buttonSecondaryLight,
+        color: AppColors.buttonSecondaryLight,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -628,13 +585,11 @@ class RoleToggle extends StatelessWidget {
             text: context.loc('customer'),
             isSelected: !isBusinessOwner,
             onTap: () => onChanged(false),
-            isDark: isDark,
           ),
           _buildToggleOption(
             text: context.loc('business_owner'),
             isSelected: isBusinessOwner,
             onTap: () => onChanged(true),
-            isDark: isDark,
           ),
         ],
       ),
@@ -645,7 +600,6 @@ class RoleToggle extends StatelessWidget {
     required String text,
     required bool isSelected,
     required VoidCallback onTap,
-    required bool isDark,
   }) {
     return Expanded(
       child: GestureDetector(
@@ -666,9 +620,7 @@ class RoleToggle extends StatelessWidget {
                 fontSize: 14,
                 color: isSelected
                     ? AppColors.white
-                    : (isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondaryLight),
+                    : (AppColors.textSecondaryLight),
               ),
             ),
           ),
@@ -704,8 +656,6 @@ class LogoHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Center(
       child: Column(
         children: [
@@ -716,8 +666,7 @@ class LogoHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(
-                      isDark ? (0.3 * 255).round() : (0.2 * 255).round()),
+                  color: Colors.black.withAlpha((0.2 * 255).round()),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -746,7 +695,6 @@ class LogoHeader extends StatelessWidget {
                 context,
                 fontSize: 14,
                 lightColor: AppColors.textSecondaryLight,
-                darkColor: AppColors.textSecondaryDark,
               ),
               textAlign: TextAlign.center,
             ),
@@ -792,8 +740,6 @@ class AppStates {
     IconData icon = Icons.inbox,
     required BuildContext context,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -803,9 +749,7 @@ class AppStates {
             Icon(
               icon,
               size: 64,
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondaryLight,
+              color: AppColors.textSecondaryLight,
             ),
             const SizedBox(height: 16),
             Text(
@@ -825,7 +769,6 @@ class AppStates {
                   context,
                   fontSize: 14,
                   lightColor: AppColors.textSecondaryLight,
-                  darkColor: AppColors.textSecondaryDark,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -871,7 +814,6 @@ class AppStates {
                   context,
                   fontSize: 14,
                   lightColor: AppColors.textSecondaryLight,
-                  darkColor: AppColors.textSecondaryDark,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -888,83 +830,6 @@ class AppStates {
           ],
         ),
       ),
-    );
-  }
-}
-
-// ==============================
-// NEW: LANGUAGE SELECTOR
-// ==============================
-
-class LanguageSelector extends StatelessWidget {
-  final Locale currentLocale;
-  final ValueChanged<Locale> onLocaleChanged;
-
-  const LanguageSelector({
-    super.key,
-    required this.currentLocale,
-    required this.onLocaleChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final languages = [
-      {'code': 'en', 'name': 'English', 'flag': '🇺🇸'},
-      {'code': 'fr', 'name': 'Français', 'flag': '🇫🇷'},
-      {'code': 'ar', 'name': 'العربية', 'flag': '🇸🇦'},
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppLabels.label(context, context.loc('language')),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: languages.map((lang) {
-            final isSelected = currentLocale.languageCode == lang['code'];
-            return GestureDetector(
-              onTap: () => onLocaleChanged(Locale(lang['code']!)),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primary
-                      : (Theme.of(context).brightness == Brightness.dark
-                          ? AppColors.buttonSecondaryDark
-                          : AppColors.buttonSecondaryLight),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isSelected ? AppColors.primary : Colors.transparent,
-                    width: 2,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(lang['flag']!, style: const TextStyle(fontSize: 16)),
-                    const SizedBox(width: 8),
-                    Text(
-                      lang['name']!,
-                      style: TextStyle(
-                        color: isSelected
-                            ? AppColors.white
-                            : (Theme.of(context).brightness == Brightness.dark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimaryLight),
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
     );
   }
 }

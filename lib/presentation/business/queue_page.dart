@@ -283,7 +283,6 @@ class _QueueViewState extends State<QueueView> {
                             context,
                             fontSize: 14,
                             lightColor: AppColors.textSecondaryLight,
-                            darkColor: AppColors.textSecondaryDark,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -303,7 +302,6 @@ class _QueueViewState extends State<QueueView> {
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                               lightColor: AppColors.white,
-                              darkColor: AppColors.white,
                             ),
                           ),
                         ),
@@ -330,7 +328,6 @@ class _QueueViewState extends State<QueueView> {
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     lightColor: AppColors.primary,
-                    darkColor: AppColors.primary,
                   ),
                 ),
               ),
@@ -433,7 +430,6 @@ class _QueueViewState extends State<QueueView> {
               context,
               fontSize: 12,
               lightColor: AppColors.textSecondaryLight,
-              darkColor: AppColors.textSecondaryDark,
             ),
           ),
         ],
@@ -611,10 +607,6 @@ class _QueueViewState extends State<QueueView> {
                                             currentQueue.maxSize
                                         ? AppColors.error
                                         : AppColors.success,
-                                    darkColor: currentQueue.currentSize >=
-                                            currentQueue.maxSize
-                                        ? AppColors.error
-                                        : AppColors.success,
                                   ),
                                 ),
                               ],
@@ -649,7 +641,6 @@ class _QueueViewState extends State<QueueView> {
                               context,
                               fontSize: 14,
                               lightColor: AppColors.textSecondaryLight,
-                              darkColor: AppColors.textSecondaryDark,
                             ),
                           ),
                         ],
@@ -717,7 +708,6 @@ class _QueueViewState extends State<QueueView> {
             context,
             fontSize: 12,
             lightColor: AppColors.textSecondaryLight,
-            darkColor: AppColors.textSecondaryDark,
           ),
         ),
       ],

@@ -234,7 +234,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                         context,
                         fontSize: 14,
                         lightColor: AppColors.textSecondaryLight,
-                        darkColor: AppColors.textSecondaryDark,
                       ),
                     ),
                   ],
@@ -329,7 +328,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                   context,
                   fontSize: 12,
                   lightColor: AppColors.textSecondaryLight,
-                  darkColor: AppColors.textSecondaryDark,
                 ),
               ),
               Container(
@@ -349,8 +347,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                     lightColor:
-                        queue.isActive ? AppColors.success : AppColors.error,
-                    darkColor:
                         queue.isActive ? AppColors.success : AppColors.error,
                   ),
                 ),
@@ -390,7 +386,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
             context,
             fontSize: 12,
             lightColor: AppColors.textSecondaryLight,
-            darkColor: AppColors.textSecondaryDark,
           ),
         ),
       ],
@@ -490,7 +485,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                                       context,
                                       fontSize: 16,
                                       lightColor: AppColors.textSecondaryLight,
-                                      darkColor: AppColors.textSecondaryDark,
                                     ),
                                   ),
                                   const SizedBox(height: 24),
@@ -568,7 +562,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       lightColor: AppColors.white,
-                      darkColor: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -579,7 +572,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                       fontSize: 14,
                       lightColor:
                           AppColors.white.withAlpha((0.8 * 255).round()),
-                      darkColor: AppColors.white.withAlpha((0.8 * 255).round()),
                     ),
                   ),
                 ],
@@ -609,7 +601,8 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                  MaterialPageRoute(
+                      builder: (context) => SettingsPage(user: widget.user)),
                 );
               },
             ),
@@ -626,7 +619,11 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
               icon: Icons.help,
               title: context.loc('help'),
               onTap: () {
-                // TODO: Navigate to help page
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AboutUsPage()),
+                );
               },
             ),
             _buildDrawerItem(
@@ -678,7 +675,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
           context,
           fontSize: 16,
           lightColor: textColor ?? AppColors.textPrimaryLight,
-          darkColor: textColor ?? AppColors.textPrimaryDark,
         ),
       ),
       onTap: onTap,

@@ -201,7 +201,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                         context,
                         fontSize: 14,
                         lightColor: AppColors.textSecondaryLight,
-                        darkColor: AppColors.textSecondaryDark,
                       ),
                     ),
                   ],
@@ -224,7 +223,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         lightColor: isFull ? AppColors.error : AppColors.success,
-                        darkColor: isFull ? AppColors.error : AppColors.success,
                       ),
                     ),
                   ),
@@ -236,14 +234,28 @@ class _JoinQueueViewState extends State<JoinQueueView> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailItem(
-                icon: Icons.business,
-                text: 'Business Name', // TODO: Get business name
+              FutureBuilder<User?>(
+                future: UserRepository(databaseHelper: DatabaseHelper())
+                    .getUserById(queue.businessOwnerId),
+                builder: (context, snapshot) {
+                  final businessName = snapshot.data?.businessName ?? snapshot.data?.name ?? '—';
+                  return _buildDetailItem(
+                    icon: Icons.business,
+                    text: businessName,
+                  );
+                },
               ),
               const SizedBox(height: 8),
-              _buildDetailItem(
-                icon: Icons.location_on,
-                text: 'Business Location', // TODO: Get business address
+              FutureBuilder<User?>(
+                future: UserRepository(databaseHelper: DatabaseHelper())
+                    .getUserById(queue.businessOwnerId),
+                builder: (context, snapshot) {
+                  final address = snapshot.data?.businessAddress ?? '—';
+                  return _buildDetailItem(
+                    icon: Icons.location_on,
+                    text: address,
+                  );
+                },
               ),
             ],
           ),
@@ -306,7 +318,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
               context,
               fontSize: 14,
               lightColor: AppColors.textSecondaryLight,
-              darkColor: AppColors.textSecondaryDark,
             ),
           ),
         ),
@@ -342,7 +353,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
             context,
             fontSize: 12,
             lightColor: AppColors.textSecondaryLight,
-            darkColor: AppColors.textSecondaryDark,
           ),
         ),
       ],
@@ -421,7 +431,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                           context,
                           fontSize: 14,
                           lightColor: AppColors.textSecondaryLight,
-                          darkColor: AppColors.textSecondaryDark,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -444,7 +453,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                                   context,
                                   fontSize: 12,
                                   lightColor: AppColors.info,
-                                  darkColor: AppColors.info,
                                 ),
                               ),
                             ),

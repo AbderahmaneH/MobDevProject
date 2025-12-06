@@ -18,7 +18,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     final databasesPath = await getDatabasesPath();
-    final path = join(databasesPath, 'qnow.db');
+    final path = join(databasesPath, 'qnow2.db');
 
     return await openDatabase(
       path,

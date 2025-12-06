@@ -106,7 +106,7 @@ class WelcomePage extends StatelessWidget {
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(width: 8),
-                    Icon(Icons.arrow_drop_down, color: AppColors.primary),
+                    const Icon(Icons.arrow_drop_down, color: AppColors.primary),
                   ],
                 ),
               ),
