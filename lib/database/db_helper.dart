@@ -1,68 +1,11 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-import 'tables.dart';
-import 'dummy_data.dart';
+// Local SQLite DatabaseHelper removed. Project migrated to Supabase.
+// This file is kept as a placeholder to avoid import errors in editors.
+// All data operations now use Supabase via the repositories in
+// lib/database/repositories and the SupabaseService in
+// lib/services/supabase_service.dart.
 
+@deprecated
 class DatabaseHelper {
-  static final DatabaseHelper _instance = DatabaseHelper._internal();
-  factory DatabaseHelper() => _instance;
-  DatabaseHelper._internal();
-
-  static Database? _database;
-
-  Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDatabase();
-    return _database!;
-  }
-
-  Future<Database> _initDatabase() async {
-    final databasesPath = await getDatabasesPath();
-    final path = join(databasesPath, 'qnow2.db');
-
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _onCreate,
-      onConfigure: _onConfigure,
-    );
-  }
-
-  Future<void> _onCreate(Database db, int version) async {
-    for (final query in DatabaseTables.createTableQueries) {
-      await db.execute(query);
-    }
-
-    for (final query in DatabaseIndexes.createIndexQueries) {
-      await db.execute(query);
-    }
-
-    await insertDummyData(db);
-  }
-
-  Future<void> _onConfigure(Database db) async {
-    await db.execute('PRAGMA foreign_keys = ON');
-  }
-
-  Future<void> clearDatabase() async {
-    final db = await database;
-    await db.delete(DatabaseTables.queueClients);
-    await db.delete(DatabaseTables.queues);
-    await db.delete(DatabaseTables.users);
-  }
-
-  Future<void> resetDatabase() async {
-    final db = await database;
-    await db.close();
-    final databasesPath = await getDatabasesPath();
-    final path = join(databasesPath, 'qnow.db');
-    await deleteDatabase(path);
-    _database = null;
-    await database;
-  }
-
-  Future<void> close() async {
-    final db = await database;
-    await db.close();
-  }
+  DatabaseHelper._();
+  factory DatabaseHelper() => DatabaseHelper._();
 }

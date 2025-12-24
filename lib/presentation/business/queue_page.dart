@@ -6,9 +6,6 @@ import '../../logic/queue_cubit.dart';
 import '../../core/common_widgets.dart';
 import '../../database/models/queue_model.dart';
 import '../../database/models/queue_client_model.dart';
-import '../../database/repositories/queue_repository.dart';
-import '../../database/repositories/queue_client_repository.dart';
-import '../../database/db_helper.dart';
 
 class QueuePage extends StatelessWidget {
   final Queue queue;
@@ -28,9 +25,8 @@ class QueuePage extends StatelessWidget {
 
     return BlocProvider(
       create: (context) => QueueCubit(
-        queueRepository: QueueRepository(databaseHelper: DatabaseHelper()),
-        queueClientRepository:
-            QueueClientRepository(databaseHelper: DatabaseHelper()),
+        queueRepository: RepositoryProvider.of(context),
+        queueClientRepository: RepositoryProvider.of(context),
         businessOwnerId: queue.businessOwnerId,
       )..loadQueues(),
       child: QueueView(queue: queue),

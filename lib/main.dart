@@ -2,14 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'logic/app_cubit.dart';
 import 'logic/auth_cubit.dart';
-import 'database/db_helper.dart';
+import 'services/supabase_service.dart';
 import 'core/localization.dart';
 import 'core/app_colors.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'presentation/welcome_page.dart';
 import 'database/repositories/user_repository.dart';
+import 'database/repositories/queue_repository.dart';
+import 'database/repositories/queue_client_repository.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Supabase here with your URL and anon/public key.
+  // Replace the empty strings with your project's values or
+  // provide them at runtime when you have the credentials.
+  await SupabaseService.initialize(url: 'https://rmxccujkhrmownftuvsn.supabase.co', anonKey: 'sb_publishable_ktYqW-uVXqp18sEImXdbyA_aUX8OVaF');
   runApp(const MyApp());
 }
 
@@ -18,19 +25,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final databaseHelper = DatabaseHelper();
+    final userRepository = UserRepository();
+    final queueRepository = QueueRepository();
+    final queueClientRepository = QueueClientRepository();
 
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider.value(value: databaseHelper),
+        RepositoryProvider.value(value: userRepository),
+        RepositoryProvider.value(value: queueRepository),
+        RepositoryProvider.value(value: queueClientRepository),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => AppCubit()),
           BlocProvider(
               create: (context) => AuthCubit(
-                  userRepository:
-                      UserRepository(databaseHelper: databaseHelper))),
+                  userRepository: RepositoryProvider.of<UserRepository>(context))),
         ],
         child: Builder(
           builder: (context) {
@@ -100,7 +110,7 @@ class MyApp extends StatelessWidget {
                       child: child,
                     );
                   },
-                  home: const WelcomePage(),
+                  home: WelcomePage(),
                 );
               },
             );

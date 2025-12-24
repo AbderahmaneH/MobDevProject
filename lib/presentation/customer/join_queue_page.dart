@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/app_colors.dart';
 import '../../logic/customer_cubit.dart';
-import '../../database/db_helper.dart';
 import '../../core/common_widgets.dart';
 import '../../core/localization.dart';
 import '../../database/models/user_model.dart';
 import '../../database/models/queue_model.dart';
-import '../../database/repositories/queue_repository.dart';
-import '../../database/repositories/queue_client_repository.dart';
 import '../../database/repositories/user_repository.dart';
 
 class JoinQueuePage extends StatelessWidget {
@@ -31,10 +28,9 @@ class JoinQueuePage extends StatelessWidget {
 
     return BlocProvider(
       create: (context) => CustomerCubit(
-        queueRepository: QueueRepository(databaseHelper: DatabaseHelper()),
-        queueClientRepository:
-            QueueClientRepository(databaseHelper: DatabaseHelper()),
-        userRepository: UserRepository(databaseHelper: DatabaseHelper()),
+        queueRepository: RepositoryProvider.of(context),
+        queueClientRepository: RepositoryProvider.of(context),
+        userRepository: RepositoryProvider.of(context),
         userId: user.id,
       )..getAvailableQueues(),
       child: JoinQueueView(user: user),
@@ -233,7 +229,7 @@ class _JoinQueueViewState extends State<JoinQueueView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FutureBuilder<User?>(
-                future: UserRepository(databaseHelper: DatabaseHelper())
+                future: RepositoryProvider.of<UserRepository>(context)
                     .getUserById(queue.businessOwnerId),
                 builder: (context, snapshot) {
                   final businessName =
@@ -246,7 +242,7 @@ class _JoinQueueViewState extends State<JoinQueueView> {
               ),
               const SizedBox(height: 8),
               FutureBuilder<User?>(
-                future: UserRepository(databaseHelper: DatabaseHelper())
+                future: RepositoryProvider.of<UserRepository>(context)
                     .getUserById(queue.businessOwnerId),
                 builder: (context, snapshot) {
                   final address = snapshot.data?.businessAddress ?? '—';

@@ -3,13 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/app_colors.dart';
 import '../../core/localization.dart';
 import '../../logic/auth_cubit.dart';
-import '../../database/db_helper.dart';
 import '../../core/common_widgets.dart';
 import '../../presentation/login_signup/signup_page.dart';
 import '../../presentation/business/business_owner_page.dart';
 import '../../presentation/customer/customer_page.dart';
 import '../../database/models/user_model.dart';
-import '../../database/repositories/user_repository.dart';
+
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -18,7 +17,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AuthCubit(
-        userRepository: UserRepository(databaseHelper: DatabaseHelper()),
+        userRepository: RepositoryProvider.of(context),
       ),
       child: const LoginView(),
     );

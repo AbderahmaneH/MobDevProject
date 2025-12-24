@@ -1,57 +1,38 @@
-import 'package:sqflite/sqflite.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../tables.dart';
 import '../models/queue_client_model.dart';
 import '../models/queue_model.dart';
-import '../db_helper.dart';
+import '../../services/supabase_service.dart';
 
 class QueueClientRepository {
-  final DatabaseHelper databaseHelper;
+  final SupabaseClient _client;
 
-  QueueClientRepository({required this.databaseHelper});
+  QueueClientRepository({SupabaseClient? client}) : _client = client ?? SupabaseService.client;
 
   Future<int> insertQueueClient(QueueClient client) async {
-    final db = await databaseHelper.database;
-    return await db.insert(
-      DatabaseTables.queueClients,
-      client.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    final result = await _client.from(DatabaseTables.queueClients).insert(client.toMap()).select().maybeSingle();
+    if (result == null) return 0;
+    return (result['id'] as int?) ?? 0;
   }
 
   Future<List<QueueClient>> getQueueClients(int queueId) async {
-    final db = await databaseHelper.database;
-    final maps = await db.query(
-      DatabaseTables.queueClients,
-      where: 'queue_id = ?',
-      whereArgs: [queueId],
-      orderBy: 'position ASC',
-    );
-    return maps.map((map) => QueueClient.fromMap(map)).toList();
+    final results = await _client
+        .from(DatabaseTables.queueClients)
+        .select()
+        .eq('queue_id', queueId)
+        .order('position', ascending: true) as List<dynamic>;
+    return results.map((r) => QueueClient.fromMap(Map<String, dynamic>.from(r))).toList();
   }
 
-  Future<List<Queue>> getQueuesByUser(int? userId,
-      {bool includeServed = false}) async {
-    final db = await databaseHelper.database;
-
-    final clientMaps = await db.query(
-      DatabaseTables.queueClients,
-      columns: ['queue_id'],
-      where: includeServed ? 'user_id = ?' : 'user_id = ? AND status != ?',
-      whereArgs: includeServed ? [userId] : [userId, 'served'],
-      distinct: true,
-    );
-
-    final queueIds = clientMaps.map((map) => map['queue_id'] as int).toList();
+  Future<List<Queue>> getQueuesByUser(int? userId, {bool includeServed = false}) async {
+    final allClients = await _client.from(DatabaseTables.queueClients).select().eq('user_id', userId) as List<dynamic>;
+    final filtered = includeServed ? allClients : allClients.where((c) => c['status'] != 'served');
+    final queueIds = filtered.map((c) => c['queue_id'] as int).toSet().toList();
 
     if (queueIds.isEmpty) return [];
 
-    final queueMaps = await db.query(
-      DatabaseTables.queues,
-      where: 'id IN (${queueIds.map((_) => '?').join(',')})',
-      whereArgs: queueIds,
-    );
-
-    final queues = queueMaps.map((map) => Queue.fromMap(map)).toList();
+    final queueResults = await _client.from(DatabaseTables.queues).select().in_('id', queueIds) as List<dynamic>;
+    final queues = queueResults.map((r) => Queue.fromMap(Map<String, dynamic>.from(r))).toList();
 
     for (final queue in queues) {
       queue.clients = await getQueueClients(queue.id);
@@ -61,99 +42,59 @@ class QueueClientRepository {
   }
 
   Future<int> getActiveQueuesCountForUser(int? userId) async {
-    final db = await databaseHelper.database;
-    final maps = await db.rawQuery(
-      '''
-      SELECT COUNT(DISTINCT queue_id) as cnt
-      FROM ${DatabaseTables.queueClients}
-      WHERE user_id = ? AND status != ?
-      ''',
-      [userId, 'served'],
-    );
-
-    final cnt = maps.first['cnt'];
-    if (cnt is int) return cnt;
-    return int.tryParse(cnt.toString()) ?? 0;
+    final results = await _client
+        .from(DatabaseTables.queueClients)
+        .select('queue_id')
+        .eq('user_id', userId) as List<dynamic>;
+    final active = results.where((r) => r['status'] != 'served').map((r) => r['queue_id'] as int).toSet().length;
+    return active;
   }
 
   Future<QueueClient?> getQueueClient(int queueId, int? userId) async {
-    final db = await databaseHelper.database;
-    final maps = await db.query(
-      DatabaseTables.queueClients,
-      where: 'queue_id = ? AND user_id = ?',
-      whereArgs: [queueId, userId],
-    );
-    if (maps.isNotEmpty) {
-      return QueueClient.fromMap(maps.first);
-    }
-    return null;
+    final result = await _client
+        .from(DatabaseTables.queueClients)
+        .select()
+        .eq('queue_id', queueId)
+        .eq('user_id', userId)
+        .maybeSingle();
+    if (result == null) return null;
+    return QueueClient.fromMap(Map<String, dynamic>.from(result));
   }
 
   Future<int> updateQueueClient(QueueClient client) async {
-    final db = await databaseHelper.database;
-    return await db.update(
-      DatabaseTables.queueClients,
-      client.toMap(),
-      where: 'id = ?',
-      whereArgs: [client.id],
-    );
+    await _client.from(DatabaseTables.queueClients).update(client.toMap()).eq('id', client.id);
+    return client.id ?? 0;
   }
 
   Future<int> deleteQueueClient(int? id) async {
-    final db = await databaseHelper.database;
-    return await db.delete(
-      DatabaseTables.queueClients,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await _client.from(DatabaseTables.queueClients).delete().eq('id', id);
+    return id ?? 0;
   }
 
   Future<int> getNextPosition(int queueId) async {
-    final db = await databaseHelper.database;
-    final maps = await db.rawQuery(
-      '''
-      SELECT MAX(position) as max_position 
-      FROM ${DatabaseTables.queueClients} 
-      WHERE queue_id = ?
-    ''',
-      [queueId],
-    );
-
-    final maxPosition = maps.first['max_position'];
-    return (maxPosition as int? ?? 0) + 1;
+    final results = await _client
+        .from(DatabaseTables.queueClients)
+        .select('position')
+        .eq('queue_id', queueId)
+        .order('position', ascending: false)
+        .limit(1) as List<dynamic>;
+    if (results.isEmpty) return 1;
+    final maxPos = results.first['position'] as int? ?? 0;
+    return maxPos + 1;
   }
 
   Future<void> updateClientStatus(int? clientId, String status) async {
-    final db = await databaseHelper.database;
     final now = DateTime.now().millisecondsSinceEpoch;
-
-    Map<String, dynamic> updates = {'status': status};
-
-    if (status == 'served') {
-      updates['served_at'] = now;
-    } else if (status == 'notified') {
-      updates['notified_at'] = now;
-    }
-
-    await db.update(
-      DatabaseTables.queueClients,
-      updates,
-      where: 'id = ?',
-      whereArgs: [clientId],
-    );
+    final updates = <String, dynamic>{'status': status};
+    if (status == 'served') updates['served_at'] = now;
+    if (status == 'notified') updates['notified_at'] = now;
+    await _client.from(DatabaseTables.queueClients).update(updates).eq('id', clientId);
   }
 
   Future<void> reorderPositions(int queueId) async {
-    final db = await databaseHelper.database;
     final clients = await getQueueClients(queueId);
-
     for (int i = 0; i < clients.length; i++) {
-      await db.update(
-        DatabaseTables.queueClients,
-        {'position': i + 1},
-        where: 'id = ?',
-        whereArgs: [clients[i].id],
-      );
+      await _client.from(DatabaseTables.queueClients).update({'position': i + 1}).eq('id', clients[i].id);
     }
   }
 }

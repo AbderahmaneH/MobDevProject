@@ -1,80 +1,49 @@
-import 'package:sqflite/sqflite.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import '../tables.dart';
 import '../models/user_model.dart';
-import '../db_helper.dart';
+import '../../services/supabase_service.dart';
 
 class UserRepository {
-  final DatabaseHelper databaseHelper;
+  final SupabaseClient _client;
 
-  UserRepository({required this.databaseHelper});
+  UserRepository({SupabaseClient? client}) : _client = client ?? SupabaseService.client;
 
   Future<int> insertUser(User user) async {
-    final db = await databaseHelper.database;
-    return await db.insert(
-      DatabaseTables.users,
-      user.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    final result = await _client.from(DatabaseTables.users).insert(user.toMap()).select().maybeSingle();
+    if (result == null) return 0;
+    return (result['id'] as int?) ?? 0;
   }
 
   Future<User?> getUserById(int? id) async {
-    final db = await databaseHelper.database;
-    final maps = await db.query(
-      DatabaseTables.users,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    if (maps.isNotEmpty) {
-      return User.fromMap(maps.first);
-    }
-    return null;
+    if (id == null) return null;
+    final result = await _client.from(DatabaseTables.users).select().eq('id', id).maybeSingle();
+    if (result == null) return null;
+    return User.fromMap(Map<String, dynamic>.from(result));
   }
 
   Future<User?> getUserByPhone(String phone) async {
-    final db = await databaseHelper.database;
-    final maps = await db.query(
-      DatabaseTables.users,
-      where: 'phone = ?',
-      whereArgs: [phone],
-    );
-    if (maps.isNotEmpty) {
-      return User.fromMap(maps.first);
-    }
-    return null;
+    final result = await _client.from(DatabaseTables.users).select().eq('phone', phone).maybeSingle();
+    if (result == null) return null;
+    return User.fromMap(Map<String, dynamic>.from(result));
   }
 
   Future<bool> isPhoneRegistered(String phone) async {
-    final db = await databaseHelper.database;
-    final maps = await db.query(
-      DatabaseTables.users,
-      where: 'phone = ?',
-      whereArgs: [phone],
-    );
-    return maps.isNotEmpty;
+    final result = await _client.from(DatabaseTables.users).select('id').eq('phone', phone).maybeSingle();
+    return result != null;
   }
 
   Future<List<User>> getAllUsers() async {
-    final db = await databaseHelper.database;
-    final maps = await db.query(DatabaseTables.users);
-    return maps.map((map) => User.fromMap(map)).toList();
+    final results = await _client.from(DatabaseTables.users).select().order('created_at', ascending: false) as List<dynamic>;
+    return results.map((r) => User.fromMap(Map<String, dynamic>.from(r))).toList();
   }
 
   Future<int> updateUser(User user) async {
-    final db = await databaseHelper.database;
-    return await db.update(
-      DatabaseTables.users,
-      user.toMap(),
-      where: 'id = ?',
-      whereArgs: [user.id],
-    );
+    await _client.from(DatabaseTables.users).update(user.toMap()).eq('id', user.id);
+    return user.id ?? 0;
   }
 
   Future<int> deleteUser(int id) async {
-    final db = await databaseHelper.database;
-    return await db.delete(
-      DatabaseTables.users,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await _client.from(DatabaseTables.users).delete().eq('id', id);
+    return id;
   }
 }

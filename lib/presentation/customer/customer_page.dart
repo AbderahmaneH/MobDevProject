@@ -7,10 +7,7 @@ import '../../logic/customer_cubit.dart';
 import '../../core/common_widgets.dart';
 import '../../database/models/queue_model.dart';
 import '../../database/models/user_model.dart';
-import '../../database/repositories/queue_repository.dart';
-import '../../database/repositories/queue_client_repository.dart';
-import '../../database/repositories/user_repository.dart';
-import '../../database/db_helper.dart';
+
 import '../drawer/profile_page.dart';
 import '../drawer/settings_page.dart';
 import '../drawer/about_us_page.dart';
@@ -27,10 +24,9 @@ class CustomerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => CustomerCubit(
-          queueRepository: QueueRepository(databaseHelper: DatabaseHelper()),
-          queueClientRepository:
-              QueueClientRepository(databaseHelper: DatabaseHelper()),
-          userRepository: UserRepository(databaseHelper: DatabaseHelper()),
+          queueRepository: RepositoryProvider.of(context),
+          queueClientRepository: RepositoryProvider.of(context),
+          userRepository: RepositoryProvider.of(context),
           userId: user.id),
       child: CustomerView(user: user),
     );
