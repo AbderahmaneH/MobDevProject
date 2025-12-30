@@ -67,6 +67,31 @@ class QueueRepository {
     return queues;
   }
 
+  Future<List<Queue>> searchQueuesByOwnerPhone(String phone) async {
+    // find users whose phone matches (partial match)
+    final userResults = await _client
+        .from(DatabaseTables.users)
+        .select()
+        .ilike('phone', '%$phone%') as List<dynamic>;
+
+    if (userResults.isEmpty) return [];
+
+    final ownerIds = userResults.map((u) => u['id'] as int).toList();
+
+    final results = await _client
+        .from(DatabaseTables.queues)
+        .select()
+        .in_('business_owner_id', ownerIds)
+        .eq('is_active', 1)
+        .order('created_at', ascending: false) as List<dynamic>;
+
+    final queues = results.map((r) => Queue.fromMap(Map<String, dynamic>.from(r))).toList();
+    for (final queue in queues) {
+      queue.clients = await _getQueueClients(queue.id);
+    }
+    return queues;
+  }
+
   Future<int> updateQueue(Queue queue) async {
     await _client.from(DatabaseTables.queues).update(queue.toMap()).eq('id', queue.id);
     return queue.id;
