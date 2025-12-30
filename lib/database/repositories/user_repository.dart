@@ -38,8 +38,10 @@ class UserRepository {
   }
 
   Future<int> updateUser(User user) async {
-    await _client.from(DatabaseTables.users).update(user.toMap()).eq('id', user.id);
-    return user.id ?? 0;
+    if (user.id == null) return 0;
+    final id = user.id!;
+    await _client.from(DatabaseTables.users).update(user.toMap()).eq('id', id);
+    return id;
   }
 
   Future<int> deleteUser(int id) async {

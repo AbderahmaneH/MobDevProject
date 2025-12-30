@@ -24,11 +24,12 @@ class QueueRepository {
   }
 
   Future<List<Queue>> getQueuesByBusinessOwner(int? businessOwnerId) async {
+    if (businessOwnerId == null) return [];
     final results = await _client
-        .from(DatabaseTables.queues)
-        .select()
-        .eq('business_owner_id', businessOwnerId)
-        .order('created_at', ascending: false) as List<dynamic>;
+      .from(DatabaseTables.queues)
+      .select()
+      .eq('business_owner_id', businessOwnerId)
+      .order('created_at', ascending: false) as List<dynamic>;
 
     final queues = results.map((r) => Queue.fromMap(Map<String, dynamic>.from(r))).toList();
 
@@ -78,12 +79,15 @@ class QueueRepository {
 
     final ownerIds = userResults.map((u) => u['id'] as int).toList();
 
-    final results = await _client
-        .from(DatabaseTables.queues)
-        .select()
-        .in_('business_owner_id', ownerIds)
-        .eq('is_active', 1)
-        .order('created_at', ascending: false) as List<dynamic>;
+    final queueQuery = _client.from(DatabaseTables.queues).select();
+    if (ownerIds.length == 1) {
+      queueQuery.eq('business_owner_id', ownerIds.first);
+    } else {
+      final cond = ownerIds.map((id) => 'business_owner_id.eq.$id').join(',');
+      queueQuery.or(cond);
+    }
+    queueQuery.eq('is_active', 1).order('created_at', ascending: false);
+    final results = await queueQuery as List<dynamic>;
 
     final queues = results.map((r) => Queue.fromMap(Map<String, dynamic>.from(r))).toList();
     for (final queue in queues) {
