@@ -106,18 +106,23 @@ class MyApp extends StatelessWidget {
                   },
                   builder: (context, child) {
                     return BlocListener<AuthCubit, AuthState>(
-                      listener: (context, state) async {
+                      listener: (context, state) {
                         if (state is AuthSuccess) {
                           context
                               .read<AppCubit>()
                               .setUserLoggedIn(true, user: state.user);
                           // Subscribe to notifications for the logged-in user
-                          await NotificationService()
-                              .subscribeToUserNotifications(state.user.id);
+                          if (state.user.id != null) {
+                            NotificationService()
+                                .subscribeToUserNotifications(state.user.id!)
+                                .catchError((e) => print(
+                                    'Error subscribing to notifications: $e'));
+                          }
                         } else if (state is AuthInitial) {
                           context.read<AppCubit>().setUserLoggedIn(false);
                           // Unsubscribe from notifications
-                          await NotificationService().unsubscribe();
+                          NotificationService().unsubscribe().catchError(
+                              (e) => print('Error unsubscribing: $e'));
                         }
                       },
                       child: child,
