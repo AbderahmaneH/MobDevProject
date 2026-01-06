@@ -338,6 +338,11 @@ class _CustomerViewState extends State<CustomerView> {
                     icon: Icon(_isSearching ? Icons.close : Icons.search),
                     onPressed: _toggleSearch,
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    tooltip: 'Refresh',
+                    onPressed: () => context.read<CustomerCubit>().refreshQueues(),
+                  ),
                   Builder(
                     builder: (context) => IconButton(
                       icon: const Icon(Icons.menu),

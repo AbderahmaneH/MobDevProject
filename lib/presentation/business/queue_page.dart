@@ -159,7 +159,7 @@ class _QueueViewState extends State<QueueView> {
               onPressed: () => Navigator.pop(dialogContext),
               child: Text(context.loc('cancel')),
             ),
-            ElevatedButton(
+                ElevatedButton(
               onPressed: () {
                 context.read<QueueCubit>().serveClient(client.id);
                 Navigator.pop(dialogContext);
