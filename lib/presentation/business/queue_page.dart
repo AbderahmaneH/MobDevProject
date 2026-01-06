@@ -27,6 +27,7 @@ class QueuePage extends StatelessWidget {
       create: (context) => QueueCubit(
         queueRepository: RepositoryProvider.of(context),
         queueClientRepository: RepositoryProvider.of(context),
+        userRepository: RepositoryProvider.of(context),
         businessOwnerId: queue.businessOwnerId,
       )..loadQueues(),
       child: QueueView(queue: queue),

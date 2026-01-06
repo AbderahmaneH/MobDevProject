@@ -100,6 +100,7 @@ class NotificationService {
   /// Subscribe to Supabase Realtime notifications for a user
   Future<void> subscribeToUserNotifications(int userId) async {
     try {
+      print('📡 Subscribing to notifications for userId: $userId');
       // Cancel existing subscription
       await _notificationSubscription?.cancel();
 
@@ -109,16 +110,19 @@ class NotificationService {
           .stream(primaryKey: ['id'])
           .eq('user_id', userId)
           .listen((List<Map<String, dynamic>> data) {
+            print('📬 Received realtime data: ${data.length} notifications');
             // Filter for unread notifications
             for (final notification in data) {
+              print('Notification data: $notification');
               if (notification['is_read'] == false ||
                   notification['is_read'] == null) {
+                print('🔔 Showing notification: ${notification['title']}');
                 _showNotificationFromData(notification);
               }
             }
           });
 
-      print('Subscribed to notifications for user $userId');
+      print('✅ Successfully subscribed to notifications for user $userId');
     } catch (e) {
       print('Error subscribing to notifications: $e');
     }
@@ -183,6 +187,7 @@ class NotificationService {
     Map<String, dynamic>? data,
   }) async {
     try {
+      print('Creating notification in Supabase: userId=$userId, title=$title');
       await _supabase.from('notifications').insert({
         'user_id': userId,
         'title': title,
@@ -193,10 +198,10 @@ class NotificationService {
         'created_at': DateTime.now().toIso8601String(),
       });
 
-      print('Notification created for user $userId');
+      print('✅ Notification created successfully for user $userId');
       return true;
     } catch (e) {
-      print('Error creating notification: $e');
+      print('❌ Error creating notification in Supabase: $e');
       return false;
     }
   }

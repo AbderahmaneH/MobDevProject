@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../database/repositories/queue_repository.dart';
 import '../database/repositories/queue_client_repository.dart';
+import '../database/repositories/user_repository.dart';
 import '../database/models/queue_client_model.dart';
 import '../database/models/queue_model.dart';
 import '../services/notification_service.dart';
@@ -9,14 +10,17 @@ part 'queue_state.dart';
 class QueueCubit extends Cubit<QueueState> {
   final QueueRepository _queueRepository;
   final QueueClientRepository _queueClientRepository;
+  final UserRepository _userRepository;
   final int? _businessOwnerId;
 
   QueueCubit({
     required QueueRepository queueRepository,
     required QueueClientRepository queueClientRepository,
+    required UserRepository userRepository,
     required int? businessOwnerId,
   })  : _queueRepository = queueRepository,
         _queueClientRepository = queueClientRepository,
+        _userRepository = userRepository,
         _businessOwnerId = businessOwnerId,
         super(QueueInitial()) {
     loadQueues();
@@ -147,16 +151,31 @@ class QueueCubit extends Cubit<QueueState> {
       final nextPosition =
           await _queueClientRepository.getNextPosition(queueId);
 
+      // Try to find user by phone number if userId not provided
+      int? finalUserId = userId;
+      if (finalUserId == null) {
+        final user = await _userRepository.getUserByPhone(phone);
+        if (user != null && user.id != null) {
+          finalUserId = user.id;
+          print('Found user with phone $phone: userId=$finalUserId');
+        } else {
+          print(
+              'No user found with phone $phone - notifications will not work');
+        }
+      }
+
       final client = QueueClient(
         id: 0,
         queueId: queueId,
-        userId: userId ?? 0,
+        userId: finalUserId,
         name: name,
         phone: phone,
         position: nextPosition,
         status: 'waiting',
         joinedAt: DateTime.now(),
       );
+
+      print('Adding client: name=$name, phone=$phone, userId=$finalUserId');
 
       emit(ClientAdded());
       await _queueClientRepository.insertQueueClient(client);
@@ -189,9 +208,12 @@ class QueueCubit extends Cubit<QueueState> {
   Future<void> notifyClient(int? clientId) async {
     try {
       if (clientId == null) {
+        print('ERROR: notifyClient called with null clientId');
         emit(const QueueError(error: 'Invalid client ID'));
         return;
       }
+
+      print('Attempting to notify client with ID: $clientId');
 
       // Get current state to find the client and queue details
       if (state is QueueLoaded) {
@@ -220,8 +242,16 @@ class QueueCubit extends Cubit<QueueState> {
           }
         }
 
+        if (client == null || queue == null) {
+          print('ERROR: Client or queue not found for clientId: $clientId');
+        } else {
+          print(
+              'Found client: ${client.name}, userId: ${client.userId}, queue: ${queue.name}');
+        }
+
         // Send notification if we found the client and they have a userId
         if (client != null && queue != null && client.userId != null) {
+          print('Sending notification to userId: ${client.userId}');
           await NotificationService().notifyClientAboutTurn(
             userId: client.userId!,
             clientName: client.name,
@@ -229,13 +259,21 @@ class QueueCubit extends Cubit<QueueState> {
             queueName: queue.name,
             position: client.position,
           );
+          print('Notification sent successfully');
+        } else {
+          print(
+              'WARNING: Cannot send notification - userId is null or client not found');
         }
+      } else {
+        print(
+            'ERROR: State is not QueueLoaded, current state: ${state.runtimeType}');
       }
 
       emit(ClientNotified());
       await _queueClientRepository.updateClientStatus(clientId, 'notified');
       await loadQueues();
     } catch (e) {
+      print('ERROR in notifyClient: $e');
       emit(QueueError(error: 'Failed to notify client: $e'));
     }
   }

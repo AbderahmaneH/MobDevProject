@@ -25,6 +25,7 @@ class BusinessOwnerPage extends StatelessWidget {
       create: (context) => QueueCubit(
           queueRepository: RepositoryProvider.of(context),
           queueClientRepository: RepositoryProvider.of(context),
+          userRepository: RepositoryProvider.of(context),
           businessOwnerId: user.id),
       child: BusinessOwnerView(user: user),
     );
