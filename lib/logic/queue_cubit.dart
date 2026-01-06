@@ -3,6 +3,7 @@ import '../database/repositories/queue_repository.dart';
 import '../database/repositories/queue_client_repository.dart';
 import '../database/models/queue_client_model.dart';
 import '../database/models/queue_model.dart';
+import '../services/notification_service.dart';
 part 'queue_state.dart';
 
 class QueueCubit extends Cubit<QueueState> {
@@ -187,6 +188,50 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> notifyClient(int? clientId) async {
     try {
+      if (clientId == null) {
+        emit(const QueueError(error: 'Invalid client ID'));
+        return;
+      }
+
+      // Get current state to find the client and queue details
+      if (state is QueueLoaded) {
+        final queues = (state as QueueLoaded).queues;
+        QueueClient? client;
+        Queue? queue;
+
+        // Find the client in any of the queues
+        for (final q in queues) {
+          final foundClient = q.clients.firstWhere(
+            (c) => c.id == clientId,
+            orElse: () => QueueClient(
+              queueId: 0,
+              userId: null,
+              name: '',
+              phone: '',
+              position: 0,
+              status: '',
+              joinedAt: DateTime.now(),
+            ),
+          );
+          if (foundClient.id != null) {
+            client = foundClient;
+            queue = q;
+            break;
+          }
+        }
+
+        // Send notification if we found the client and they have a userId
+        if (client != null && queue != null && client.userId != null) {
+          await NotificationService().notifyClientAboutTurn(
+            userId: client.userId!,
+            clientName: client.name,
+            phoneNumber: client.phone,
+            queueName: queue.name,
+            position: client.position,
+          );
+        }
+      }
+
       emit(ClientNotified());
       await _queueClientRepository.updateClientStatus(clientId, 'notified');
       await loadQueues();
