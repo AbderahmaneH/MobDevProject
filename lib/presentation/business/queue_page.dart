@@ -159,7 +159,7 @@ class _QueueViewState extends State<QueueView> {
               onPressed: () => Navigator.pop(dialogContext),
               child: Text(context.loc('cancel')),
             ),
-                ElevatedButton(
+            ElevatedButton(
               onPressed: () {
                 context.read<QueueCubit>().serveClient(client.id);
                 Navigator.pop(dialogContext);
@@ -181,18 +181,18 @@ class _QueueViewState extends State<QueueView> {
   void _notifyClient(QueueClient client) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(context.loc('notify_customer')),
         content: Text('${context.loc('notify_confirm')} ${client.name}?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(context.loc('cancel')),
           ),
           ElevatedButton(
             onPressed: () {
               context.read<QueueCubit>().notifyClient(client.id);
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('${client.name} ${context.loc('notified')}'),
@@ -210,18 +210,18 @@ class _QueueViewState extends State<QueueView> {
   void _removeClient(QueueClient client) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(context.loc('remove_customer')),
         content: Text('${context.loc('remove_confirm')} ${client.name}?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(context.loc('cancel')),
           ),
           ElevatedButton(
             onPressed: () {
               context.read<QueueCubit>().removeClientFromQueue(client.id);
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('${client.name} ${context.loc('removed')}'),
