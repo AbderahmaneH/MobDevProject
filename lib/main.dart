@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'logic/app_cubit.dart';
 import 'logic/auth_cubit.dart';
 import 'services/supabase_service.dart';
+import 'services/notification_service.dart';
 import 'core/localization.dart';
 import 'core/app_colors.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,7 +17,13 @@ void main() async {
   // Initialize Supabase here with your URL and anon/public key.
   // Replace the empty strings with your project's values or
   // provide them at runtime when you have the credentials.
-  await SupabaseService.initialize(url: 'https://rmxccujkhrmownftuvsn.supabase.co', anonKey: 'sb_publishable_ktYqW-uVXqp18sEImXdbyA_aUX8OVaF');
+  await SupabaseService.initialize(
+      url: 'https://rmxccujkhrmownftuvsn.supabase.co',
+      anonKey: 'sb_publishable_ktYqW-uVXqp18sEImXdbyA_aUX8OVaF');
+
+  // Initialize notification service
+  await NotificationService().initialize();
+
   runApp(const MyApp());
 }
 
@@ -40,7 +47,8 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (context) => AppCubit()),
           BlocProvider(
               create: (context) => AuthCubit(
-                  userRepository: RepositoryProvider.of<UserRepository>(context))),
+                  userRepository:
+                      RepositoryProvider.of<UserRepository>(context))),
         ],
         child: Builder(
           builder: (context) {
@@ -98,13 +106,18 @@ class MyApp extends StatelessWidget {
                   },
                   builder: (context, child) {
                     return BlocListener<AuthCubit, AuthState>(
-                      listener: (context, state) {
+                      listener: (context, state) async {
                         if (state is AuthSuccess) {
                           context
                               .read<AppCubit>()
                               .setUserLoggedIn(true, user: state.user);
+                          // Subscribe to notifications for the logged-in user
+                          await NotificationService()
+                              .subscribeToUserNotifications(state.user.id);
                         } else if (state is AuthInitial) {
                           context.read<AppCubit>().setUserLoggedIn(false);
+                          // Unsubscribe from notifications
+                          await NotificationService().unsubscribe();
                         }
                       },
                       child: child,
