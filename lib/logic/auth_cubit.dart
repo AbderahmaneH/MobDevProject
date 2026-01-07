@@ -232,7 +232,8 @@ class AuthCubit extends Cubit<AuthState> {
   Future<Map<String, dynamic>> requestPasswordReset(String email) async {
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:3000/api/auth/forgot-password'),
+        Uri.parse(
+            'https://mobdevproject-5qvu.onrender.com/api/auth/forgot-password'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': email}),
       );
