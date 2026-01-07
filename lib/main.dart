@@ -10,6 +10,7 @@ import 'presentation/welcome_page.dart';
 import 'database/repositories/user_repository.dart';
 import 'database/repositories/queue_repository.dart';
 import 'database/repositories/queue_client_repository.dart';
+import 'database/repositories/manual_customer_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,12 +29,14 @@ class MyApp extends StatelessWidget {
     final userRepository = UserRepository();
     final queueRepository = QueueRepository();
     final queueClientRepository = QueueClientRepository();
+    final manualCustomerRepository = ManualCustomerRepository();
 
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: userRepository),
         RepositoryProvider.value(value: queueRepository),
         RepositoryProvider.value(value: queueClientRepository),
+        RepositoryProvider.value(value: manualCustomerRepository),
       ],
       child: MultiBlocProvider(
         providers: [
