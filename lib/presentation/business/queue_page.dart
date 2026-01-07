@@ -492,8 +492,11 @@ class _QueueViewState extends State<QueueView> {
 
               final visibleClients =
                   currentQueue.clients.where((c) => c.status != 'served').toList();
+<<<<<<< Updated upstream
               final servedClients =
                   currentQueue.clients.where((c) => c.status == 'served').toList();
+=======
+>>>>>>> Stashed changes
 
               return CustomScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -630,7 +633,11 @@ class _QueueViewState extends State<QueueView> {
                             ),
                           ),
                           Text(
+<<<<<<< Updated upstream
                             '${visibleClients.length} ${context.loc('customers')}',
+=======
+                              '${visibleClients.length} ${context.loc('customers')}',
+>>>>>>> Stashed changes
                             style: AppTextStyles.getAdaptiveStyle(
                               context,
                               fontSize: 14,
@@ -661,6 +668,7 @@ class _QueueViewState extends State<QueueView> {
                           child: _buildClientCard(visibleClients[index]),
                         ),
                         childCount: visibleClients.length,
+<<<<<<< Updated upstream
                       ),
                     ),
 
@@ -746,6 +754,8 @@ class _QueueViewState extends State<QueueView> {
                           );
                         },
                         childCount: servedClients.length,
+=======
+>>>>>>> Stashed changes
                       ),
                     ),
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
