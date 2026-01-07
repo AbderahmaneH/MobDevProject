@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../core/localization.dart';
 import '../database/models/user_model.dart';
 import '../database/repositories/user_repository.dart';
@@ -41,10 +43,10 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> signup({
     required String name,
+    required String email,
     required String phone,
     required String password,
     required bool isBusiness,
-    String? email,
     String? businessName,
     String? businessAddress,
   }) async {
@@ -225,6 +227,29 @@ class AuthCubit extends Cubit<AuthState> {
 
   void logout() {
     emit(AuthInitial());
+  }
+
+  Future<Map<String, dynamic>> requestPasswordReset(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:3000/api/auth/forgot-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email}),
+      );
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message']};
+      } else {
+        return {
+          'success': false,
+          'error': data['message'] ?? 'Failed to send reset email'
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'error': 'Network error: $e'};
+    }
   }
 
   Future<void> deleteAccountWithPassword(int? userId, String password) async {

@@ -1,7 +1,7 @@
 class User {
   final int? id;
   final String name;
-  final String? email;
+  final String email;
   final String phone;
   final String password;
   final bool isBusiness;
@@ -13,7 +13,7 @@ class User {
   User({
     required this.id,
     required this.name,
-    this.email,
+    required this.email,
     required this.phone,
     required this.password,
     required this.isBusiness,
