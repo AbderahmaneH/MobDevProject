@@ -1,19 +1,25 @@
 const supabase = require('../config/database');
+const bcrypt = require('bcrypt');
+
+const SALT_ROUNDS = 10;
 
 /**
- * Insert a new user into the database
+ * Insert a new user into the database with hashed password
  */
 async function createUser(userData) {
   const { name, email, phone, password, isBusiness, businessName, businessType, businessAddress } = userData;
   
   try {
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    
     const { data, error } = await supabase
       .from('users')
       .insert({
         name,
         email: email || null,
         phone,
-        password,
+        password: hashedPassword,
         is_business: isBusiness ? 1 : 0,
         created_at: Date.now(),
         business_name: businessName || null,
@@ -31,9 +37,13 @@ async function createUser(userData) {
       };
     }
     
+    // Remove password from response
+    const userResponse = { ...data };
+    delete userResponse.password;
+    
     return {
       success: true,
-      data
+      data: userResponse
     };
   } catch (error) {
     console.error('Error creating user:', error);
@@ -51,17 +61,23 @@ async function updateUser(userId, userData) {
   const { name, email, phone, password, businessName, businessType, businessAddress } = userData;
   
   try {
+    const updateData = {
+      name,
+      email: email || null,
+      phone,
+      business_name: businessName || null,
+      business_type: businessType || null,
+      business_address: businessAddress || null
+    };
+    
+    // Only hash and update password if provided
+    if (password) {
+      updateData.password = await bcrypt.hash(password, SALT_ROUNDS);
+    }
+    
     const { data, error } = await supabase
       .from('users')
-      .update({
-        name,
-        email: email || null,
-        phone,
-        password,
-        business_name: businessName || null,
-        business_type: businessType || null,
-        business_address: businessAddress || null
-      })
+      .update(updateData)
       .eq('id', userId)
       .select()
       .single();
@@ -81,9 +97,13 @@ async function updateUser(userId, userData) {
       };
     }
     
+    // Remove password from response
+    const userResponse = { ...data };
+    delete userResponse.password;
+    
     return {
       success: true,
-      data
+      data: userResponse
     };
   } catch (error) {
     console.error('Error updating user:', error);

@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 
+const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const queueRoutes = require('./routes/queues');
 const queueClientRoutes = require('./routes/queueClients');
@@ -31,6 +32,7 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/queues', queueRoutes);
 app.use('/api/queue-clients', queueClientRoutes);
@@ -42,6 +44,7 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       health: '/health',
+      auth: '/api/auth',
       users: '/api/users',
       queues: '/api/queues',
       queueClients: '/api/queue-clients'
