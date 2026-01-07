@@ -20,7 +20,7 @@ class QueueRepository {
     final result = await _client.from(DatabaseTables.queues).select().eq('id', id).maybeSingle();
     if (result == null) return null;
     final queue = Queue.fromMap(Map<String, dynamic>.from(result));
-    queue.clients = await _getQueueClients(queue.id);
+    queue.clients = await _getMergedQueueClients(queue.id);
     return queue;
   }
 
@@ -36,7 +36,7 @@ class QueueRepository {
     final queues = results.map((r) => Queue.fromMap(Map<String, dynamic>.from(r))).toList();
 
     for (final queue in queues) {
-      queue.clients = await _getQueueClients(queue.id);
+      queue.clients = await _getMergedQueueClients(queue.id);
     }
 
     return queues;
@@ -52,7 +52,7 @@ class QueueRepository {
 
     final queues = results.map((r) => Queue.fromMap(Map<String, dynamic>.from(r))).toList();
     for (final queue in queues) {
-      queue.clients = await _getQueueClients(queue.id);
+      queue.clients = await _getMergedQueueClients(queue.id);
     }
     return queues;
   }
@@ -67,7 +67,7 @@ class QueueRepository {
 
     final queues = results.map((r) => Queue.fromMap(Map<String, dynamic>.from(r))).toList();
     for (final queue in queues) {
-      queue.clients = await _getQueueClients(queue.id);
+      queue.clients = await _getMergedQueueClients(queue.id);
     }
     return queues;
   }
@@ -108,6 +108,8 @@ class QueueRepository {
 
   Future<int> deleteQueue(int id) async {
     await _client.from(DatabaseTables.queueClients).delete().eq('queue_id', id);
+    // also delete manual customers associated with this queue
+    await _client.from(DatabaseTables.manualCustomers).delete().eq('queue_id', id);
     await _client.from(DatabaseTables.queues).delete().eq('id', id);
     return id;
   }
@@ -141,5 +143,44 @@ class QueueRepository {
         .eq('queue_id', queueId)
         .order('position', ascending: true) as List<dynamic>;
     return results.map((r) => QueueClient.fromMap(Map<String, dynamic>.from(r))).toList();
+  }
+
+  // Fetch queue clients (regular clients) and manual customers and merge them.
+  Future<List<QueueClient>> _getMergedQueueClients(int queueId) async {
+    // load queue_clients
+    final results = await _client
+        .from(DatabaseTables.queueClients)
+        .select()
+        .eq('queue_id', queueId)
+        .order('position', ascending: true) as List<dynamic>;
+    final clients = results.map((r) => QueueClient.fromMap(Map<String, dynamic>.from(r))).toList();
+
+    // load manual customers
+    final manualResults = await _client.from(DatabaseTables.manualCustomers).select().eq('queue_id', queueId).order('id', ascending: true) as List<dynamic>;
+    if (manualResults.isNotEmpty) {
+      // Assign positions 0 for manual customers (they are shown but have no position number)
+      for (final m in manualResults) {
+        final mid = m['id'] as int?;
+        final name = m['name'] as String? ?? '';
+        final status = m['status'] as String? ?? 'waiting';
+        final servedAtMs = m['served_at'] as int?;
+        final servedAt = servedAtMs != null ? DateTime.fromMillisecondsSinceEpoch(servedAtMs) : null;
+        // Create a synthetic QueueClient for display. Use negative id to identify manual records.
+        final synthetic = QueueClient(
+          id: mid != null ? -mid : null,
+          queueId: queueId,
+          userId: null,
+          name: name,
+          phone: '',
+          position: 0,
+          status: status,
+          joinedAt: DateTime.now(),
+          servedAt: servedAt,
+        );
+        clients.add(synthetic);
+      }
+    }
+
+    return clients;
   }
 }

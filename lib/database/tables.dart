@@ -2,6 +2,7 @@ class DatabaseTables {
   static const String users = 'users';
   static const String queues = 'queues';
   static const String queueClients = 'queue_clients';
+  static const String manualCustomers = 'manual_customers';
 
   static const String createUsersTable = '''
     CREATE TABLE IF NOT EXISTS users (
@@ -50,10 +51,21 @@ class DatabaseTables {
     )
   ''';
 
+    static const String createManualCustomersTable = '''
+      CREATE TABLE IF NOT EXISTS manual_customers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        queue_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        status TEXT DEFAULT 'waiting',
+        FOREIGN KEY (queue_id) REFERENCES queues (id) ON DELETE CASCADE
+      )
+    ''';
+
   static const List<String> createTableQueries = [
     createUsersTable,
     createQueuesTable,
     createQueueClientsTable,
+    createManualCustomersTable,
   ];
 }
 
@@ -69,11 +81,15 @@ class DatabaseIndexes {
   static const String queueClientsStatusIndex =
       'CREATE INDEX IF NOT EXISTS idx_queue_clients_status ON queue_clients(status)';
 
+    static const String manualCustomersQueueIndex =
+      'CREATE INDEX IF NOT EXISTS idx_manual_customers_queue ON manual_customers(queue_id)';
+
   static const List<String> createIndexQueries = [
     usersPhoneIndex,
     queuesBusinessOwnerIndex,
     queueClientsQueueIndex,
     queueClientsUserIndex,
     queueClientsStatusIndex,
+    manualCustomersQueueIndex,
   ];
 }
