@@ -177,8 +177,33 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> serveClient(int? clientId) async {
     try {
+      if (clientId == null) {
+        emit(const QueueError(error: 'Invalid client ID'));
+        return;
+      }
+
       emit(ClientServed());
+
+      // Find the queueId for this client from current loaded state if possible
+      int? queueId;
+      if (state is QueueLoaded) {
+        final queues = (state as QueueLoaded).queues;
+        for (final q in queues) {
+          final found = q.clients.firstWhere((c) => c.id == clientId, orElse: () => QueueClient(queueId: 0, userId: null, name: '', phone: '', position: 0, status: '', joinedAt: DateTime.now()));
+          if (found.id != null) {
+            queueId = q.id;
+            break;
+          }
+        }
+      }
+
       await _queueClientRepository.updateClientStatus(clientId, 'served');
+
+      // Reorder positions for the queue to close any gaps (exclude served clients)
+      if (queueId != null) {
+        await _queueClientRepository.reorderPositions(queueId);
+      }
+
       await loadQueues();
     } catch (e) {
       emit(QueueError(error: 'Failed to serve client: $e'));

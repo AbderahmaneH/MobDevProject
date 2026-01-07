@@ -106,7 +106,14 @@ class QueueClientRepository {
   }
 
   Future<void> reorderPositions(int queueId) async {
-    final clients = await getQueueClients(queueId);
+    // Only reorder positions for clients that are not served
+    final results = await _client
+        .from(DatabaseTables.queueClients)
+        .select()
+        .eq('queue_id', queueId)
+        .neq('status', 'served')
+        .order('position', ascending: true) as List<dynamic>;
+    final clients = results.map((r) => QueueClient.fromMap(Map<String, dynamic>.from(r))).toList();
     for (int i = 0; i < clients.length; i++) {
       final cid = clients[i].id;
       if (cid == null) continue;
