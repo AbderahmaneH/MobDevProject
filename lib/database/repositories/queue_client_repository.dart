@@ -10,6 +10,66 @@ class QueueClientRepository {
   QueueClientRepository({SupabaseClient? client}) : _client = client ?? SupabaseService.client;
 
   Future<int> insertQueueClient(QueueClient client) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    // Try to find an existing record for this user or phone in the same queue
+    dynamic existing;
+    try {
+      if (client.userId != null && client.userId! > 0) {
+        existing = await _client
+            .from(DatabaseTables.queueClients)
+            .select()
+            .eq('queue_id', client.queueId)
+        .eq('user_id', client.userId!)
+            .maybeSingle();
+      }
+      if (existing == null) {
+        existing = await _client
+            .from(DatabaseTables.queueClients)
+            .select()
+            .eq('queue_id', client.queueId)
+            .eq('phone', client.phone)
+            .maybeSingle();
+      }
+    } catch (_) {
+      existing = null;
+    }
+
+    if (existing != null) {
+      final status = (existing['status'] as String?) ?? 'waiting';
+      final servedAt = existing['served_at'] as int?;
+
+      if (status != 'served') {
+        // already in queue (waiting/notified)
+        throw Exception('User is already in the queue');
+      }
+
+      // served previously: enforce 24-hour cooldown
+      final servedMillis = servedAt ?? 0;
+      final diff = now - servedMillis;
+      const int dayMs = 24 * 3600 * 1000;
+      if (diff < dayMs) {
+        throw Exception('You can rejoin this queue only after 24 hours');
+      }
+
+      // allowed to rejoin after 24h: reuse existing record by resetting fields
+      final nextPos = await getNextPosition(client.queueId);
+      final updates = {
+        'status': 'waiting',
+        'joined_at': now,
+        'served_at': null,
+        'notified_at': null,
+        'position': nextPos,
+      };
+
+      await _client
+          .from(DatabaseTables.queueClients)
+          .update(updates)
+          .eq('id', existing['id']);
+
+      return existing['id'] as int;
+    }
+
     final result = await _client.from(DatabaseTables.queueClients).insert(client.toMap()).select().maybeSingle();
     if (result == null) return 0;
     return (result['id'] as int?) ?? 0;

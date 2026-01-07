@@ -16,6 +16,7 @@ class QueueRepository {
   }
 
   Future<Queue?> getQueueById(int id) async {
+    await _cleanupExpiredQueues();
     final result = await _client.from(DatabaseTables.queues).select().eq('id', id).maybeSingle();
     if (result == null) return null;
     final queue = Queue.fromMap(Map<String, dynamic>.from(result));
@@ -24,6 +25,7 @@ class QueueRepository {
   }
 
   Future<List<Queue>> getQueuesByBusinessOwner(int? businessOwnerId) async {
+    await _cleanupExpiredQueues();
     if (businessOwnerId == null) return [];
     final results = await _client
       .from(DatabaseTables.queues)
@@ -41,6 +43,7 @@ class QueueRepository {
   }
 
   Future<List<Queue>> getAllQueues({bool activeOnly = true}) async {
+    await _cleanupExpiredQueues();
     final query = _client.from(DatabaseTables.queues).select();
     if (activeOnly) {
       query.eq('is_active', 1);
@@ -55,6 +58,7 @@ class QueueRepository {
   }
 
   Future<List<Queue>> searchQueues(String queryStr) async {
+    await _cleanupExpiredQueues();
     final results = await _client
         .from(DatabaseTables.queues)
         .select()
@@ -69,6 +73,7 @@ class QueueRepository {
   }
 
   Future<List<Queue>> searchQueuesByOwnerPhone(String phone) async {
+    await _cleanupExpiredQueues();
     // find users whose phone matches (partial match)
     final userResults = await _client
         .from(DatabaseTables.users)
@@ -105,6 +110,28 @@ class QueueRepository {
     await _client.from(DatabaseTables.queueClients).delete().eq('queue_id', id);
     await _client.from(DatabaseTables.queues).delete().eq('id', id);
     return id;
+  }
+
+  Future<void> _cleanupExpiredQueues() async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    const int dayMs = 24 * 3600 * 1000;
+    final cutoff = now - dayMs;
+
+    try {
+      final expired = await _client
+          .from(DatabaseTables.queues)
+          .select('id')
+          .lt('created_at', cutoff) as List<dynamic>;
+
+      for (final q in expired) {
+        final id = q['id'] as int?;
+        if (id != null) {
+          await deleteQueue(id);
+        }
+      }
+    } catch (_) {
+      // ignore cleanup errors silently
+    }
   }
 
   Future<List<QueueClient>> _getQueueClients(int queueId) async {
