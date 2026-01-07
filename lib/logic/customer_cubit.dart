@@ -42,9 +42,7 @@ class CustomerCubit extends Cubit<CustomerState> {
 
     try {
       final queues = await _queueRepository.searchQueues(query);
-      final joined = await _queueClientRepository.getQueuesByUser(_userId,
-          includeServed: true);
-      final joinedIds = joined.map((q) => q.id).toSet();
+      final joinedIds = await _queueClientRepository.getQueueIdsForUser(_userId, includeServed: true);
       final filtered = queues.where((q) => !joinedIds.contains(q.id)).toList();
 
       emit(QueuesSearched(queues: filtered));
@@ -58,14 +56,10 @@ class CustomerCubit extends Cubit<CustomerState> {
 
     try {
       final allQueues = await _queueRepository.getAllQueues(activeOnly: true);
-      final joined = await _queueClientRepository.getQueuesByUser(_userId,
-          includeServed: true);
-      final joinedIds = joined.map((q) => q.id).toSet();
+      final joinedIds = await _queueClientRepository.getQueueIdsForUser(_userId, includeServed: true);
 
       final availableQueues = allQueues
-          .where((queue) =>
-              queue.currentSize < queue.maxSize &&
-              !joinedIds.contains(queue.id))
+          .where((queue) => queue.currentSize < queue.maxSize && !joinedIds.contains(queue.id))
           .toList();
 
       emit(AvailableQueuesLoaded(queues: availableQueues));
@@ -188,11 +182,8 @@ class CustomerCubit extends Cubit<CustomerState> {
 
   Future<double> getEstimatedWaitTime(int queueId) async {
     try {
-      final queue = await _queueRepository.getQueueById(queueId);
-      if (queue == null) return 0;
-
-      final peopleAhead = await getPeopleAheadInQueue(queueId);
-      return peopleAhead * queue.estimatedWaitTime.toDouble();
+      // estimated wait removed from model/DB; return 0 for compatibility
+      return 0;
     } catch (e) {
       return 0;
     }

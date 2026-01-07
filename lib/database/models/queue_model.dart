@@ -6,7 +6,6 @@ class Queue {
   final String name;
   final String? description;
   final int maxSize;
-  final int estimatedWaitTime;
   final bool isActive;
   final DateTime createdAt;
   List<QueueClient> clients;
@@ -17,14 +16,18 @@ class Queue {
     required this.name,
     this.description,
     this.maxSize = 50,
-    this.estimatedWaitTime = 5,
+  // removed estimatedWaitTime (column removed from DB)
     this.isActive = true,
     required this.createdAt,
     this.clients = const [],
   });
 
-  int get currentSize => clients.length;
-  int get waitingCount => clients.where((c) => c.status == 'waiting').length;
+  // number of clients currently occupying the queue (exclude served)
+  int get currentSize => clients.where((c) => c.status != 'served').length;
+  // total clients ever in this queue (including served)
+  int get totalCount => clients.length;
+  // waitingCount counts only not-served clients (waiting or notified)
+  int get waitingCount => clients.where((c) => c.status != 'served').length;
   int get servedCount => clients.where((c) => c.status == 'served').length;
   int get notifiedCount => clients.where((c) => c.status == 'notified').length;
 
@@ -34,7 +37,6 @@ class Queue {
       'name': name,
       'description': description,
       'max_size': maxSize,
-      'estimated_wait_time': estimatedWaitTime,
       'is_active': isActive ? 1 : 0,
       'created_at': createdAt.millisecondsSinceEpoch,
     };
@@ -51,7 +53,7 @@ class Queue {
       name: map['name'],
       description: map['description'],
       maxSize: map['max_size'],
-      estimatedWaitTime: map['estimated_wait_time'],
+      // estimatedWaitTime removed from DB
       isActive: map['is_active'] == 1,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at']),
       clients: [],

@@ -120,8 +120,6 @@ class _CustomerViewState extends State<CustomerView> {
             .length
         : 0;
 
-    final estimatedWait = peopleAhead * queue.estimatedWaitTime;
-
     return AppContainers.card(
       context: context,
       onTap: () {},
@@ -211,10 +209,7 @@ class _CustomerViewState extends State<CustomerView> {
                     ? '${context.loc('position')} #$position'
                     : context.loc('not_joined'),
               ),
-              _buildStatItem(
-                icon: Icons.timer_outlined,
-                text: '$estimatedWait ${context.loc('minutes')}',
-              ),
+              // estimated wait removed
             ],
           ),
           const SizedBox(height: 16),
@@ -274,11 +269,12 @@ class _CustomerViewState extends State<CustomerView> {
 
           if (!mounted) return;
 
+          // Always refresh joined queues after returning from JoinQueuePage
+          try {
+            await customerCubit.loadJoinedQueues();
+          } catch (_) {}
+          if (!mounted) return;
           if (result == true) {
-            try {
-              await customerCubit.loadJoinedQueues();
-            } catch (_) {}
-            if (!mounted) return;
             messenger.showSnackBar(
               SnackBar(
                 content: Text(joinedMsg),
@@ -338,6 +334,10 @@ class _CustomerViewState extends State<CustomerView> {
                     icon: Icon(_isSearching ? Icons.close : Icons.search),
                     onPressed: _toggleSearch,
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () => context.read<CustomerCubit>().loadJoinedQueues(),
+                  ),
                   Builder(
                     builder: (context) => IconButton(
                       icon: const Icon(Icons.menu),
@@ -367,7 +367,10 @@ class _CustomerViewState extends State<CustomerView> {
                       BlocBuilder<CustomerCubit, CustomerState>(
                         builder: (context, state) {
                           if (state is CustomerLoaded) {
-                            final joinedQueues = state.joinedQueues;
+                            // Ensure we only show queues that this user actually joined
+                            final joinedQueues = state.joinedQueues.where((q) {
+                              return q.clients.any((c) => c.userId == widget.user.id);
+                            }).toList();
                             final activeQueues =
                                 joinedQueues.where((q) => q.isActive).length;
 
@@ -433,7 +436,8 @@ class _CustomerViewState extends State<CustomerView> {
                       ),
                     );
                   } else if (state is CustomerLoaded) {
-                    final queues = state.joinedQueues;
+                    // show only queues the user actually joined
+                    final queues = state.joinedQueues.where((q) => q.clients.any((c) => c.userId == widget.user.id)).toList();
 
                     if (queues.isEmpty) {
                       return SliverToBoxAdapter(

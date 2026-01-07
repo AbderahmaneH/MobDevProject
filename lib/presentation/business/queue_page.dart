@@ -530,7 +530,7 @@ class _QueueViewState extends State<QueueView> {
                               children: [
                                 _buildStatItem(
                                   title: context.loc('total'),
-                                  value: '${currentQueue.clients.length}',
+                                  value: '${currentQueue.totalCount}',
                                 ),
                                 _buildStatItem(
                                   title: context.loc('waiting'),
