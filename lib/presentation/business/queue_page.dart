@@ -490,14 +490,9 @@ class _QueueViewState extends State<QueueView> {
                     )
                   : widget.queue;
 
-              final visibleClients =
-                  currentQueue.clients.where((c) => c.status != 'served').toList();
-<<<<<<< Updated upstream
-              final servedClients =
-                  currentQueue.clients.where((c) => c.status == 'served').toList();
-=======
->>>>>>> Stashed changes
-
+              final visibleClients = currentQueue.clients
+                  .where((c) => c.status != 'served')
+                  .toList();
               return CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: [
@@ -633,11 +628,7 @@ class _QueueViewState extends State<QueueView> {
                             ),
                           ),
                           Text(
-<<<<<<< Updated upstream
-                            '${visibleClients.length} ${context.loc('customers')}',
-=======
-                              '${visibleClients.length} ${context.loc('customers')}',
->>>>>>> Stashed changes
+                            '${currentQueue.clients.length} ${context.loc('customers')}',
                             style: AppTextStyles.getAdaptiveStyle(
                               context,
                               fontSize: 14,
@@ -665,97 +656,9 @@ class _QueueViewState extends State<QueueView> {
                             horizontal: 24,
                             vertical: 8,
                           ),
-                          child: _buildClientCard(visibleClients[index]),
+                          child: _buildClientCard(currentQueue.clients[index]),
                         ),
-                        childCount: visibleClients.length,
-<<<<<<< Updated upstream
-                      ),
-                    ),
-
-                  // Served clients section
-                  if (servedClients.isNotEmpty)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 8,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 8),
-                            Text(
-                              context.loc('served'),
-                              style: AppTextStyles.getAdaptiveStyle(
-                                context,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  if (servedClients.isNotEmpty)
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final client = servedClients[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 8,
-                            ),
-                            child: AppContainers.card(
-                              context: context,
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          client.name,
-                                          style: AppTextStyles.getAdaptiveStyle(
-                                            context,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          client.phone,
-                                          style: AppTextStyles.getAdaptiveStyle(
-                                            context,
-                                            fontSize: 12,
-                                            lightColor: AppColors.textSecondaryLight,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(
-                                    client.servedAt != null
-                                        ? _formatTime(client.servedAt!)
-                                        : '-',
-                                    style: AppTextStyles.getAdaptiveStyle(
-                                      context,
-                                      fontSize: 12,
-                                      lightColor: AppColors.textSecondaryLight,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                        childCount: servedClients.length,
-=======
->>>>>>> Stashed changes
+                        childCount: currentQueue.clients.length,
                       ),
                     ),
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
