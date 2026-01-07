@@ -114,11 +114,6 @@ class _CustomerViewState extends State<CustomerView> {
     );
 
     final position = userClient.position > 0 ? userClient.position : null;
-    final peopleAhead = position != null
-        ? queue.clients
-            .where((c) => c.position < position && c.status == 'waiting')
-            .length
-        : 0;
 
     return AppContainers.card(
       context: context,

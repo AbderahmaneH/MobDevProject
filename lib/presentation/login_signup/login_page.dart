@@ -9,7 +9,6 @@ import '../../presentation/business/business_owner_page.dart';
 import '../../presentation/customer/customer_page.dart';
 import '../../database/models/user_model.dart';
 
-
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
@@ -54,6 +53,110 @@ class _LoginViewState extends State<LoginView> {
             : CustomerPage(user: user),
       ),
     );
+  }
+
+  void _showForgotPasswordDialog(BuildContext context) {
+    final emailController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: AppColors.backgroundLight,
+          title: Text(
+            context.loc('forgot_password'),
+            style: AppTextStyles.titleMedium(context),
+          ),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.loc('enter_email_reset'),
+                  style: AppTextStyles.getAdaptiveStyle(
+                    context,
+                    fontSize: 14,
+                    lightColor: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                AppTextFields.textField(
+                  context: context,
+                  hintText: context.loc('email'),
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return context.loc('email_required');
+                    }
+                    if (!value.contains('@')) {
+                      return context.loc('invalid_email');
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            AppButtons.textButton(
+              text: context.loc('cancel'),
+              onPressed: () => Navigator.pop(dialogContext),
+              context: context,
+            ),
+            AppButtons.primaryButton(
+              text: context.loc('send_reset_link'),
+              isLoading: isLoading,
+              onPressed: isLoading
+                  ? () {}
+                  : () async {
+                      if (formKey.currentState!.validate()) {
+                        setDialogState(() => isLoading = true);
+                        await _sendPasswordResetEmail(
+                          emailController.text.trim(),
+                          dialogContext,
+                        );
+                        setDialogState(() => isLoading = false);
+                      }
+                    },
+              context: context,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _sendPasswordResetEmail(
+      String email, BuildContext dialogContext) async {
+    try {
+      final response =
+          await context.read<AuthCubit>().requestPasswordReset(email);
+
+      if (dialogContext.mounted) {
+        Navigator.pop(dialogContext);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.loc('reset_email_sent')),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (dialogContext.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.loc('reset_email_error')),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -166,6 +269,16 @@ class _LoginViewState extends State<LoginView> {
                               context: context,
                             );
                           },
+                        ),
+                        const SizedBox(height: 12),
+                        Center(
+                          child: AppButtons.textButton(
+                            text: context.loc('forgot_password'),
+                            onPressed: () {
+                              _showForgotPasswordDialog(context);
+                            },
+                            context: context,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         Center(

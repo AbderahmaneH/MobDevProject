@@ -13,11 +13,19 @@ async function createUser(userData) {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     
+    // Validate required fields
+    if (!email) {
+      return {
+        success: false,
+        error: 'Email is required'
+      };
+    }
+    
     const { data, error } = await supabase
       .from('users')
       .insert({
         name,
-        email: email || null,
+        email,
         phone,
         password: hashedPassword,
         is_business: isBusiness ? 1 : 0,
@@ -63,7 +71,7 @@ async function updateUser(userId, userData) {
   try {
     const updateData = {
       name,
-      email: email || null,
+      email,
       phone,
       business_name: businessName || null,
       business_type: businessType || null,

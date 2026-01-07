@@ -64,6 +64,12 @@ class QNowLocalizations {
       'already_have_account': 'Already have an account?',
       'create_account': 'Create Account',
       'reset_password': 'Reset Password',
+      'enter_email_reset':
+          'Enter your email address to receive a password reset link',
+      'send_reset_link': 'Send Reset Link',
+      'reset_email_sent': 'Password reset link sent! Check your email.',
+      'reset_email_error': 'Failed to send reset email. Please try again.',
+      'email_required': 'Email is required',
 
       // User Information
       'name': 'Name',
@@ -345,6 +351,14 @@ class QNowLocalizations {
       'already_have_account': 'Vous avez déjà un compte ?',
       'create_account': 'Créer un compte',
       'reset_password': 'Réinitialiser le mot de passe',
+      'enter_email_reset':
+          'Entrez votre adresse e-mail pour recevoir un lien de réinitialisation',
+      'send_reset_link': 'Envoyer le lien',
+      'reset_email_sent':
+          'Lien de réinitialisation envoyé ! Vérifiez votre e-mail.',
+      'reset_email_error':
+          'Échec de l\'envoi de l\'e-mail. Veuillez réessayer.',
+      'email_required': 'L\'e-mail est requis',
 
       // User Info
       'name': 'Nom',
@@ -634,6 +648,14 @@ class QNowLocalizations {
       'already_have_account': 'لديك حساب بالفعل؟',
       'create_account': 'إنشاء حساب',
       'reset_password': 'إعادة تعيين كلمة المرور',
+      'enter_email_reset':
+          'أدخل عنوان بريدك الإلكتروني لتلقي رابط إعادة تعيين كلمة المرور',
+      'send_reset_link': 'إرسال الرابط',
+      'reset_email_sent':
+          'تم إرسال رابط إعادة التعيين! تحقق من بريدك الإلكتروني.',
+      'reset_email_error':
+          'فشل إرسال البريد الإلكتروني. يرجى المحاولة مرة أخرى.',
+      'email_required': 'البريد الإلكتروني مطلوب',
 
       // User Info
       'name': 'الاسم',

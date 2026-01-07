@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getProfile } = require('../models/auth');
+const { register, login, getProfile, requestPasswordReset, resetPassword } = require('../models/auth');
 const { verifyToken } = require('../middleware/auth');
 
 /**
@@ -11,10 +11,10 @@ router.post('/register', async (req, res) => {
     const { name, email, phone, password, isBusiness, businessName, businessType, businessAddress } = req.body;
     
     // Validate required fields
-    if (!name || !phone || !password) {
+    if (!name || !email || !phone || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Name, phone, and password are required'
+        message: 'Name, email, phone, and password are required'
       });
     }
     
@@ -97,6 +97,83 @@ router.get('/profile', verifyToken, async (req, res) => {
       res.status(404).json({
         success: false,
         message: 'Profile not found',
+        error: result.error
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/auth/forgot-password - Request password reset
+ */
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    // Validate required fields
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+    
+    const result = await requestPasswordReset(email);
+    
+    // Always return 200 to prevent email enumeration
+    res.status(200).json({
+      success: true,
+      message: 'If the email exists, a reset link has been sent'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/auth/reset-password - Reset password with token
+ */
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    
+    // Validate required fields
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token and new password are required'
+      });
+    }
+    
+    // Validate password length
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long'
+      });
+    }
+    
+    const result = await resetPassword(token, newPassword);
+    
+    if (result.success) {
+      res.status(200).json({
+        success: true,
+        message: 'Password reset successfully'
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Password reset failed',
         error: result.error
       });
     }
