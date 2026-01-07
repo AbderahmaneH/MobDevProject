@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../database/repositories/queue_repository.dart';
 import '../database/repositories/queue_client_repository.dart';
+import '../database/repositories/manual_customer_repository.dart';
+import '../database/models/manual_customer_model.dart';
 import '../database/models/queue_client_model.dart';
 import '../database/models/queue_model.dart';
 part 'queue_state.dart';
@@ -8,14 +10,17 @@ part 'queue_state.dart';
 class QueueCubit extends Cubit<QueueState> {
   final QueueRepository _queueRepository;
   final QueueClientRepository _queueClientRepository;
+  final ManualCustomerRepository? _manualCustomerRepository;
   final int? _businessOwnerId;
 
   QueueCubit({
     required QueueRepository queueRepository,
     required QueueClientRepository queueClientRepository,
+    ManualCustomerRepository? manualCustomerRepository,
     required int? businessOwnerId,
   })  : _queueRepository = queueRepository,
         _queueClientRepository = queueClientRepository,
+        _manualCustomerRepository = manualCustomerRepository,
         _businessOwnerId = businessOwnerId,
         super(QueueInitial()) {
     loadQueues();
@@ -161,10 +166,47 @@ class QueueCubit extends Cubit<QueueState> {
     }
   }
 
+  Future<void> addManualCustomer({required int queueId, required String name}) async {
+    if (_manualCustomerRepository == null) {
+      emit(QueueError(error: 'Manual customer repository not available'));
+      return;
+    }
+    try {
+      final manual = ManualCustomer(id: null, queueId: queueId, name: name, status: 'waiting');
+      await _manualCustomerRepository!.insertManualCustomer(manual);
+      emit(ClientAdded());
+      await loadQueues();
+    } catch (e) {
+      emit(QueueError(error: 'Failed to add manual customer: $e'));
+    }
+  }
+
   Future<void> removeClientFromQueue(int? clientId) async {
     try {
       emit(ClientRemoved());
-      await _queueClientRepository.deleteQueueClient(clientId);
+      if (clientId != null && clientId < 0) {
+        final realId = -clientId;
+        await _manualCustomerRepository?.deleteManualCustomer(realId);
+      } else {
+        await _queueClientRepository.deleteQueueClient(clientId);
+        if (clientId != null) {
+          // if it was a regular client, reorder positions
+          int? queueId;
+          if (state is QueueLoaded) {
+            final queues = (state as QueueLoaded).queues;
+            for (final q in queues) {
+              final found = q.clients.firstWhere((c) => c.id == clientId, orElse: () => QueueClient(queueId: 0, userId: null, name: '', phone: '', position: 0, status: '', joinedAt: DateTime.now()));
+              if (found.id == clientId) {
+                queueId = q.id;
+                break;
+              }
+            }
+          }
+          if (queueId != null) {
+            await _queueClientRepository.reorderPositions(queueId);
+          }
+        }
+      }
       await loadQueues();
     } catch (e) {
       emit(QueueError(error: 'Failed to remove client: $e'));
@@ -193,11 +235,15 @@ class QueueCubit extends Cubit<QueueState> {
         }
       }
 
-      await _queueClientRepository.updateClientStatus(clientId, 'served');
-
-      // Reorder positions for the queue to close any gaps (exclude served clients)
-      if (queueId != null) {
-        await _queueClientRepository.reorderPositions(queueId);
+      if (clientId < 0) {
+        final realId = -clientId;
+        await _manualCustomerRepository?.updateManualCustomerStatus(realId, 'served');
+      } else {
+        await _queueClientRepository.updateClientStatus(clientId, 'served');
+        // Reorder positions for the queue to close any gaps (exclude served clients)
+        if (queueId != null) {
+          await _queueClientRepository.reorderPositions(queueId);
+        }
       }
 
       await loadQueues();
@@ -209,7 +255,12 @@ class QueueCubit extends Cubit<QueueState> {
   Future<void> notifyClient(int? clientId) async {
     try {
       emit(ClientNotified());
-      await _queueClientRepository.updateClientStatus(clientId, 'notified');
+      if (clientId != null && clientId < 0) {
+        final realId = -clientId;
+        await _manualCustomerRepository?.updateManualCustomerStatus(realId, 'notified');
+      } else {
+        await _queueClientRepository.updateClientStatus(clientId, 'notified');
+      }
       await loadQueues();
     } catch (e) {
       emit(QueueError(error: 'Failed to notify client: $e'));

@@ -6,6 +6,9 @@ import '../../logic/queue_cubit.dart';
 import '../../core/common_widgets.dart';
 import '../../database/models/queue_model.dart';
 import '../../database/models/queue_client_model.dart';
+import '../../database/repositories/queue_repository.dart';
+import '../../database/repositories/queue_client_repository.dart';
+import '../../database/repositories/manual_customer_repository.dart';
 
 class QueuePage extends StatelessWidget {
   final Queue queue;
@@ -25,8 +28,11 @@ class QueuePage extends StatelessWidget {
 
     return BlocProvider(
       create: (context) => QueueCubit(
-        queueRepository: RepositoryProvider.of(context),
-        queueClientRepository: RepositoryProvider.of(context),
+        queueRepository: RepositoryProvider.of<QueueRepository>(context),
+        queueClientRepository:
+            RepositoryProvider.of<QueueClientRepository>(context),
+        manualCustomerRepository:
+            RepositoryProvider.of<ManualCustomerRepository>(context),
         businessOwnerId: queue.businessOwnerId,
       )..loadQueues(),
       child: QueueView(queue: queue),
@@ -45,20 +51,18 @@ class QueueView extends StatefulWidget {
 
 class _QueueViewState extends State<QueueView> {
   final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
+  // manual customers are name-only
   final _addClientFormKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     _nameController.text = '';
-    _phoneController.text = '';
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _phoneController.dispose();
     super.dispose();
   }
 
@@ -96,18 +100,7 @@ class _QueueViewState extends State<QueueView> {
                   },
                 ),
                 const SizedBox(height: 16),
-                AppTextFields.textField(
-                  context: dialogContext,
-                  hintText: context.loc('phone'),
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return context.loc('required_field');
-                    }
-                    return null;
-                  },
-                ),
+                // phone removed for manual customer
               ],
             ),
           ),
@@ -115,7 +108,6 @@ class _QueueViewState extends State<QueueView> {
             TextButton(
               onPressed: () {
                 _nameController.clear();
-                _phoneController.clear();
                 Navigator.pop(dialogContext);
               },
               child: Text(context.loc('cancel')),
@@ -123,13 +115,12 @@ class _QueueViewState extends State<QueueView> {
             ElevatedButton(
               onPressed: () {
                 if (_addClientFormKey.currentState!.validate()) {
-                  context.read<QueueCubit>().addClientToQueue(
+                  // Use cubit to add manual customer (name-only)
+                  context.read<QueueCubit>().addManualCustomer(
                         queueId: widget.queue.id,
                         name: _nameController.text.trim(),
-                        phone: _phoneController.text.trim(),
                       );
                   _nameController.clear();
-                  _phoneController.clear();
                   Navigator.pop(dialogContext);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -311,25 +302,46 @@ class _QueueViewState extends State<QueueView> {
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withAlpha((0.1 * 255).round()),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '#${client.position}',
-                  style: AppTextStyles.getAdaptiveStyle(
-                    context,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    lightColor: AppColors.primary,
+              if (client.position > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withAlpha((0.1 * 255).round()),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '#${client.position}',
+                    style: AppTextStyles.getAdaptiveStyle(
+                      context,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      lightColor: AppColors.primary,
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.buttonSecondaryLight,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    context.loc('manual'),
+                    style: AppTextStyles.getAdaptiveStyle(
+                      context,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      lightColor: AppColors.textSecondaryLight,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -407,6 +419,61 @@ class _QueueViewState extends State<QueueView> {
                   ),
               ],
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServedClientCard(QueueClient client) {
+    return AppContainers.card(
+      context: context,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.customerServed,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(Icons.person, color: AppColors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      client.name,
+                      style: AppTextStyles.getAdaptiveStyle(
+                        context,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    if (client.servedAt != null)
+                      Text(
+                        '${context.loc('served_at')}: ${_formatTime(client.servedAt!)}',
+                        style: AppTextStyles.getAdaptiveStyle(
+                          context,
+                          fontSize: 12,
+                          lightColor: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: AppColors.error),
+                onPressed: () => _removeClient(client),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -490,9 +557,8 @@ class _QueueViewState extends State<QueueView> {
                     )
                   : widget.queue;
 
-              final visibleClients = currentQueue.clients
-                  .where((c) => c.status != 'served')
-                  .toList();
+                final visibleClients = currentQueue.clients.where((c) => c.status != 'served').toList();
+                final servedClients = currentQueue.clients.where((c) => c.status == 'served').toList();
               return CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: [
@@ -656,11 +722,43 @@ class _QueueViewState extends State<QueueView> {
                             horizontal: 24,
                             vertical: 8,
                           ),
-                          child: _buildClientCard(currentQueue.clients[index]),
+                          child: _buildClientCard(visibleClients[index]),
                         ),
-                        childCount: currentQueue.clients.length,
+                        childCount: visibleClients.length,
                       ),
                     ),
+
+                  // Served clients section
+                  if (servedClients.isNotEmpty) ...[
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 8,
+                        ),
+                        child: Text(
+                          context.loc('served'),
+                          style: AppTextStyles.getAdaptiveStyle(
+                            context,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 8,
+                          ),
+                          child: _buildServedClientCard(servedClients[index]),
+                        ),
+                        childCount: servedClients.length,
+                      ),
+                    ),
+                  ],
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
               );

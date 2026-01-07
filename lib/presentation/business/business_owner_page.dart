@@ -7,6 +7,9 @@ import '../../logic/queue_cubit.dart';
 import '../../core/common_widgets.dart';
 import '../../database/models/queue_model.dart';
 import '../../database/models/user_model.dart';
+import '../../database/repositories/queue_repository.dart';
+import '../../database/repositories/queue_client_repository.dart';
+import '../../database/repositories/manual_customer_repository.dart';
 
 import '../drawer/profile_page.dart';
 import '../drawer/settings_page.dart';
@@ -23,9 +26,12 @@ class BusinessOwnerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => QueueCubit(
-          queueRepository: RepositoryProvider.of(context),
-          queueClientRepository: RepositoryProvider.of(context),
-          businessOwnerId: user.id),
+        queueRepository: RepositoryProvider.of<QueueRepository>(context),
+        queueClientRepository:
+          RepositoryProvider.of<QueueClientRepository>(context),
+        manualCustomerRepository:
+          RepositoryProvider.of<ManualCustomerRepository>(context),
+        businessOwnerId: user.id),
       child: BusinessOwnerView(user: user),
     );
   }
@@ -587,14 +593,7 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                 );
               },
             ),
-            _buildDrawerItem(
-              context: context,
-              icon: Icons.analytics,
-              title: context.loc('analytics'),
-              onTap: () {
-                // TODO: Navigate to analytics page
-              },
-            ),
+            // analytics removed from drawer
             _buildDrawerItem(
               context: context,
               icon: Icons.help,
