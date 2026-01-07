@@ -119,6 +119,14 @@ class QueueClientRepository {
     return active;
   }
 
+  Future<Set<int>> getQueueIdsForUser(int? userId, {bool includeServed = false}) async {
+    if (userId == null) return <int>{};
+    var query = _client.from(DatabaseTables.queueClients).select('queue_id').eq('user_id', userId);
+    if (!includeServed) query = query.neq('status', 'served');
+    final results = await query as List<dynamic>;
+    return results.map((r) => r['queue_id'] as int).toSet();
+  }
+
   Future<QueueClient?> getQueueClient(int queueId, int? userId) async {
     if (userId == null) return null;
     final result = await _client

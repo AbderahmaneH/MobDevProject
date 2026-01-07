@@ -7,6 +7,8 @@ import '../../core/localization.dart';
 import '../../database/models/user_model.dart';
 import '../../database/models/queue_model.dart';
 import '../../database/repositories/user_repository.dart';
+import '../../database/repositories/queue_repository.dart';
+import '../../database/repositories/queue_client_repository.dart';
 
 class JoinQueuePage extends StatelessWidget {
   final User user;
@@ -15,24 +17,16 @@ class JoinQueuePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var hasAncestor = true;
-    try {
-      context.read<CustomerCubit>();
-    } catch (_) {
-      hasAncestor = false;
-    }
-
-    if (hasAncestor) {
-      return JoinQueueView(user: user);
-    }
-
+    // Always create a local CustomerCubit for the Join Queue screen so
+    // it can load available queues without affecting the parent's state.
     return BlocProvider(
       create: (context) => CustomerCubit(
-        queueRepository: RepositoryProvider.of(context),
-        queueClientRepository: RepositoryProvider.of(context),
-        userRepository: RepositoryProvider.of(context),
+        queueRepository: RepositoryProvider.of<QueueRepository>(context),
+        queueClientRepository:
+            RepositoryProvider.of<QueueClientRepository>(context),
+        userRepository: RepositoryProvider.of<UserRepository>(context),
         userId: user.id,
-      )..getAvailableQueues(),
+      ),
       child: JoinQueueView(user: user),
     );
   }
@@ -40,8 +34,9 @@ class JoinQueuePage extends StatelessWidget {
 
 class JoinQueueView extends StatefulWidget {
   final User user;
+  final bool fetchOnInit;
 
-  const JoinQueueView({super.key, required this.user});
+  const JoinQueueView({super.key, required this.user, this.fetchOnInit = true});
 
   @override
   State<JoinQueueView> createState() => _JoinQueueViewState();
@@ -60,9 +55,11 @@ class _JoinQueueViewState extends State<JoinQueueView> {
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      try {
-        context.read<CustomerCubit>().getAvailableQueues();
-      } catch (_) {}
+      if (widget.fetchOnInit) {
+        try {
+          context.read<CustomerCubit>().getAvailableQueues();
+        } catch (_) {}
+      }
     });
   }
 
@@ -152,7 +149,7 @@ class _JoinQueueViewState extends State<JoinQueueView> {
 
   Widget _buildQueueCard(Queue queue) {
     final isFull = queue.currentSize >= queue.maxSize;
-    final estimatedWait = queue.currentSize * queue.estimatedWaitTime;
+    // estimated wait removed
 
     return AppContainers.card(
       context: context,
@@ -262,16 +259,6 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                 icon: Icons.people_outline,
                 title: context.loc('capacity'),
                 value: '${queue.currentSize}/${queue.maxSize}',
-              ),
-              _buildStatItem(
-                icon: Icons.timer_outlined,
-                title: context.loc('wait_time'),
-                value: '$estimatedWait ${context.loc('minutes')}',
-              ),
-              _buildStatItem(
-                icon: Icons.speed,
-                title: context.loc('avg_time'),
-                value: '${queue.estimatedWaitTime} min',
               ),
             ],
           ),

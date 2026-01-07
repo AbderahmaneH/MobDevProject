@@ -37,7 +37,6 @@ class QueueCubit extends Cubit<QueueState> {
     required String name,
     String? description,
     int maxSize = 50,
-    int estimatedWaitTime = 5,
   }) async {
     try {
       final queue = Queue(
@@ -46,7 +45,6 @@ class QueueCubit extends Cubit<QueueState> {
         name: name,
         description: description,
         maxSize: maxSize,
-        estimatedWaitTime: estimatedWaitTime,
         isActive: true,
         createdAt: DateTime.now(),
       );
@@ -64,7 +62,6 @@ class QueueCubit extends Cubit<QueueState> {
     required String name,
     String? description,
     int? maxSize,
-    int? estimatedWaitTime,
     bool? isActive,
   }) async {
     try {
@@ -80,7 +77,7 @@ class QueueCubit extends Cubit<QueueState> {
         name: name,
         description: description ?? existingQueue.description,
         maxSize: maxSize ?? existingQueue.maxSize,
-        estimatedWaitTime: estimatedWaitTime ?? existingQueue.estimatedWaitTime,
+        // estimatedWaitTime removed
         isActive: isActive ?? existingQueue.isActive,
         createdAt: existingQueue.createdAt,
         clients: existingQueue.clients,
@@ -117,7 +114,6 @@ class QueueCubit extends Cubit<QueueState> {
         name: queue.name,
         description: queue.description,
         maxSize: queue.maxSize,
-        estimatedWaitTime: queue.estimatedWaitTime,
         isActive: !queue.isActive,
       );
     } catch (e) {
