@@ -1,158 +1,175 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/models/queue_client.dart';
-import '../../domain/models/queue_entry.dart';
-import '../cubits/queue_cubit.dart';
-import '../cubits/queue_state.dart';
-import '../../core/theme/colors.dart';
-import '../../core/utils/extensions.dart';
+import 'package:flutter/material. dart';
+import 'package: flutter_bloc/flutter_bloc. dart';
+import '../../core/app_colors.dart';
+import '../../core/localization. dart';
+import '../../logic/queue_cubit.dart';
+import '../../core/common_widgets. dart';
+import '../../database/models/queue_model.dart';
+import '../../database/models/queue_client_model.dart';
+import '../../database/repositories/queue_repository.dart';
+import '../../database/repositories/queue_client_repository.dart';
+import '../../database/repositories/manual_customer_repository.dart';
 
 class QueuePage extends StatelessWidget {
-  const QueuePage({super.key});
+  final Queue queue;
+  final QueueCubit?  parentCubit;
+
+  const QueuePage({super. key, required this.queue, this.parentCubit});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.loc('queue_management')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<QueueCubit>().loadQueue(),
-          ),
-        ],
-      ),
-      body: BlocBuilder<QueueCubit, QueueState>(
-        builder: (context, state) {
-          if (state is QueueLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    if (parentCubit != null) {
+      parentCubit!.loadQueues();
+      return BlocProvider. value(
+        value: parentCubit!,
+        child:  QueueView(queue: queue),
+      );
+    }
 
-          if (state is QueueError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: AppColors.error),
-                  const SizedBox(height: 16),
-                  Text(
-                    state.message,
-                    style: TextStyle(color: AppColors.error),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => context.read<QueueCubit>().loadQueue(),
-                    child: Text(context.loc('retry')),
-                  ),
-                ],
-              ),
-            );
-          }
+    return BlocProvider(
+      create: (context) => QueueCubit(
+        queueRepository: RepositoryProvider.of<QueueRepository>(context),
+        queueClientRepository: 
+            RepositoryProvider.of<QueueClientRepository>(context),
+        manualCustomerRepository: 
+            RepositoryProvider.of<ManualCustomerRepository>(context),
+        businessOwnerId: queue.businessOwnerId,
+      )..loadQueues(),
+      child: QueueView(queue: queue),
+    );
+  }
+}
 
-          if (state is QueueLoaded) {
-            final entries = state.entries;
+class QueueView extends StatefulWidget {
+  final Queue queue;
 
-            if (entries.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.people_outline, size: 64, color: AppColors.textSecondary),
-                    const SizedBox(height: 16),
-                    Text(
-                      context.loc('no_clients_in_queue'),
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
+  const QueueView({super.key, required this.queue});
 
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<QueueCubit>().loadQueue();
-              },
-              child: ListView.builder(
-                itemCount: entries.length,
-                padding: const EdgeInsets.all(16),
-                itemBuilder: (context, index) {
-                  final entry = entries[index];
-                  return _QueueEntryCard(
-                    entry: entry,
-                    position: index + 1,
-                    onNotify: () => _notifyClient(context, entry.client),
-                    onRemove: () => _removeClient(context, entry),
-                  );
-                },
-              ),
-            );
-          }
+  @override
+  State<QueueView> createState() => _QueueViewState();
+}
 
-          return const SizedBox();
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddClientDialog(context),
-        child: const Icon(Icons.add),
+class _QueueViewState extends State<QueueView> {
+  final _nameController = TextEditingController();
+  // manual customers are name-only
+  final _addClientFormKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController. text = '';
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _refreshQueue() {
+    context.read<QueueCubit>().refreshQueues();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(context.loc('refreshed')),
+        backgroundColor: AppColors. success,
       ),
     );
   }
 
-  void _showAddClientDialog(BuildContext context) {
-    final nameController = TextEditingController();
-    final phoneController = TextEditingController();
-
+  void _showAddClientDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.loc('add_client')),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: context.loc('name'),
-                border: const OutlineInputBorder(),
-              ),
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: AppColors.backgroundLight,
+          title: Text(context.loc('add_customer')),
+          content: Form(
+            key: _addClientFormKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppTextFields. textField(
+                  context:  dialogContext,
+                  hintText: context.loc('name'),
+                  controller: _nameController,
+                  validator: (value) {
+                    if (value == null || value. isEmpty) {
+                      return context. loc('required_field');
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height:  16),
+                // phone removed for manual customer
+              ],
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: phoneController,
-              decoration: InputDecoration(
-                labelText: context.loc('phone'),
-                border: const OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.phone,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                _nameController.clear();
+                Navigator. pop(dialogContext);
+              },
+              child: Text(context. loc('cancel')),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (_addClientFormKey.currentState!.validate()) {
+                  // Use cubit to add manual customer (name-only)
+                  context.read<QueueCubit>().addManualCustomer(
+                        queueId: widget.queue.id,
+                        name: _nameController.text.trim(),
+                      );
+                  _nameController.clear();
+                  Navigator.pop(dialogContext);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(context.loc('person_added')),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                }
+              },
+              child:  Text(context.loc('add')),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.loc('cancel')),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final name = nameController.text.trim();
-              final phone = phoneController.text.trim();
-
-              if (name.isNotEmpty && phone.isNotEmpty) {
-                context.read<QueueCubit>().addClient(name, phone);
-                Navigator.pop(context);
-              }
-            },
-            child: Text(context.loc('add')),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  void _notifyClient(BuildContext context, QueueClient client) {
+  void _serveClient(QueueClient client) {
+    showDialog(
+      context: context,
+      builder:  (dialogContext) {
+        return AlertDialog(
+          title: Text(context.loc('serve')),
+          content: Text('${context.loc('serve_confirm')} ${client.name}?'),
+          actions: [
+            TextButton(
+              onPressed:  () => Navigator.pop(dialogContext),
+              child: Text(context.loc('cancel')),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                context.read<QueueCubit>().serveClient(client.id);
+                Navigator. pop(dialogContext);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${client. name} ${context.loc('served')}'),
+                    backgroundColor:  AppColors.success,
+                  ),
+                );
+              },
+              child: Text(context.loc('serve')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _notifyClient(QueueClient client) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -160,17 +177,17 @@ class QueuePage extends StatelessWidget {
         content: Text('${context.loc('notify_confirm')} ${client.name}?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
+            onPressed:  () => Navigator.pop(dialogContext),
             child: Text(context.loc('cancel')),
           ),
           ElevatedButton(
             onPressed: () {
               context.read<QueueCubit>().notifyClient(client.id);
-              Navigator.pop(dialogContext);
+              Navigator. pop(dialogContext);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('${client.name} ${context.loc('notified')}'),
-                  backgroundColor: AppColors.info,
+                  backgroundColor:  AppColors.info,
                 ),
               );
             },
@@ -181,106 +198,605 @@ class QueuePage extends StatelessWidget {
     );
   }
 
-  void _removeClient(BuildContext context, QueueEntry entry) {
+  void _removeClient(QueueClient client) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(context.loc('remove_client')),
-        content: Text('${context.loc('remove_confirm')} ${entry.client.name}?'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.loc('remove_customer')),
+        content: Text('${context.loc('remove_confirm')} ${client.name}?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed:  () => Navigator.pop(dialogContext),
             child: Text(context.loc('cancel')),
           ),
           ElevatedButton(
             onPressed: () {
-              context.read<QueueCubit>().removeClient(entry.id);
-              Navigator.pop(context);
+              context.read<QueueCubit>().removeClientFromQueue(client.id);
+              Navigator.pop(dialogContext);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${client. name} ${context.loc('removed')}'),
+                  backgroundColor:  AppColors.success,
+                ),
+              );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
             child: Text(context.loc('remove')),
           ),
         ],
       ),
     );
   }
-}
 
-class _QueueEntryCard extends StatelessWidget {
-  final QueueEntry entry;
-  final int position;
-  final VoidCallback onNotify;
-  final VoidCallback onRemove;
-
-  const _QueueEntryCard({
-    required this.entry,
-    required this.position,
-    required this.onNotify,
-    required this.onRemove,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: AppColors.primary,
-          child: Text(
-            position.toString(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        title: Text(
-          entry.client.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(entry.client.phone),
-            const SizedBox(height: 4),
-            Text(
-              '${context.loc('joined')}: ${_formatTime(entry.joinedAt)}',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
+  Widget _buildClientCard(QueueClient client) {
+    return AppContainers.card(
+      context: context,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: _getStatusColor(client.status),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: 
+                    const Icon(Icons.person, color: AppColors.white, size: 20),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      client. name,
+                      style: AppTextStyles.getAdaptiveStyle(
+                        context,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.phone,
+                          size: 14,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                        const SizedBox(width:  4),
+                        Text(
+                          client.phone,
+                          style: AppTextStyles. getAdaptiveStyle(
+                            context,
+                            fontSize:  14,
+                            lightColor: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getStatusColor(client.status),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            _getStatusText(client.status),
+                            style: AppTextStyles.getAdaptiveStyle(
+                              context,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              lightColor: AppColors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              if (client.position > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary. withAlpha((0.1 * 255).round()),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '#${client.position}',
+                    style: AppTextStyles.getAdaptiveStyle(
+                      context,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      lightColor: AppColors.primary,
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.buttonSecondaryLight,
+                    borderRadius:  BorderRadius.circular(8),
+                  ),
+                  child:  Text(
+                    context.loc('manual'),
+                    style: AppTextStyles.getAdaptiveStyle(
+                      context,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      lightColor: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: 
+                      client.notified ? null : () => _notifyClient(client),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color:  client.notified
+                          ?  AppColors.buttonDisabledLight
+                          : AppColors.warning,
+                    ),
+                  ),
+                  child: Text(
+                    client.notified
+                        ? context.loc('notified')
+                        : context. loc('notify'),
+                    style: TextStyle(
+                      color: client.notified
+                          ? AppColors.buttonDisabledLight
+                          : AppColors.warning,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: client.served ? null : () => _serveClient(client),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: client. served
+                        ? AppColors. buttonDisabledLight
+                        : AppColors.success,
+                  ),
+                  child: Text(
+                    client.served
+                        ? context.loc('served')
+                        : context.loc('serve'),
+                    style: TextStyle(
+                      color: client.served
+                          ? AppColors.textSecondaryLight
+                          : AppColors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              IconButton(
+                icon: const Icon(Icons.delete, color: AppColors.error),
+                onPressed: () => _removeClient(client),
+              ),
+            ],
+          ),
+          if (client.notifiedAt != null || client.servedAt != null)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 12),
+                const Divider(),
+                const SizedBox(height: 8),
+                if (client.notifiedAt != null)
+                  _buildTimestamp(
+                    icon: Icons.notifications,
+                    text: '${context.loc('notified_at')}: '
+                        '${_formatTime(client.notifiedAt!)}',
+                  ),
+                if (client.servedAt != null)
+                  _buildTimestamp(
+                    icon: Icons. check_circle,
+                    text:  '${context.loc('served_at')}: '
+                        '${_formatTime(client.servedAt!)}',
+                  ),
+              ],
             ),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: Icon(Icons.notifications, color: AppColors.info),
-              onPressed: onNotify,
-            ),
-            IconButton(
-              icon: Icon(Icons.delete, color: AppColors.error),
-              onPressed: onRemove,
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
 
-  String _formatTime(DateTime time) {
-    final now = DateTime.now();
-    final difference = now.difference(time);
+  Widget _buildServedClientCard(QueueClient client) {
+    return AppContainers. card(
+      context: context,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.customerServed,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child:  const Icon(Icons.person, color: AppColors. white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment:  CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      client.name,
+                      style: AppTextStyles.getAdaptiveStyle(
+                        context,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    if (client.servedAt != null)
+                      Text(
+                        '${context.loc('served_at')}: ${_formatTime(client.servedAt!)}',
+                        style: AppTextStyles.getAdaptiveStyle(
+                          context,
+                          fontSize: 12,
+                          lightColor: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: AppColors.error),
+                onPressed: () => _removeClient(client),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-    if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
-    } else {
-      return '${difference.inDays}d ago';
+  Widget _buildTimestamp({required IconData icon, required String text}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: AppColors.textSecondaryLight),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: AppTextStyles.getAdaptiveStyle(
+              context,
+              fontSize: 12,
+              lightColor: AppColors.textSecondaryLight,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'waiting':
+        return AppColors.primary;
+      case 'notified':
+        return AppColors. warning;
+      case 'served': 
+        return AppColors.success;
+      default:
+        return AppColors.grey500;
     }
+  }
+
+  String _getStatusText(String status) {
+    switch (status) {
+      case 'waiting':
+        return context.loc('waiting');
+      case 'notified':
+        return context.loc('notified');
+      case 'served': 
+        return context.loc('served');
+      default:
+        return status;
+    }
+  }
+
+  String _formatTime(DateTime time) {
+    return '${time.hour. toString().padLeft(2, '0')}:'
+        '${time.minute. toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      body: SafeArea(
+        child: BlocListener<QueueCubit, QueueState>(
+          listener: (context, state) {
+            if (state is ClientAdded) {
+              setState(() {});
+            } else if (state is QueueError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.error),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            }
+          },
+          child: BlocBuilder<QueueCubit, QueueState>(
+            builder: (context, state) {
+              final currentQueue = (state is QueueLoaded)
+                  ? state.queues. firstWhere(
+                      (q) => q.id == widget.queue.id,
+                      orElse:  () => widget.queue,
+                    )
+                  : widget.queue;
+
+                final visibleClients = currentQueue.clients.where((c) => c.status != 'served').toList();
+                final servedClients = currentQueue.clients.where((c) => c.status == 'served').toList();
+              return CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                    title:  Text(currentQueue.name),
+                    backgroundColor: AppColors.backgroundLight,
+                    elevation: 0,
+                    leading: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed:  () => Navigator.pop(context),
+                    ),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.refresh),
+                        onPressed: _refreshQueue,
+                      ),
+                    ],
+                  ),
+                  SliverToBoxAdapter(
+                    child:  Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
+                      child: Column(
+                        children: [
+                          // Queue Stats
+                          AppContainers.card(
+                            context: context,
+                            padding: const EdgeInsets.all(20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildStatItem(
+                                  title: context.loc('total'),
+                                  value: '${currentQueue.totalCount}',
+                                ),
+                                _buildStatItem(
+                                  title: context. loc('waiting'),
+                                  value: '${currentQueue.waitingCount}',
+                                ),
+                                _buildStatItem(
+                                  title: context. loc('served'),
+                                  value: '${currentQueue.servedCount}',
+                                ),
+                                _buildStatItem(
+                                  title: context.loc('notified'),
+                                  value:  '${currentQueue.notifiedCount}',
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          AppContainers.card(
+                            context: context,
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: 
+                                      MainAxisAlignment. spaceBetween,
+                                  children: [
+                                    Text(
+                                      context. loc('capacity'),
+                                      style: AppTextStyles.getAdaptiveStyle(
+                                        context,
+                                        fontSize: 16,
+                                        fontWeight:  FontWeight.w600,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${currentQueue.currentSize}/'
+                                      '${currentQueue.maxSize}',
+                                      style: AppTextStyles.getAdaptiveStyle(
+                                        context,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                LinearProgressIndicator(
+                                  value: currentQueue.currentSize /
+                                      currentQueue.maxSize,
+                                  backgroundColor: 
+                                      AppColors.buttonSecondaryLight,
+                                  color: currentQueue.currentSize >=
+                                          currentQueue. maxSize
+                                      ? AppColors.error
+                                      : AppColors. primary,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  currentQueue.currentSize >=
+                                          currentQueue. maxSize
+                                      ? context.loc('queue_full')
+                                      :  '${currentQueue.maxSize - currentQueue.currentSize} '
+                                          '${context.loc('spots_available')}',
+                                  style: AppTextStyles.getAdaptiveStyle(
+                                    context,
+                                    fontSize: 12,
+                                    lightColor: currentQueue.currentSize >=
+                                            currentQueue.maxSize
+                                        ? AppColors.error
+                                        : AppColors. success,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child:  Padding(
+                      padding:  const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
+                      child:  Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            context.loc('waiting_list'),
+                            style: AppTextStyles.getAdaptiveStyle(
+                              context,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            '${currentQueue.clients.length} ${context.loc('customers')}',
+                            style:  AppTextStyles.getAdaptiveStyle(
+                              context,
+                              fontSize: 14,
+                              lightColor: AppColors.textSecondaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (visibleClients.isEmpty)
+                    SliverToBoxAdapter(
+                      child:  AppStates.emptyState(
+                        message: context.loc('no_customers'),
+                        subtitle: context.loc('add_customer_hint'),
+                        icon: Icons.people_outline,
+                        context: context,
+                      ),
+                    )
+                  else
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 8,
+                          ),
+                          child: _buildClientCard(visibleClients[index]),
+                        ),
+                        childCount:  visibleClients.length,
+                      ),
+                    ),
+
+                  // Served clients section
+                  if (servedClients.isNotEmpty) ...[
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 8,
+                        ),
+                        child: Text(
+                          context.loc('served'),
+                          style: AppTextStyles.getAdaptiveStyle(
+                            context,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => Padding(
+                          padding: const EdgeInsets. symmetric(
+                            horizontal: 24,
+                            vertical: 8,
+                          ),
+                          child: _buildServedClientCard(servedClients[index]),
+                        ),
+                        childCount: servedClients. length,
+                      ),
+                    ),
+                  ],
+                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton. extended(
+        onPressed: _showAddClientDialog,
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
+        icon: const Icon(Icons.person_add),
+        label: Text(context.loc('add_customer')),
+      ),
+    );
+  }
+
+  Widget _buildStatItem({required String title, required String value}) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: AppTextStyles.getAdaptiveStyle(
+            context,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height:  4),
+        Text(
+          title,
+          style: AppTextStyles.getAdaptiveStyle(
+            context,
+            fontSize: 12,
+            lightColor: AppColors.textSecondaryLight,
+          ),
+        ),
+      ],
+    );
   }
 }
