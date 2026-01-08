@@ -1,194 +1,132 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'dart:io';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'supabase_service.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   bool _initialized = false;
+  int? _currentUserId;
+  RealtimeChannel? _notificationChannel;
 
-  /// Initialize the notification service
   Future<void> initialize() async {
     if (_initialized) return;
 
-    // Android initialization settings
-    const AndroidInitializationSettings androidInitSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    // iOS initialization settings
-    const DarwinInitializationSettings iosInitSettings =
-        DarwinInitializationSettings(
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
 
-    // Combined initialization settings
-    const InitializationSettings initSettings = InitializationSettings(
-      android: androidInitSettings,
-      iOS: iosInitSettings,
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
     );
 
-    // Initialize the plugin
-    await _flutterLocalNotificationsPlugin.initialize(
-      initSettings,
-      onDidReceiveNotificationResponse: _onNotificationTapped,
-    );
-
+    await _notificationsPlugin.initialize(initSettings);
+    await requestPermissions();
+    
     _initialized = true;
   }
 
-  /// Handle notification tap
-  void _onNotificationTapped(NotificationResponse response) {
-    // Handle notification tap - you can navigate to specific screens here
-    print('Notification tapped: ${response.payload}');
-  }
-
-  /// Request notification permissions
   Future<bool> requestPermissions() async {
-    if (Platform.isAndroid) {
-      // For Android 13+ (API 33+), request notification permission
+    if (await Permission.notification.isDenied) {
       final status = await Permission.notification.request();
       return status.isGranted;
-    } else if (Platform.isIOS) {
-      // For iOS, request permissions
-      final granted = await _flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
-      return granted ?? false;
     }
     return true;
   }
 
-  /// Show a local notification
   Future<void> showNotification({
     required int id,
     required String title,
     required String body,
-    String? payload,
   }) async {
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
-      'qnow_channel',
-      'QNow Notifications',
-      channelDescription: 'Notifications for queue updates',
+    const androidDetails = AndroidNotificationDetails(
+      'queue_notifications',
+      'Queue Notifications',
+      channelDescription: 'Notifications for queue status updates',
       importance: Importance.high,
       priority: Priority.high,
       showWhen: true,
-      enableVibration: true,
-      playSound: true,
     );
 
-    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+    const iosDetails = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
     );
 
-    const NotificationDetails notificationDetails = NotificationDetails(
+    const details = NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );
 
-    await _flutterLocalNotificationsPlugin.show(
-      id,
-      title,
-      body,
-      notificationDetails,
-      payload: payload,
-    );
+    await _notificationsPlugin.show(id, title, body, details);
   }
 
-  /// Show notification when customer is next in line
-  Future<void> showYouAreNextNotification({
+  void startListening(int userId) {
+    _currentUserId = userId;
+    
+    // Cancel existing subscription if any
+    _notificationChannel?.unsubscribe();
+
+    // Subscribe to notifications for this user
+    _notificationChannel = SupabaseService.client
+        .channel('notifications:user_id=eq.$userId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'notifications',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'user_id',
+            value: userId,
+          ),
+          callback: (payload) {
+            final notification = payload.newRecord;
+            if (notification != null) {
+              showNotification(
+                id: notification['id'] as int,
+                title: notification['title'] as String,
+                body: notification['message'] as String,
+              );
+            }
+          },
+        )
+        .subscribe();
+  }
+
+  void stopListening() {
+    _notificationChannel?.unsubscribe();
+    _notificationChannel = null;
+    _currentUserId = null;
+  }
+
+  Future<void> createNotification({
+    required int userId,
+    required String title,
+    required String message,
     required int queueId,
-    required String queueName,
-    required int position,
   }) async {
-    await showNotification(
-      id: queueId,
-      title: 'You\'re Almost There! 🎉',
-      body: 'You are #$position in line at $queueName. Get ready!',
-      payload: 'queue_$queueId',
-    );
-  }
-
-  /// Show notification when it's customer's turn
-  Future<void> showYourTurnNotification({
-    required int queueId,
-    required String queueName,
-  }) async {
-    await showNotification(
-      id: queueId,
-      title: 'It\'s Your Turn! ⏰',
-      body: 'Please proceed to $queueName now.',
-      payload: 'queue_$queueId',
-    );
-  }
-
-  /// Show notification when customer is added to queue
-  Future<void> showJoinedQueueNotification({
-    required int queueId,
-    required String queueName,
-    required int position,
-  }) async {
-    await showNotification(
-      id: queueId,
-      title: 'Joined Queue Successfully ✅',
-      body: 'You are #$position in line at $queueName',
-      payload: 'queue_$queueId',
-    );
-  }
-
-  /// Show notification for queue status change
-  Future<void> showQueueStatusNotification({
-    required int queueId,
-    required String queueName,
-    required String status,
-  }) async {
-    await showNotification(
-      id: queueId,
-      title: 'Queue Update',
-      body: '$queueName is now $status',
-      payload: 'queue_$queueId',
-    );
-  }
-
-  /// Cancel a specific notification
-  Future<void> cancelNotification(int id) async {
-    await _flutterLocalNotificationsPlugin.cancel(id);
-  }
-
-  /// Cancel all notifications
-  Future<void> cancelAllNotifications() async {
-    await _flutterLocalNotificationsPlugin.cancelAll();
-  }
-
-  /// Check if notifications are enabled
-  Future<bool> areNotificationsEnabled() async {
-    if (Platform.isAndroid) {
-      return await Permission.notification.isGranted;
-    } else if (Platform.isIOS) {
-      final granted = await _flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
-      return granted ?? false;
+    try {
+      await SupabaseService.client.from('notifications').insert({
+        'user_id': userId,
+        'title': title,
+        'message': message,
+        'queue_id': queueId,
+        'created_at': DateTime.now().millisecondsSinceEpoch,
+        'is_read': false,
+      });
+    } catch (e) {
+      print('Error creating notification: $e');
     }
-    return true;
   }
 }
