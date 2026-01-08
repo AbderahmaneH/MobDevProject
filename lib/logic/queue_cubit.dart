@@ -1,96 +1,204 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../database/models/queue_model.dart';
-import '../database/models/queue_client_model.dart';
-import '../database/repositories/queue_repository.dart';
-import '../database/repositories/queue_client_repository.dart';
-import '../database/repositories/manual_customer_repository.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/client.dart';
+import '../models/queue.dart';
+import '../services/supabase_service.dart';
 
 part 'queue_state.dart';
 
 class QueueCubit extends Cubit<QueueState> {
-  final QueueRepository _queueRepository;
-  final QueueClientRepository _queueClientRepository;
-  final ManualCustomerRepository _manualCustomerRepository;
+  QueueCubit() : super(QueueInitial());
 
-  QueueCubit({
-    required QueueRepository queueRepository,
-    required QueueClientRepository queueClientRepository,
-    required ManualCustomerRepository manualCustomerRepository,
-  })  : _queueRepository = queueRepository,
-        _queueClientRepository = queueClientRepository,
-        _manualCustomerRepository = manualCustomerRepository,
-        super(QueueInitial());
-
-  Future<void> loadQueue(String queueId) async {
+  void createQueue({
+    required String name,
+    required String description,
+    required int averageServiceTime,
+  }) {
     try {
-      emit(QueueLoading());
-      final queue = await _queueRepository.getQueue(queueId);
-      final clients = await _queueClientRepository.getClientsByQueue(queueId);
-      emit(QueueLoaded(queue: queue, clients: clients));
+      final queue = Queue(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: name,
+        description: description,
+        averageServiceTime: averageServiceTime,
+        clients: [],
+        isActive: true,
+      );
+      emit(QueueCreated(queue));
     } catch (e) {
-      emit(QueueError(message: e.toString()));
+      emit(QueueError(e.toString()));
     }
   }
 
-  Future<void> addClient({
-    required String queueId,
+  void addClient({
+    required Queue queue,
     required String name,
     required String phone,
-  }) async {
+    bool isManualCustomer = false,
+  }) {
     try {
-      await _queueClientRepository.addClient(
-        queueId: queueId,
+      final client = Client(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: name,
         phone: phone,
+        joinedAt: DateTime.now(),
+        isManualCustomer: isManualCustomer,
       );
-      await loadQueue(queueId);
+      
+      final updatedClients = [...queue.clients, client];
+      final updatedQueue = queue.copyWith(clients: updatedClients);
+      
+      emit(ClientAdded(updatedQueue, client));
     } catch (e) {
-      emit(QueueError(message: e.toString()));
+      emit(QueueError(e.toString()));
     }
   }
 
-  Future<void> notifyClient(String clientId, String queueId) async {
+  void removeClient({
+    required Queue queue,
+    required String clientId,
+  }) {
     try {
-      await _queueClientRepository.updateClientStatus(clientId, 'notified');
+      final updatedClients = queue.clients
+          .where((client) => client.id != clientId)
+          .toList();
+      final updatedQueue = queue.copyWith(clients: updatedClients);
       
-      // Create a Supabase notification
-      final supabase = Supabase.instance.client;
-      final client = await _queueClientRepository.getClient(clientId);
+      emit(ClientRemoved(updatedQueue, clientId));
+    } catch (e) {
+      emit(QueueError(e.toString()));
+    }
+  }
+
+  void updateClientPosition({
+    required Queue queue,
+    required String clientId,
+    required int newPosition,
+  }) {
+    try {
+      final clients = List<Client>.from(queue.clients);
+      final clientIndex = clients.indexWhere((c) => c.id == clientId);
       
-      if (client != null) {
-        await supabase.from('notifications').insert({
-          'queue_id': queueId,
-          'client_id': clientId,
-          'phone_number': client.phone,
-          'message': 'It\'s your turn! Please proceed to the counter.',
-          'status': 'pending',
-          'created_at': DateTime.now().toIso8601String(),
-        });
+      if (clientIndex == -1) {
+        throw Exception('Client not found');
       }
       
-      await loadQueue(queueId);
+      final client = clients.removeAt(clientIndex);
+      clients.insert(newPosition, client);
+      
+      final updatedQueue = queue.copyWith(clients: clients);
+      emit(ClientPositionUpdated(updatedQueue));
     } catch (e) {
-      emit(QueueError(message: e.toString()));
+      emit(QueueError(e.toString()));
     }
   }
 
-  Future<void> completeClient(String clientId, String queueId) async {
+  void serveNextClient(Queue queue) {
     try {
-      await _queueClientRepository.updateClientStatus(clientId, 'completed');
-      await loadQueue(queueId);
+      if (queue.clients.isEmpty) {
+        throw Exception('No clients in queue');
+      }
+      
+      final nextClient = queue.clients.first;
+      final updatedClients = queue.clients.skip(1).toList();
+      final updatedQueue = queue.copyWith(clients: updatedClients);
+      
+      emit(ClientServed(updatedQueue, nextClient));
     } catch (e) {
-      emit(QueueError(message: e.toString()));
+      emit(QueueError(e.toString()));
     }
   }
 
-  Future<void> removeClient(String clientId, String queueId) async {
+  void pauseQueue(Queue queue) {
     try {
-      await _queueClientRepository.deleteClient(clientId);
-      await loadQueue(queueId);
+      final updatedQueue = queue.copyWith(isActive: false);
+      emit(QueuePaused(updatedQueue));
     } catch (e) {
-      emit(QueueError(message: e.toString()));
+      emit(QueueError(e.toString()));
     }
+  }
+
+  void resumeQueue(Queue queue) {
+    try {
+      final updatedQueue = queue.copyWith(isActive: true);
+      emit(QueueResumed(updatedQueue));
+    } catch (e) {
+      emit(QueueError(e.toString()));
+    }
+  }
+
+  void deleteQueue(Queue queue) {
+    try {
+      emit(QueueDeleted(queue.id));
+    } catch (e) {
+      emit(QueueError(e.toString()));
+    }
+  }
+
+  void loadQueue(Queue queue) {
+    try {
+      emit(QueueLoaded(queue));
+    } catch (e) {
+      emit(QueueError(e.toString()));
+    }
+  }
+
+  int getEstimatedWaitTime(Queue queue, String clientId) {
+    final clientIndex = queue.clients.indexWhere((c) => c.id == clientId);
+    if (clientIndex == -1) return 0;
+    
+    return clientIndex * queue.averageServiceTime;
+  }
+
+  int getQueuePosition(Queue queue, String clientId) {
+    final index = queue.clients.indexWhere((c) => c.id == clientId);
+    return index == -1 ? -1 : index + 1;
+  }
+
+  void updateQueue(Queue queue) {
+    try {
+      emit(QueueUpdated(queue));
+    } catch (e) {
+      emit(QueueError(e.toString()));
+    }
+  }
+
+  void notifyClient({
+    required Queue queue,
+    required String clientId,
+    required String message,
+  }) async {
+    try {
+      final client = queue.clients.firstWhere((c) => c.id == clientId);
+      final position = getQueuePosition(queue, clientId);
+      final waitTime = getEstimatedWaitTime(queue, clientId);
+      
+      emit(ClientNotified(
+        queue: queue,
+        client: client,
+        message: message,
+        position: position,
+        estimatedWaitTime: waitTime,
+      ));
+
+      // Add notification to Supabase if client is not a manual customer
+      if (!client.isManualCustomer) {
+        final supabaseService = SupabaseService();
+        
+        await supabaseService.createNotification(
+          userId: client.phone, // Using phone as user_id
+          queueId: queue.id,
+          title: 'Queue Update',
+          message: message,
+          createdAt: DateTime.now().toIso8601String(),
+          isRead: false,
+        );
+      }
+    } catch (e) {
+      emit(QueueError(e.toString()));
+    }
+  }
+
+  void clearError() {
+    emit(QueueInitial());
   }
 }
