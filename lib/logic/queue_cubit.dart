@@ -1,273 +1,152 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../database/repositories/queue_repository.dart';
-import '../database/repositories/queue_client_repository.dart';
-import '../database/repositories/manual_customer_repository.dart';
-import '../database/models/manual_customer_model.dart';
-import '../database/models/queue_client_model.dart';
-import '../database/models/queue_model.dart';
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/notification_service.dart';
+
 part 'queue_state.dart';
 
 class QueueCubit extends Cubit<QueueState> {
-  final QueueRepository _queueRepository;
-  final QueueClientRepository _queueClientRepository;
-  final ManualCustomerRepository? _manualCustomerRepository;
-  final int? _businessOwnerId;
+  final SupabaseClient supabase;
+  final NotificationService notificationService;
 
-  QueueCubit({
-    required QueueRepository queueRepository,
-    required QueueClientRepository queueClientRepository,
-    ManualCustomerRepository? manualCustomerRepository,
-    required int? businessOwnerId,
-  })  : _queueRepository = queueRepository,
-        _queueClientRepository = queueClientRepository,
-        _manualCustomerRepository = manualCustomerRepository,
-        _businessOwnerId = businessOwnerId,
-        super(QueueInitial()) {
-    loadQueues();
-  }
+  QueueCubit({required this.supabase, required this.notificationService})
+      : super(QueueInitial());
 
   Future<void> loadQueues() async {
-    emit(QueueLoading());
-
     try {
-      final queues =
-          await _queueRepository.getQueuesByBusinessOwner(_businessOwnerId);
-      emit(QueueLoaded(queues: queues));
+      emit(QueueLoading());
+      final response = await supabase
+          .from('queues')
+          .select()
+          .order('created_at', ascending: false);
+      
+      emit(QueueLoaded(queues: response as List<dynamic>));
     } catch (e) {
-      emit(QueueError(error: 'Failed to load queues: $e'));
+      emit(QueueError(message: e.toString()));
     }
   }
 
-  Future<void> createQueue({
-    required String name,
-    String? description,
-    int maxSize = 50,
-  }) async {
+  Future<void> createQueue(String name, String description, int estimatedTime) async {
     try {
-      final queue = Queue(
-        id: 0,
-        businessOwnerId: _businessOwnerId,
-        name: name,
-        description: description,
-        maxSize: maxSize,
-        isActive: true,
-        createdAt: DateTime.now(),
+      emit(QueueLoading());
+      await supabase.from('queues').insert({
+        'name': name,
+        'description': description,
+        'estimated_time_per_client': estimatedTime,
+        'status': 'active',
+      });
+      await loadQueues();
+    } catch (e) {
+      emit(QueueError(message: e.toString()));
+    }
+  }
+
+  Future<void> joinQueue(String queueId) async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
+
+      await supabase.from('queue_clients').insert({
+        'queue_id': queueId,
+        'user_id': userId,
+        'status': 'waiting',
+      });
+      
+      await loadQueues();
+    } catch (e) {
+      emit(QueueError(message: e.toString()));
+    }
+  }
+
+  Future<void> notifyClient(String clientId, String queueId) async {
+    try {
+      // 1. Get the client's user_id from the queue_client record
+      final clientRecord = await supabase
+          .from('queue_clients')
+          .select('user_id')
+          .eq('id', clientId)
+          .single();
+      
+      final userId = clientRecord['user_id'] as String;
+
+      // 2. Get the queue name
+      final queueRecord = await supabase
+          .from('queues')
+          .select('name')
+          .eq('id', queueId)
+          .single();
+      
+      final queueName = queueRecord['name'] as String;
+
+      // 3. Create a notification record in the notifications table
+      final title = "Your Turn is Coming!";
+      final message = "Your turn is coming up in $queueName. Please get ready!";
+      
+      await supabase.from('notifications').insert({
+        'user_id': userId,
+        'queue_id': queueId,
+        'title': title,
+        'message': message,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+
+      // 4. Update the client status to 'notified' and set notified_at timestamp
+      await supabase
+          .from('queue_clients')
+          .update({
+            'status': 'notified',
+            'notified_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', clientId);
+
+      // 5. Send local notification
+      await notificationService.showNotification(
+        title: title,
+        body: message,
       );
 
-      emit(QueueCreated());
-      await _queueRepository.insertQueue(queue);
       await loadQueues();
     } catch (e) {
-      emit(QueueError(error: 'Failed to create queue: $e'));
+      emit(QueueError(message: e.toString()));
     }
   }
 
-  Future<void> updateQueue({
-    required int queueId,
-    required String name,
-    String? description,
-    int? maxSize,
-    bool? isActive,
-  }) async {
+  Future<void> completeClient(String clientId) async {
     try {
-      final existingQueue = await _queueRepository.getQueueById(queueId);
-      if (existingQueue == null) {
-        emit(const QueueError(error: 'Queue not found'));
-        return;
-      }
-
-      final updatedQueue = Queue(
-        id: queueId,
-        businessOwnerId: _businessOwnerId,
-        name: name,
-        description: description ?? existingQueue.description,
-        maxSize: maxSize ?? existingQueue.maxSize,
-        // estimatedWaitTime removed
-        isActive: isActive ?? existingQueue.isActive,
-        createdAt: existingQueue.createdAt,
-        clients: existingQueue.clients,
-      );
-
-      emit(QueueUpdated());
-      await _queueRepository.updateQueue(updatedQueue);
+      await supabase
+          .from('queue_clients')
+          .update({'status': 'completed'})
+          .eq('id', clientId);
+      
       await loadQueues();
     } catch (e) {
-      emit(QueueError(error: 'Failed to update queue: $e'));
+      emit(QueueError(message: e.toString()));
     }
   }
 
-  Future<void> deleteQueue(int queueId) async {
+  Future<void> removeClient(String clientId) async {
     try {
-      emit(QueueDeleted());
-      await _queueRepository.deleteQueue(queueId);
+      await supabase
+          .from('queue_clients')
+          .delete()
+          .eq('id', clientId);
+      
       await loadQueues();
     } catch (e) {
-      emit(QueueError(error: 'Failed to delete queue: $e'));
+      emit(QueueError(message: e.toString()));
     }
   }
 
-  Future<void> toggleQueueStatus(int queueId) async {
+  Future<void> updateQueueStatus(String queueId, String status) async {
     try {
-      final queue = await _queueRepository.getQueueById(queueId);
-      if (queue == null) {
-        emit(const QueueError(error: 'Queue not found'));
-        return;
-      }
-
-      await updateQueue(
-        queueId: queueId,
-        name: queue.name,
-        description: queue.description,
-        maxSize: queue.maxSize,
-        isActive: !queue.isActive,
-      );
-    } catch (e) {
-      emit(QueueError(error: 'Failed to toggle queue status: $e'));
-    }
-  }
-
-  Future<void> addClientToQueue({
-    required int queueId,
-    required String name,
-    required String phone,
-    int? userId,
-  }) async {
-    try {
-      final queue = await _queueRepository.getQueueById(queueId);
-      if (queue == null) {
-        emit(const QueueError(error: 'Queue not found'));
-        return;
-      }
-
-      if (queue.currentSize >= queue.maxSize) {
-        emit(const QueueError(error: 'Queue is full'));
-        return;
-      }
-
-      final nextPosition =
-          await _queueClientRepository.getNextPosition(queueId);
-
-      final client = QueueClient(
-        id: 0,
-        queueId: queueId,
-        userId: userId ?? 0,
-        name: name,
-        phone: phone,
-        position: nextPosition,
-        status: 'waiting',
-        joinedAt: DateTime.now(),
-      );
-
-      emit(ClientAdded());
-      await _queueClientRepository.insertQueueClient(client);
+      await supabase
+          .from('queues')
+          .update({'status': status})
+          .eq('id', queueId);
+      
       await loadQueues();
     } catch (e) {
-      emit(QueueError(error: 'Failed to add client: $e'));
+      emit(QueueError(message: e.toString()));
     }
-  }
-
-  Future<void> addManualCustomer({required int queueId, required String name}) async {
-    if (_manualCustomerRepository == null) {
-      emit(QueueError(error: 'Manual customer repository not available'));
-      return;
-    }
-    try {
-      final manual = ManualCustomer(id: null, queueId: queueId, name: name, status: 'waiting');
-      await _manualCustomerRepository!.insertManualCustomer(manual);
-      emit(ClientAdded());
-      await loadQueues();
-    } catch (e) {
-      emit(QueueError(error: 'Failed to add manual customer: $e'));
-    }
-  }
-
-  Future<void> removeClientFromQueue(int? clientId) async {
-    try {
-      emit(ClientRemoved());
-      if (clientId != null && clientId < 0) {
-        final realId = -clientId;
-        await _manualCustomerRepository?.deleteManualCustomer(realId);
-      } else {
-        await _queueClientRepository.deleteQueueClient(clientId);
-        if (clientId != null) {
-          // if it was a regular client, reorder positions
-          int? queueId;
-          if (state is QueueLoaded) {
-            final queues = (state as QueueLoaded).queues;
-            for (final q in queues) {
-              final found = q.clients.firstWhere((c) => c.id == clientId, orElse: () => QueueClient(queueId: 0, userId: null, name: '', phone: '', position: 0, status: '', joinedAt: DateTime.now()));
-              if (found.id == clientId) {
-                queueId = q.id;
-                break;
-              }
-            }
-          }
-          if (queueId != null) {
-            await _queueClientRepository.reorderPositions(queueId);
-          }
-        }
-      }
-      await loadQueues();
-    } catch (e) {
-      emit(QueueError(error: 'Failed to remove client: $e'));
-    }
-  }
-
-  Future<void> serveClient(int? clientId) async {
-    try {
-      if (clientId == null) {
-        emit(const QueueError(error: 'Invalid client ID'));
-        return;
-      }
-
-      emit(ClientServed());
-
-      // Find the queueId for this client from current loaded state if possible
-      int? queueId;
-      if (state is QueueLoaded) {
-        final queues = (state as QueueLoaded).queues;
-        for (final q in queues) {
-          final found = q.clients.firstWhere((c) => c.id == clientId, orElse: () => QueueClient(queueId: 0, userId: null, name: '', phone: '', position: 0, status: '', joinedAt: DateTime.now()));
-          if (found.id != null) {
-            queueId = q.id;
-            break;
-          }
-        }
-      }
-
-      if (clientId < 0) {
-        final realId = -clientId;
-        await _manualCustomerRepository?.updateManualCustomerStatus(realId, 'served');
-      } else {
-        await _queueClientRepository.updateClientStatus(clientId, 'served');
-        // Reorder positions for the queue to close any gaps (exclude served clients)
-        if (queueId != null) {
-          await _queueClientRepository.reorderPositions(queueId);
-        }
-      }
-
-      await loadQueues();
-    } catch (e) {
-      emit(QueueError(error: 'Failed to serve client: $e'));
-    }
-  }
-
-  Future<void> notifyClient(int? clientId) async {
-    try {
-      emit(ClientNotified());
-      if (clientId != null && clientId < 0) {
-        final realId = -clientId;
-        await _manualCustomerRepository?.updateManualCustomerStatus(realId, 'notified');
-      } else {
-        await _queueClientRepository.updateClientStatus(clientId, 'notified');
-      }
-      await loadQueues();
-    } catch (e) {
-      emit(QueueError(error: 'Failed to notify client: $e'));
-    }
-  }
-
-  void refreshQueues() {
-    loadQueues();
   }
 }
