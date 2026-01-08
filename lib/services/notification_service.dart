@@ -14,6 +14,7 @@ class NotificationService {
   bool _initialized = false;
   int? _currentUserId;
   RealtimeChannel? _notificationChannel;
+  int _notificationId = 0;
 
   Future<void> initialize() async {
     if (_initialized) return;
@@ -45,7 +46,6 @@ class NotificationService {
   }
 
   Future<void> showNotification({
-    required int id,
     required String title,
     required String body,
   }) async {
@@ -69,7 +69,12 @@ class NotificationService {
       iOS: iosDetails,
     );
 
-    await _notificationsPlugin.show(id, title, body, details);
+    await _notificationsPlugin.show(
+      _notificationId++,
+      title,
+      body,
+      details,
+    );
   }
 
   void startListening(int userId) {
@@ -94,7 +99,6 @@ class NotificationService {
             final notification = payload.newRecord;
             if (notification != null) {
               showNotification(
-                id: notification['id'] as int,
                 title: notification['title'] as String,
                 body: notification['message'] as String,
               );
