@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/app_colors.dart';
-import '../../core/localization. dart';
+import '../../core/localization.dart';
 import '../../logic/queue_cubit.dart';
-import '../../core/common_widgets. dart';
+import '../../core/common_widgets.dart';
 import '../../database/models/queue_model.dart';
 import '../../database/models/queue_client_model.dart';
 import '../../database/repositories/queue_repository.dart';
