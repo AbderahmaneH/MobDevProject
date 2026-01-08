@@ -1,5 +1,5 @@
-import 'package:flutter/material. dart';
-import 'package: flutter_bloc/flutter_bloc. dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/app_colors.dart';
 import '../../core/localization. dart';
 import '../../logic/queue_cubit.dart';
@@ -14,7 +14,7 @@ class QueuePage extends StatelessWidget {
   final Queue queue;
   final QueueCubit?  parentCubit;
 
-  const QueuePage({super. key, required this.queue, this.parentCubit});
+  const QueuePage({super.key, required this.queue, this.parentCubit});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class QueuePage extends StatelessWidget {
       parentCubit!.loadQueues();
       return BlocProvider. value(
         value: parentCubit!,
-        child:  QueueView(queue: queue),
+        child: QueueView(queue: queue),
       );
     }
 
@@ -57,7 +57,7 @@ class _QueueViewState extends State<QueueView> {
   @override
   void initState() {
     super.initState();
-    _nameController. text = '';
+    _nameController.text = '';
   }
 
   @override
@@ -71,7 +71,7 @@ class _QueueViewState extends State<QueueView> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(context.loc('refreshed')),
-        backgroundColor: AppColors. success,
+        backgroundColor: AppColors.success,
       ),
     );
   }
@@ -89,7 +89,7 @@ class _QueueViewState extends State<QueueView> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 AppTextFields. textField(
-                  context:  dialogContext,
+                  context: dialogContext,
                   hintText: context.loc('name'),
                   controller: _nameController,
                   validator: (value) {
@@ -99,7 +99,7 @@ class _QueueViewState extends State<QueueView> {
                     return null;
                   },
                 ),
-                const SizedBox(height:  16),
+                const SizedBox(height: 16),
                 // phone removed for manual customer
               ],
             ),
@@ -114,11 +114,11 @@ class _QueueViewState extends State<QueueView> {
             ),
             ElevatedButton(
               onPressed: () {
-                if (_addClientFormKey.currentState!.validate()) {
+                if (_addClientFormKey.currentState! .validate()) {
                   // Use cubit to add manual customer (name-only)
                   context.read<QueueCubit>().addManualCustomer(
                         queueId: widget.queue.id,
-                        name: _nameController.text.trim(),
+                        name: _nameController.text. trim(),
                       );
                   _nameController.clear();
                   Navigator.pop(dialogContext);
@@ -141,7 +141,7 @@ class _QueueViewState extends State<QueueView> {
   void _serveClient(QueueClient client) {
     showDialog(
       context: context,
-      builder:  (dialogContext) {
+      builder: (dialogContext) {
         return AlertDialog(
           title: Text(context.loc('serve')),
           content: Text('${context.loc('serve_confirm')} ${client.name}?'),
@@ -152,12 +152,12 @@ class _QueueViewState extends State<QueueView> {
             ),
             ElevatedButton(
               onPressed: () {
-                context.read<QueueCubit>().serveClient(client.id);
-                Navigator. pop(dialogContext);
+                context.read<QueueCubit>().serveClient(client. id);
+                Navigator.pop(dialogContext);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('${client. name} ${context.loc('served')}'),
-                    backgroundColor:  AppColors.success,
+                    content: Text('${client.name} ${context. loc('served')}'),
+                    backgroundColor: AppColors.success,
                   ),
                 );
               },
@@ -172,7 +172,7 @@ class _QueueViewState extends State<QueueView> {
   void _notifyClient(QueueClient client) {
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      builder:  (dialogContext) => AlertDialog(
         title: Text(context.loc('notify_customer')),
         content: Text('${context.loc('notify_confirm')} ${client.name}?'),
         actions: [
@@ -183,11 +183,11 @@ class _QueueViewState extends State<QueueView> {
           ElevatedButton(
             onPressed: () {
               context.read<QueueCubit>().notifyClient(client.id);
-              Navigator. pop(dialogContext);
+              Navigator.pop(dialogContext);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('${client.name} ${context.loc('notified')}'),
-                  backgroundColor:  AppColors.info,
+                  content: Text('${client.name} ${context. loc('notified')}'),
+                  backgroundColor: AppColors.info,
                 ),
               );
             },
@@ -206,22 +206,22 @@ class _QueueViewState extends State<QueueView> {
         content: Text('${context.loc('remove_confirm')} ${client.name}?'),
         actions: [
           TextButton(
-            onPressed:  () => Navigator.pop(dialogContext),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(context.loc('cancel')),
           ),
           ElevatedButton(
             onPressed: () {
               context.read<QueueCubit>().removeClientFromQueue(client.id);
               Navigator.pop(dialogContext);
-              ScaffoldMessenger.of(context).showSnackBar(
+              ScaffoldMessenger. of(context).showSnackBar(
                 SnackBar(
-                  content: Text('${client. name} ${context.loc('removed')}'),
-                  backgroundColor:  AppColors.success,
+                  content: Text('${client.name} ${context.loc('removed')}'),
+                  backgroundColor: AppColors.success,
                 ),
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: Text(context.loc('remove')),
+            child: Text(context. loc('remove')),
           ),
         ],
       ),
@@ -253,7 +253,7 @@ class _QueueViewState extends State<QueueView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      client. name,
+                      client.name,
                       style: AppTextStyles.getAdaptiveStyle(
                         context,
                         fontSize: 16,
@@ -268,12 +268,12 @@ class _QueueViewState extends State<QueueView> {
                           size: 14,
                           color: AppColors.textSecondaryLight,
                         ),
-                        const SizedBox(width:  4),
+                        const SizedBox(width: 4),
                         Text(
                           client.phone,
-                          style: AppTextStyles. getAdaptiveStyle(
+                          style: AppTextStyles.getAdaptiveStyle(
                             context,
-                            fontSize:  14,
+                            fontSize: 14,
                             lightColor: AppColors.textSecondaryLight,
                           ),
                         ),
@@ -354,7 +354,7 @@ class _QueueViewState extends State<QueueView> {
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
                       color:  client.notified
-                          ?  AppColors.buttonDisabledLight
+                          ? AppColors.buttonDisabledLight
                           : AppColors.warning,
                     ),
                   ),
@@ -384,9 +384,9 @@ class _QueueViewState extends State<QueueView> {
                         ? context.loc('served')
                         : context.loc('serve'),
                     style: TextStyle(
-                      color: client.served
-                          ? AppColors.textSecondaryLight
-                          : AppColors.white,
+                      color: client. served
+                          ? AppColors. textSecondaryLight
+                          :  AppColors.white,
                     ),
                   ),
                 ),
@@ -438,7 +438,7 @@ class _QueueViewState extends State<QueueView> {
                 height: 40,
                 decoration: BoxDecoration(
                   color: AppColors.customerServed,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius:  BorderRadius.circular(20),
                 ),
                 child:  const Icon(Icons.person, color: AppColors. white, size: 20),
               ),
@@ -469,7 +469,7 @@ class _QueueViewState extends State<QueueView> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.delete, color: AppColors.error),
+                icon:  const Icon(Icons.delete, color: AppColors.error),
                 onPressed: () => _removeClient(client),
               ),
             ],
@@ -526,7 +526,7 @@ class _QueueViewState extends State<QueueView> {
   }
 
   String _formatTime(DateTime time) {
-    return '${time.hour. toString().padLeft(2, '0')}:'
+    return '${time.hour.toString().padLeft(2, '0')}:'
         '${time.minute. toString().padLeft(2, '0')}';
   }
 
@@ -553,7 +553,7 @@ class _QueueViewState extends State<QueueView> {
               final currentQueue = (state is QueueLoaded)
                   ? state.queues. firstWhere(
                       (q) => q.id == widget.queue.id,
-                      orElse:  () => widget.queue,
+                      orElse: () => widget.queue,
                     )
                   : widget.queue;
 
@@ -563,16 +563,16 @@ class _QueueViewState extends State<QueueView> {
                 physics: const BouncingScrollPhysics(),
                 slivers: [
                   SliverAppBar(
-                    title:  Text(currentQueue.name),
+                    title: Text(currentQueue.name),
                     backgroundColor: AppColors.backgroundLight,
                     elevation: 0,
                     leading: IconButton(
                       icon: const Icon(Icons.arrow_back),
-                      onPressed:  () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(context),
                     ),
                     actions: [
                       IconButton(
-                        icon: const Icon(Icons.refresh),
+                        icon: const Icon(Icons. refresh),
                         onPressed: _refreshQueue,
                       ),
                     ],
@@ -590,7 +590,7 @@ class _QueueViewState extends State<QueueView> {
                             context: context,
                             padding: const EdgeInsets.all(20),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              mainAxisAlignment:  MainAxisAlignment.spaceAround,
                               children: [
                                 _buildStatItem(
                                   title: context.loc('total'),
@@ -628,7 +628,7 @@ class _QueueViewState extends State<QueueView> {
                                       style: AppTextStyles.getAdaptiveStyle(
                                         context,
                                         fontSize: 16,
-                                        fontWeight:  FontWeight.w600,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                     Text(
@@ -651,7 +651,7 @@ class _QueueViewState extends State<QueueView> {
                                   color: currentQueue.currentSize >=
                                           currentQueue. maxSize
                                       ? AppColors.error
-                                      : AppColors. primary,
+                                      :  AppColors.primary,
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
@@ -732,7 +732,7 @@ class _QueueViewState extends State<QueueView> {
                   if (servedClients.isNotEmpty) ...[
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
+                        padding: const EdgeInsets. symmetric(
                           horizontal: 24,
                           vertical: 8,
                         ),
