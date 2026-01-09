@@ -8,6 +8,10 @@ router.get('/ping', (req, res) => {
   res.json({ ok: true, message: 'webhooks router is mounted' });
 });
 
+router.get('/notification-created', (req, res) => {
+  res.status(405).json({ success: false, message: 'Use POST' });
+});
+
 // simple shared secret protection
 function requireWebhookSecret(req, res, next) {
   const header = req.headers['authorization'] || '';
