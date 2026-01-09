@@ -266,7 +266,7 @@ class QueueCubit extends Cubit<QueueState> {
         await _manualCustomerRepository?.updateManualCustomerStatus(realId, 'notified');
         emit(ClientNotificationSuccess(
           clientId: clientId,
-          message: 'Manual customer notified (no push notification)',
+          message: 'manual_customer_notified',
         ));
         await loadQueues();
         return;
@@ -298,7 +298,7 @@ class QueueCubit extends Cubit<QueueState> {
         await _queueClientRepository.updateClientStatus(clientId, 'notified');
         emit(ClientNotificationSuccess(
           clientId: clientId,
-          message: 'Customer marked as notified (no registered user)',
+          message: 'customer_notified_no_user',
         ));
         await loadQueues();
         return;
@@ -311,7 +311,7 @@ class QueueCubit extends Cubit<QueueState> {
         // Still update the status but inform the business owner
         await _queueClientRepository.updateClientStatus(clientId, 'notified');
         emit(ClientNotificationFailed(
-          error: 'User has notifications disabled or not configured',
+          error: 'user_no_notifications',
           clientId: clientId,
         ));
         await loadQueues();
@@ -337,7 +337,7 @@ class QueueCubit extends Cubit<QueueState> {
       if (success) {
         emit(ClientNotificationSuccess(
           clientId: clientId,
-          message: 'Notification sent successfully',
+          message: 'notification_sent_successfully',
         ));
       } else {
         emit(ClientNotificationFailed(

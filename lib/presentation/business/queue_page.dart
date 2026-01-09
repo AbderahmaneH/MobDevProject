@@ -560,7 +560,7 @@ class _QueueViewState extends State<QueueView> {
               }
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.message),
+                  content: Text(context.loc(state.message)),
                   backgroundColor: AppColors.success,
                 ),
               );
@@ -569,9 +569,13 @@ class _QueueViewState extends State<QueueView> {
               if (Navigator.of(context).canPop()) {
                 Navigator.of(context).pop();
               }
+              // Check if error is a localization key
+              final errorText = state.error.contains('_') 
+                  ? context.loc(state.error)
+                  : state.error;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.error),
+                  content: Text(errorText),
                   backgroundColor: AppColors.error,
                   duration: const Duration(seconds: 4),
                   action: SnackBarAction(
