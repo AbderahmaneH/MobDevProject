@@ -24,7 +24,7 @@ function requireWebhookSecret(req, res, next) {
 }
 
 
-// Supabase Database Webhook payload includes: type, table, schema, record, old_record :contentReference[oaicite:3]{index=3}
+// Supabase Database Webhook payload includes: type, table, schema, record, old_record
 router.post('/notification-created', requireWebhookSecret, async (req, res) => {
   try {
     const payload = req.body;
@@ -33,11 +33,14 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
 
     // Only handle INSERTs (optional but safe)
     if (payload.type && payload.type !== 'INSERT') {
+      console.log(`[Webhook] Ignoring non-INSERT event type: ${payload.type}`);
       return res.json({ success: true, ignored: true });
     }
 
     const notificationId = record.id;
     const userId = record.user_id;
+
+    console.log(`[Webhook] Processing notification ${notificationId} for user ${userId}`);
 
     // 1) get user token from Supabase
     const { data: user, error: userErr } = await supabaseService
@@ -46,10 +49,14 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
       .eq('id', userId)
       .maybeSingle();
 
-    if (userErr) throw userErr;
+    if (userErr) {
+      console.error(`[Webhook] Error fetching user ${userId}:`, userErr);
+      throw userErr;
+    }
 
     // No token => can't push
     if (!user || !user.fcm_token) {
+      console.warn(`[Webhook] No FCM token for user ${userId}, skipping push notification`);
       // Optional: write status into notification.data
       const newData = {
         ...(record.data || {}),
@@ -59,7 +66,7 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
       };
 
       await supabaseService.from('notification').update({ data: newData }).eq('id', notificationId);
-      return res.json({ success: true, skipped: true });
+      return res.json({ success: true, skipped: true, reason: 'no_fcm_token' });
     }
 
     // Optional safety: avoid duplicate sends if webhook retries
@@ -71,6 +78,7 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
       .maybeSingle();
 
     if (latest?.data?.push_sent_at) {
+      console.log(`[Webhook] Notification ${notificationId} already sent, deduplicating`);
       return res.json({ success: true, deduped: true });
     }
 
@@ -86,11 +94,27 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
       Object.entries(data).map(([k, v]) => [String(k), v == null ? '' : String(v)])
     );
 
-    await admin.messaging().send({
-      token: user.fcm_token,
-      notification: { title, body },
-      data: stringData,
-    });
+    console.log(`[Webhook] Sending FCM notification to user ${userId}: "${title}"`);
+    
+    try {
+      await admin.messaging().send({
+        token: user.fcm_token,
+        notification: { title, body },
+        data: stringData,
+      });
+      console.log(`[Webhook] Successfully sent FCM notification ${notificationId} to user ${userId}`);
+    } catch (fcmError) {
+      console.error(`[Webhook] FCM send error for notification ${notificationId}:`, fcmError);
+      // Update notification with error status
+      const errorData = {
+        ...(record.data || {}),
+        delivery_status: 'failed',
+        delivery_error: fcmError.message || 'FCM send failed',
+        failed_at: new Date().toISOString(),
+      };
+      await supabaseService.from('notification').update({ data: errorData }).eq('id', notificationId);
+      return res.status(500).json({ success: false, error: 'FCM send failed', details: fcmError.message });
+    }
 
     // 3) mark as sent inside `data` (since your table has no status column)
     const updatedData = {
@@ -101,9 +125,9 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
 
     await supabaseService.from('notification').update({ data: updatedData }).eq('id', notificationId);
 
-    return res.json({ success: true });
+    return res.json({ success: true, notificationId, userId });
   } catch (e) {
-    console.error('Webhook error:', e);
+    console.error('[Webhook] Unexpected error:', e);
     return res.status(500).json({ success: false, error: e.message });
   }
 });

@@ -554,8 +554,10 @@ class _QueueViewState extends State<QueueView> {
             if (state is ClientAdded) {
               setState(() {});
             } else if (state is ClientNotificationSuccess) {
-              // Close loading dialog if open
-              Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst || !route.navigator!.canPop());
+              // Try to close loading dialog if it's open
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
@@ -563,8 +565,10 @@ class _QueueViewState extends State<QueueView> {
                 ),
               );
             } else if (state is ClientNotificationFailed) {
-              // Close loading dialog if open
-              Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst || !route.navigator!.canPop());
+              // Try to close loading dialog if it's open
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.error),
