@@ -5,12 +5,14 @@ import 'logic/auth_cubit.dart';
 import 'services/supabase_service.dart';
 import 'core/localization.dart';
 import 'core/app_colors.dart';
+import 'services/notification_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'presentation/welcome_page.dart';
 import 'database/repositories/user_repository.dart';
 import 'database/repositories/queue_repository.dart';
 import 'database/repositories/queue_client_repository.dart';
 import 'database/repositories/manual_customer_repository.dart';
+import 'database/repositories/notification_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,7 @@ void main() async {
   // Replace the empty strings with your project's values or
   // provide them at runtime when you have the credentials.
   await SupabaseService.initialize(url: 'https://rmxccujkhrmownftuvsn.supabase.co', anonKey: 'sb_publishable_ktYqW-uVXqp18sEImXdbyA_aUX8OVaF');
+  await NotificationService.initialize();
   runApp(const MyApp());
 }
 
@@ -30,6 +33,7 @@ class MyApp extends StatelessWidget {
     final queueRepository = QueueRepository();
     final queueClientRepository = QueueClientRepository();
     final manualCustomerRepository = ManualCustomerRepository();
+    final notificationRepository = NotificationRepository();
 
     return MultiRepositoryProvider(
       providers: [
@@ -37,6 +41,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider.value(value: queueRepository),
         RepositoryProvider.value(value: queueClientRepository),
         RepositoryProvider.value(value: manualCustomerRepository),
+        RepositoryProvider.value(value: notificationRepository),
       ],
       child: MultiBlocProvider(
         providers: [

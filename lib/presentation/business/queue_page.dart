@@ -9,6 +9,8 @@ import '../../database/models/queue_client_model.dart';
 import '../../database/repositories/queue_repository.dart';
 import '../../database/repositories/queue_client_repository.dart';
 import '../../database/repositories/manual_customer_repository.dart';
+import '../../database/repositories/notification_repository.dart';
+
 
 class QueuePage extends StatelessWidget {
   final Queue queue;
@@ -31,6 +33,7 @@ class QueuePage extends StatelessWidget {
         queueRepository: RepositoryProvider.of<QueueRepository>(context),
         queueClientRepository:
             RepositoryProvider.of<QueueClientRepository>(context),
+        notificationRepository: RepositoryProvider.of<NotificationRepository>(context),
         manualCustomerRepository:
             RepositoryProvider.of<ManualCustomerRepository>(context),
         businessOwnerId: queue.businessOwnerId,
