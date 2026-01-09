@@ -5,21 +5,27 @@ import '../database/repositories/manual_customer_repository.dart';
 import '../database/models/manual_customer_model.dart';
 import '../database/models/queue_client_model.dart';
 import '../database/models/queue_model.dart';
+import '../database/repositories/notification_repository.dart';
+
 part 'queue_state.dart';
 
 class QueueCubit extends Cubit<QueueState> {
   final QueueRepository _queueRepository;
   final QueueClientRepository _queueClientRepository;
+  final NotificationRepository _notificationRepository;
   final ManualCustomerRepository? _manualCustomerRepository;
   final int? _businessOwnerId;
+
 
   QueueCubit({
     required QueueRepository queueRepository,
     required QueueClientRepository queueClientRepository,
+    required NotificationRepository notificationRepository,
     ManualCustomerRepository? manualCustomerRepository,
     required int? businessOwnerId,
   })  : _queueRepository = queueRepository,
         _queueClientRepository = queueClientRepository,
+        _notificationRepository = notificationRepository,
         _manualCustomerRepository = manualCustomerRepository,
         _businessOwnerId = businessOwnerId,
         super(QueueInitial()) {
@@ -255,12 +261,42 @@ class QueueCubit extends Cubit<QueueState> {
   Future<void> notifyClient(int? clientId) async {
     try {
       emit(ClientNotified());
+
+      // 1) manual customers (negative id) -> DB update only (no push possible)
       if (clientId != null && clientId < 0) {
         final realId = -clientId;
         await _manualCustomerRepository?.updateManualCustomerStatus(realId, 'notified');
-      } else {
-        await _queueClientRepository.updateClientStatus(clientId, 'notified');
+        await loadQueues();
+        return;
       }
+
+      // 2) normal clients
+      if (clientId == null) throw Exception("clientId is null");
+
+      // update queue_clients status (existing behavior)
+      await _queueClientRepository.updateClientStatus(clientId, 'notified');
+
+      // fetch the client to get userId
+      final client = await _queueClientRepository.getClientById(clientId);
+
+      // if no userId (or missing record), we cannot push
+      if (client == null || client.userId == null) {
+        await loadQueues();
+        return;
+      }
+
+      await _notificationRepository.createNotification(
+        userId: client.userId!,
+        title: "It's your turn soon",
+        message: "Please get ready. You will be called shortly.",
+        type: "QUEUE_NOTIFY",
+        data: {
+          "queue_id": client.queueId,
+          "queue_client_id": client.id,
+          "position": client.position,
+        },
+      );
+
       await loadQueues();
     } catch (e) {
       emit(QueueError(error: 'Failed to notify client: $e'));

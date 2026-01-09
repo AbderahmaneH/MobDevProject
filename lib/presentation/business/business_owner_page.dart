@@ -10,7 +10,7 @@ import '../../database/models/user_model.dart';
 import '../../database/repositories/queue_repository.dart';
 import '../../database/repositories/queue_client_repository.dart';
 import '../../database/repositories/manual_customer_repository.dart';
-
+import '../../database/repositories/notification_repository.dart';
 import '../drawer/profile_page.dart';
 import '../drawer/settings_page.dart';
 import '../drawer/about_us_page.dart';
@@ -29,6 +29,7 @@ class BusinessOwnerPage extends StatelessWidget {
         queueRepository: RepositoryProvider.of<QueueRepository>(context),
         queueClientRepository:
           RepositoryProvider.of<QueueClientRepository>(context),
+          notificationRepository: RepositoryProvider.of<NotificationRepository>(context),
         manualCustomerRepository:
           RepositoryProvider.of<ManualCustomerRepository>(context),
         businessOwnerId: user.id),

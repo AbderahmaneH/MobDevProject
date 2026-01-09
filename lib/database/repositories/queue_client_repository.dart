@@ -8,7 +8,16 @@ class QueueClientRepository {
   final SupabaseClient _client;
 
   QueueClientRepository({SupabaseClient? client}) : _client = client ?? SupabaseService.client;
+  Future<QueueClient?> getClientById(int id) async {
+  final data = await _client
+      .from(DatabaseTables.queueClients)
+      .select()
+      .eq('id', id)
+      .maybeSingle();
 
+  if (data == null) return null;
+  return QueueClient.fromMap(data);
+}
   Future<int> insertQueueClient(QueueClient client) async {
     final now = DateTime.now().millisecondsSinceEpoch;
 

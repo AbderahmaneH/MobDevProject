@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../services/notification_service.dart';
 import '../core/localization.dart';
 import '../database/models/user_model.dart';
 import '../database/repositories/user_repository.dart';
@@ -36,6 +37,7 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       emit(AuthSuccess(user: user));
+      await NotificationService.registerTokenForUser(user.id!);
     } catch (e) {
       emit(const AuthFailure(error: 'Login failed'));
     }
@@ -86,6 +88,7 @@ class AuthCubit extends Cubit<AuthState> {
       );
 
       emit(AuthSuccess(user: createdUser));
+      await NotificationService.registerTokenForUser(user.id!);
     } catch (e) {
       emit(AuthFailure(error: 'Signup failed: $e'));
     }
