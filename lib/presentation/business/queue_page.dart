@@ -175,24 +175,35 @@ class _QueueViewState extends State<QueueView> {
   void _notifyClient(QueueClient client) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
         title: Text(context.loc('notify_customer')),
         content: Text('${context.loc('notify_confirm')} ${client.name}?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(context.loc('cancel')),
           ),
           ElevatedButton(
             onPressed: () {
-              context.read<QueueCubit>().notifyClient(client.id);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${client.name} ${context.loc('notified')}'),
-                  backgroundColor: AppColors.info,
+              Navigator.pop(dialogContext);
+              // Show loading dialog
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (loadingContext) => AlertDialog(
+                  content: Row(
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Text(context.loc('sending_notification')),
+                      ),
+                    ],
+                  ),
                 ),
               );
+              context.read<QueueCubit>().notifyClient(client.id);
             },
             child: Text(context.loc('notify')),
           ),
@@ -542,6 +553,32 @@ class _QueueViewState extends State<QueueView> {
           listener: (context, state) {
             if (state is ClientAdded) {
               setState(() {});
+            } else if (state is ClientNotificationSuccess) {
+              // Close loading dialog if open
+              Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst || !route.navigator!.canPop());
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+            } else if (state is ClientNotificationFailed) {
+              // Close loading dialog if open
+              Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst || !route.navigator!.canPop());
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.error),
+                  backgroundColor: AppColors.error,
+                  duration: const Duration(seconds: 4),
+                  action: SnackBarAction(
+                    label: context.loc('retry'),
+                    textColor: AppColors.white,
+                    onPressed: () {
+                      context.read<QueueCubit>().notifyClient(state.clientId);
+                    },
+                  ),
+                ),
+              );
             } else if (state is QueueError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

@@ -207,6 +207,12 @@ class QNowLocalizations {
       'promotional_notifications_subtitle': 'Receive offers and updates',
       'sound_alerts': 'Sound Alerts',
       'sound_alerts_subtitle': 'Play sound for notifications',
+      'notification_sent_successfully': 'Notification sent successfully',
+      'notification_failed': 'Failed to send notification',
+      'user_no_notifications': 'User has notifications disabled',
+      'notification_retry': 'Retry sending notification',
+      'sending_notification': 'Sending notification...',
+      'notify_customer': 'Notify Customer',
 
       // Settings and Help
       'privacy_policy': 'Privacy Policy',
@@ -499,6 +505,12 @@ class QNowLocalizations {
           'Recevoir des offres et mises à jour',
       'sound_alerts': 'Alertes sonores',
       'sound_alerts_subtitle': 'Jouer un son pour les notifications',
+      'notification_sent_successfully': 'Notification envoyée avec succès',
+      'notification_failed': 'Échec de l\'envoi de la notification',
+      'user_no_notifications': 'L\'utilisateur a désactivé les notifications',
+      'notification_retry': 'Réessayer l\'envoi de la notification',
+      'sending_notification': 'Envoi de la notification...',
+      'notify_customer': 'Notifier le client',
 
       // Settings and Help
       'privacy_policy': 'Politique de confidentialité',
@@ -790,6 +802,12 @@ class QNowLocalizations {
       'promotional_notifications_subtitle': 'تلقي العروض والتحديثات',
       'sound_alerts': 'التنبيهات الصوتية',
       'sound_alerts_subtitle': 'تشغيل الصوت للإشعارات',
+      'notification_sent_successfully': 'تم إرسال الإشعار بنجاح',
+      'notification_failed': 'فشل إرسال الإشعار',
+      'user_no_notifications': 'قام المستخدم بتعطيل الإشعارات',
+      'notification_retry': 'إعادة محاولة إرسال الإشعار',
+      'sending_notification': 'جاري إرسال الإشعار...',
+      'notify_customer': 'تنبيه العميل',
 
       // Settings and Help
       'privacy_policy': 'سياسة الخصوصية',

@@ -88,7 +88,7 @@ class AuthCubit extends Cubit<AuthState> {
       );
 
       emit(AuthSuccess(user: createdUser));
-      await NotificationService.registerTokenForUser(user.id!);
+      await NotificationService.registerTokenForUser(userId);
     } catch (e) {
       emit(AuthFailure(error: 'Signup failed: $e'));
     }
