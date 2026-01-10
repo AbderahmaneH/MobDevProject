@@ -43,21 +43,23 @@ router.post('/register', async (req, res) => {
 });
 
 /**
- * POST /api/auth/login - Login user
+ * POST /api/auth/login - Login user with email or phone
  */
 router.post('/login', async (req, res) => {
   try {
-    const { phone, password } = req.body;
+    // Support both 'identifier' (email or phone) and legacy 'phone' field
+    const identifier = req.body.identifier || req.body.phone;
+    const { password } = req.body;
     
     // Validate required fields
-    if (!phone || !password) {
+    if (!identifier || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Phone and password are required'
+        message: 'Email/Phone and password are required'
       });
     }
     
-    const result = await login(phone, password);
+    const result = await login(identifier, password);
     
     if (result.success) {
       res.status(200).json({
