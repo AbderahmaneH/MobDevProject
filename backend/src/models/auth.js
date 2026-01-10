@@ -109,21 +109,24 @@ async function register(userData) {
 }
 
 /**
- * Login user with phone and password
+ * Login user with email or phone and password
  */
-async function login(phone, password) {
+async function login(identifier, password) {
   try {
-    // Get user by phone
+    // Determine if identifier is email or phone
+    const isEmail = identifier.includes('@');
+    
+    // Get user by email or phone
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
-      .eq('phone', phone)
+      .eq(isEmail ? 'email' : 'phone', identifier)
       .single();
     
     if (error || !user) {
       return {
         success: false,
-        error: 'Invalid phone number or password'
+        error: 'Invalid email/phone or password'
       };
     }
     
@@ -133,7 +136,7 @@ async function login(phone, password) {
     if (!isPasswordValid) {
       return {
         success: false,
-        error: 'Invalid phone number or password'
+        error: 'Invalid email/phone or password'
       };
     }
     
