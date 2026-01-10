@@ -28,9 +28,9 @@ class WelcomePage extends StatelessWidget {
                     LogoHeader(
                       title: context.loc('app_title'),
                       subtitle: context.loc('welcome'),
-                      icon: Icons.access_time_filled,
-                      iconSize: 60,
-                      iconContainerSize: 30,
+                      imagePath: 'assets/images/qnow_logo.png',
+                      imageSize: 120,
+                      showContainer: false,
                     ),
 
                     const SizedBox(height: 40),

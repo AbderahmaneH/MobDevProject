@@ -9,7 +9,6 @@ import '../../presentation/business/business_owner_page.dart';
 import '../../presentation/customer/customer_page.dart';
 import '../../database/models/user_model.dart';
 
-
 class SignupPage extends StatelessWidget {
   const SignupPage({super.key});
 
@@ -126,6 +125,9 @@ class _SignupViewState extends State<SignupView> {
                         LogoHeader(
                           title: context.loc('app_title'),
                           subtitle: context.loc('signup'),
+                          imagePath: 'assets/images/qnow_logo.png',
+                          imageSize: 100,
+                          showContainer: false,
                         ),
                         const SizedBox(height: 24),
                         RoleToggle(

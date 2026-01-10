@@ -12,7 +12,7 @@ router.get('/notification-created', (req, res) => {
   res.status(405).json({ success: false, message: 'Use POST' });
 });
 
-// simple shared secret protection
+// Simple shared secret protection
 function requireWebhookSecret(req, res, next) {
   const header = req.headers['authorization'] || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
@@ -102,7 +102,6 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
       console.log(`[Webhook] Successfully sent FCM notification ${notificationId} to user ${userId}`);
     } catch (fcmError) {
       console.error(`[Webhook] FCM send error for notification ${notificationId}:`, fcmError);
-      // Update notification with error status
       const errorData = {
         ...(record.data || {}),
         delivery_status: 'failed',
@@ -113,7 +112,7 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
       return res.status(500).json({ success: false, error: 'FCM send failed', details: fcmError.message });
     }
 
-    // 3) mark as sent inside `data` (since your table has no status column)
+    // Mark as sent inside `data`
     const updatedData = {
       ...(record.data || {}),
       delivery_status: 'sent',

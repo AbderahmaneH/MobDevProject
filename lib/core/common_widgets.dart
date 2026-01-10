@@ -630,6 +630,9 @@ class LogoHeader extends StatelessWidget {
   final Color? iconBackgroundColor;
   final double iconSize;
   final double iconContainerSize;
+  final String? imagePath;
+  final double? imageSize;
+  final bool showContainer;
 
   const LogoHeader({
     super.key,
@@ -640,6 +643,9 @@ class LogoHeader extends StatelessWidget {
     this.iconBackgroundColor,
     this.iconSize = 48,
     this.iconContainerSize = 25,
+    this.imagePath,
+    this.imageSize,
+    this.showContainer = true,
   });
 
   @override
@@ -647,25 +653,53 @@ class LogoHeader extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          Container(
-            padding: EdgeInsets.all(iconContainerSize),
-            decoration: BoxDecoration(
-              color: iconBackgroundColor ?? AppColors.primary,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha((0.2 * 255).round()),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+          if (imagePath != null)
+            // Display image logo
+            Container(
+              padding: showContainer
+                  ? EdgeInsets.all(iconContainerSize)
+                  : EdgeInsets.zero,
+              decoration: showContainer
+                  ? BoxDecoration(
+                      color: iconBackgroundColor ?? Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha((0.1 * 255).round()),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    )
+                  : null,
+              child: Image.asset(
+                imagePath!,
+                width: imageSize ?? 120,
+                height: imageSize ?? 120,
+                fit: BoxFit.contain,
+              ),
+            )
+          else
+            // Display icon
+            Container(
+              padding: EdgeInsets.all(iconContainerSize),
+              decoration: BoxDecoration(
+                color: iconBackgroundColor ?? AppColors.primary,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha((0.2 * 255).round()),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Icon(
+                icon ?? Icons.access_time_filled,
+                color: iconColor ?? AppColors.white,
+                size: iconSize,
+              ),
             ),
-            child: Icon(
-              icon ?? Icons.access_time_filled,
-              color: iconColor ?? AppColors.white,
-              size: iconSize,
-            ),
-          ),
           const SizedBox(height: 16),
           Text(
             title,
