@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../tables.dart';
 import '../models/queue_client_model.dart';
@@ -70,6 +71,91 @@ class QueueRepository {
       queue.clients = await _getMergedQueueClients(queue.id);
     }
     return queues;
+  }
+
+  Future<List<Map<String, dynamic>>> searchQueuesByLocation({
+    required double userLatitude,
+    required double userLongitude,
+    double maxDistanceKm = 50,
+    String? searchQuery,
+  }) async {
+    await _cleanupExpiredQueues();
+    
+    // Get all active queues with business owner info
+    var query = _client
+        .from(DatabaseTables.queues)
+        .select('*, ${DatabaseTables.users}!inner(id, business_name, name, business_address, latitude, longitude, city, area)')
+        .eq('is_active', 1);
+    
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      query = query.ilike('name', '%$searchQuery%');
+    }
+    
+    final results = await query as List<dynamic>;
+    
+    // Calculate distances and filter
+    final queuesWithDistance = <Map<String, dynamic>>[];
+    
+    for (final result in results) {
+      final queueData = Map<String, dynamic>.from(result);
+      final ownerData = queueData[DatabaseTables.users];
+      
+      if (ownerData != null && ownerData['latitude'] != null && ownerData['longitude'] != null) {
+        final double ownerLat = ownerData['latitude'];
+        final double ownerLng = ownerData['longitude'];
+        
+        // Calculate distance using Haversine formula
+        final distance = _calculateDistance(
+          userLatitude,
+          userLongitude,
+          ownerLat,
+          ownerLng,
+        );
+        
+        if (distance <= maxDistanceKm) {
+          final queue = Queue.fromMap(Map<String, dynamic>.from(queueData));
+          queue.clients = await _getMergedQueueClients(queue.id);
+          
+          queuesWithDistance.add({
+            'queue': queue,
+            'distance': distance,
+            'businessName': ownerData['business_name'] ?? ownerData['name'],
+            'address': ownerData['business_address'],
+            'city': ownerData['city'],
+            'area': ownerData['area'],
+            'latitude': ownerLat,
+            'longitude': ownerLng,
+          });
+        }
+      }
+    }
+    
+    // Sort by distance
+    queuesWithDistance.sort((a, b) => (a['distance'] as double).compareTo(b['distance'] as double));
+    
+    return queuesWithDistance;
+  }
+  
+  // Calculate distance between two coordinates using Haversine formula
+  double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const double earthRadiusKm = 6371.0;
+    
+    final dLat = _degreesToRadians(lat2 - lat1);
+    final dLon = _degreesToRadians(lon2 - lon1);
+    
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_degreesToRadians(lat1)) *
+        cos(_degreesToRadians(lat2)) *
+        sin(dLon / 2) *
+        sin(dLon / 2);
+    
+    final c = 2 * asin(sqrt(a));
+    
+    return earthRadiusKm * c;
+  }
+  
+  double _degreesToRadians(double degrees) {
+    return degrees * pi / 180.0;
   }
 
   Future<List<Queue>> searchQueuesByOwnerPhone(String phone) async {

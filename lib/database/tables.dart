@@ -15,7 +15,14 @@ class DatabaseTables {
       created_at INTEGER NOT NULL,
       business_name TEXT,
       business_type TEXT,
-      business_address TEXT
+      business_address TEXT,
+      latitude REAL,
+      longitude REAL,
+      area TEXT,
+      city TEXT,
+      state TEXT,
+      pincode TEXT,
+      landmark TEXT
     )
   ''';
 

@@ -51,6 +51,13 @@ class AuthCubit extends Cubit<AuthState> {
     required bool isBusiness,
     String? businessName,
     String? businessAddress,
+    double? latitude,
+    double? longitude,
+    String? area,
+    String? city,
+    String? state,
+    String? pincode,
+    String? landmark,
   }) async {
     emit(AuthLoading());
 
@@ -71,6 +78,13 @@ class AuthCubit extends Cubit<AuthState> {
         createdAt: DateTime.now(),
         businessName: businessName,
         businessAddress: businessAddress,
+        latitude: latitude,
+        longitude: longitude,
+        area: area,
+        city: city,
+        state: state,
+        pincode: pincode,
+        landmark: landmark,
       );
 
       final userId = await _userRepository.insertUser(user);
@@ -85,6 +99,13 @@ class AuthCubit extends Cubit<AuthState> {
         createdAt: DateTime.now(),
         businessName: businessName,
         businessAddress: businessAddress,
+        latitude: latitude,
+        longitude: longitude,
+        area: area,
+        city: city,
+        state: state,
+        pincode: pincode,
+        landmark: landmark,
       );
 
       emit(AuthSuccess(user: createdUser));

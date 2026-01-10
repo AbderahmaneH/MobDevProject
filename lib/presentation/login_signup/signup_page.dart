@@ -8,6 +8,8 @@ import '../../presentation/login_signup/login_page.dart';
 import '../../presentation/business/business_owner_page.dart';
 import '../../presentation/customer/customer_page.dart';
 import '../../database/models/user_model.dart';
+import '../common/map_location_picker.dart';
+import '../common/address_details_page.dart';
 
 
 class SignupPage extends StatelessWidget {
@@ -44,6 +46,15 @@ class _SignupViewState extends State<SignupView> {
   bool _isBusiness = false;
   bool _showPassword = false;
   bool _showConfirmPassword = false;
+  
+  // Location data
+  double? _latitude;
+  double? _longitude;
+  String? _area;
+  String? _city;
+  String? _state;
+  String? _pincode;
+  String? _landmark;
 
   @override
   void dispose() {
@@ -55,6 +66,55 @@ class _SignupViewState extends State<SignupView> {
     _businessNameController.dispose();
     _businessAddressController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickLocation() async {
+    // First, open map to pick location
+    final mapResult = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const MapLocationPicker(),
+      ),
+    );
+
+    if (mapResult != null) {
+      // Then, open address details page
+      final addressResult = await Navigator.push<Map<String, dynamic>>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddressDetailsPage(
+            latitude: mapResult['latitude'],
+            longitude: mapResult['longitude'],
+            initialAddress: mapResult['address'] ?? '',
+          ),
+        ),
+      );
+
+      if (addressResult != null) {
+        setState(() {
+          _latitude = addressResult['latitude'];
+          _longitude = addressResult['longitude'];
+          _area = addressResult['area'];
+          _city = addressResult['city'];
+          _state = addressResult['state'];
+          _pincode = addressResult['pincode'];
+          _landmark = addressResult['landmark'];
+          
+          // Set the business address controller with formatted address
+          final addressParts = <String>[];
+          if (addressResult['address'] != null && addressResult['address'].isNotEmpty) {
+            addressParts.add(addressResult['address']);
+          }
+          if (addressResult['area'] != null && addressResult['area'].isNotEmpty) {
+            addressParts.add(addressResult['area']);
+          }
+          if (addressResult['city'] != null && addressResult['city'].isNotEmpty) {
+            addressParts.add(addressResult['city']);
+          }
+          _businessAddressController.text = addressParts.join(', ');
+        });
+      }
+    }
   }
 
   void _navigateToHome(User user) {
@@ -188,15 +248,64 @@ class _SignupViewState extends State<SignupView> {
                           const SizedBox(height: 14),
                           AppLabels.label(context, context.loc('address')),
                           const SizedBox(height: 6),
-                          AppTextFields.textField(
-                            context: context,
-                            hintText: context.loc('address'),
-                            controller: _businessAddressController,
-                            validator: (value) => context
-                                .read<AuthCubit>()
-                                .validateBusinessAddress(
-                                    value, context, _isBusiness),
+                          GestureDetector(
+                            onTap: _pickLocation,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _businessAddressController.text.isEmpty
+                                      ? Colors.grey[300]!
+                                      : AppColors.primary,
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on,
+                                    color: AppColors.primary,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      _businessAddressController.text.isEmpty
+                                          ? 'Tap to select location on map'
+                                          : _businessAddressController.text,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: _businessAddressController.text.isEmpty
+                                            ? AppColors.textSecondaryLight
+                                            : AppColors.textPrimaryLight,
+                                      ),
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: AppColors.textSecondaryLight,
+                                    size: 16,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
+                          if (_businessAddressController.text.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6, left: 16),
+                              child: Text(
+                                context.loc('required_field'),
+                                style: const TextStyle(
+                                  color: AppColors.error,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
                           const SizedBox(height: 14),
                         ],
                         AppLabels.label(context, context.loc('password')),
@@ -240,6 +349,17 @@ class _SignupViewState extends State<SignupView> {
                               onPressed: isLoading
                                   ? () {}
                                   : () {
+                                      // Validate location for business owners
+                                      if (_isBusiness && _businessAddressController.text.isEmpty) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Please select your business location'),
+                                            backgroundColor: AppColors.error,
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      
                                       if (_formKey.currentState!.validate()) {
                                         context.read<AuthCubit>().signup(
                                               name: _nameController.text.trim(),
@@ -257,6 +377,13 @@ class _SignupViewState extends State<SignupView> {
                                                   _businessAddressController
                                                       .text
                                                       .trim(),
+                                              latitude: _latitude,
+                                              longitude: _longitude,
+                                              area: _area,
+                                              city: _city,
+                                              state: _state,
+                                              pincode: _pincode,
+                                              landmark: _landmark,
                                             );
                                       }
                                     },

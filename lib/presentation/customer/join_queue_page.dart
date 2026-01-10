@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../core/app_colors.dart';
 import '../../logic/customer_cubit.dart';
 import '../../core/common_widgets.dart';
@@ -45,6 +46,8 @@ class JoinQueueView extends StatefulWidget {
 class _JoinQueueViewState extends State<JoinQueueView> {
   final _searchController = TextEditingController();
   bool _isSearching = false;
+  bool _searchByLocation = false;
+  Position? _currentPosition;
 
   @override
   void initState() {
@@ -88,9 +91,65 @@ class _JoinQueueViewState extends State<JoinQueueView> {
       _isSearching = !_isSearching;
       if (!_isSearching) {
         _searchController.clear();
+        _searchByLocation = false;
         context.read<CustomerCubit>().getAvailableQueues();
       }
     });
+  }
+
+  Future<void> _toggleLocationSearch() async {
+    if (!_searchByLocation) {
+      // Enable location search
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(context.loc('location_permission_denied')),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
+      }
+
+      try {
+        final position = await Geolocator.getCurrentPosition();
+        setState(() {
+          _currentPosition = position;
+          _searchByLocation = true;
+        });
+        
+        if (mounted) {
+          context.read<CustomerCubit>().searchQueuesByLocation(
+            latitude: position.latitude,
+            longitude: position.longitude,
+            maxDistanceKm: 50,
+            searchQuery: _searchController.text.isEmpty ? null : _searchController.text,
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to get location: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    } else {
+      // Disable location search
+      setState(() {
+        _searchByLocation = false;
+      });
+      _refreshQueues();
+    }
   }
 
   void _joinQueue(int queueId) {
@@ -280,6 +339,148 @@ class _JoinQueueViewState extends State<JoinQueueView> {
     );
   }
 
+  Widget _buildQueueCardWithDistance(Queue queue, double distance, Map<String, dynamic> item) {
+    final isFull = queue.currentSize >= queue.maxSize;
+    final businessName = item['businessName'] ?? '—';
+    final address = item['address'] ?? '—';
+    final distanceText = distance < 1 
+        ? '${(distance * 1000).round()} m' 
+        : '${distance.toStringAsFixed(1)} km';
+
+    return AppContainers.card(
+      context: context,
+      onTap: isFull ? null : () => _joinQueue(queue.id),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: isFull ? AppColors.error : AppColors.primary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.access_time,
+                  color: AppColors.white,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      queue.name,
+                      style: AppTextStyles.getAdaptiveStyle(
+                        context,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.near_me,
+                          size: 14,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          distanceText,
+                          style: AppTextStyles.getAdaptiveStyle(
+                            context,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            lightColor: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '• ${queue.currentSize} waiting',
+                          style: AppTextStyles.getAdaptiveStyle(
+                            context,
+                            fontSize: 13,
+                            lightColor: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isFull
+                      ? AppColors.error.withAlpha((0.1 * 255).round())
+                      : AppColors.success.withAlpha((0.1 * 255).round()),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  isFull ? context.loc('full') : context.loc('available'),
+                  style: AppTextStyles.getAdaptiveStyle(
+                    context,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    lightColor: isFull ? AppColors.error : AppColors.success,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailItem(
+                icon: Icons.business,
+                text: businessName,
+              ),
+              const SizedBox(height: 8),
+              _buildDetailItem(
+                icon: Icons.location_on,
+                text: address,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildStatItem(
+                icon: Icons.people_outline,
+                title: context.loc('capacity'),
+                value: '${queue.currentSize}/${queue.maxSize}',
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (!isFull)
+            AppButtons.primaryButton(
+              text: context.loc('join_queue'),
+              onPressed: () => _joinQueue(queue.id),
+              context: context,
+            )
+          else
+            AppButtons.secondaryButton(
+              text: context.loc('queue_full'),
+              onPressed: () {},
+              context: context,
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDetailItem({required IconData icon, required String text}) {
     return Row(
       children: [
@@ -382,6 +583,14 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                     onPressed: _toggleSearch,
                   ),
                   IconButton(
+                    icon: Icon(
+                      _searchByLocation ? Icons.location_on : Icons.location_off,
+                      color: _searchByLocation ? AppColors.primary : null,
+                    ),
+                    onPressed: _toggleLocationSearch,
+                    tooltip: _searchByLocation ? 'Disable location search' : 'Search nearby',
+                  ),
+                  IconButton(
                     icon: const Icon(Icons.refresh),
                     onPressed: _refreshQueues,
                   ),
@@ -460,7 +669,42 @@ class _JoinQueueViewState extends State<JoinQueueView> {
                       ),
                     );
                   } else if (state is AvailableQueuesLoaded ||
-                      state is QueuesSearched) {
+                      state is QueuesSearched ||
+                      state is QueuesSearchedByLocation) {
+                    
+                    if (state is QueuesSearchedByLocation) {
+                      // Handle location-based search results
+                      final results = state.results;
+                      
+                      if (results.isEmpty) {
+                        return SliverToBoxAdapter(
+                          child: AppStates.emptyState(
+                            message: 'No queues found nearby',
+                            context: context,
+                          ),
+                        );
+                      }
+                      
+                      return SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final item = results[index];
+                              final queue = item['queue'] as Queue;
+                              final distance = item['distance'] as double;
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: _buildQueueCardWithDistance(queue, distance, item),
+                              );
+                            },
+                            childCount: results.length,
+                          ),
+                        ),
+                      );
+                    }
+                    
+                    // Handle regular search results
                     final queues = state is AvailableQueuesLoaded
                         ? state.queues
                         : (state as QueuesSearched).queues;

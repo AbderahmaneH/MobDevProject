@@ -162,6 +162,7 @@ class QNowLocalizations {
       'popular_queues': 'Popular Queues',
       'recommended': 'Recommended',
       'recent': 'Recent',
+      'location_permission_denied': 'Location permission denied. Please enable location access to search nearby queues.',
 
       // Large Messages
       'privacy_policy_message':
