@@ -1,16 +1,26 @@
 const nodemailer = require('nodemailer');
 
-// Create reusable transporter using Gmail with secure connection
-// Render blocks port 587, so we use port 465 (SSL)
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // use SSL
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+// Create transporter based on environment
+// For production (Render), use SendGrid API
+// For local dev, use Gmail SMTP
+const transporter = nodemailer.createTransport(
+  process.env.SENDGRID_API_KEY ? {
+    host: 'smtp.sendgrid.net',
+    port: 587,
+    auth: {
+      user: 'apikey',
+      pass: process.env.SENDGRID_API_KEY
+    }
+  } : {
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
   }
-});
+);
 
 /**
  * Send password reset email
