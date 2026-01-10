@@ -98,42 +98,84 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
 
     try {
-      final phoneExists = await _userRepository.isPhoneRegistered(phone);
-      if (phoneExists) {
-        emit(const AuthFailure(error: 'Phone number already registered'));
-        return;
+      // Use backend API for registration to support bcrypt password hashing
+      final response = await http.post(
+        Uri.parse('https://mobdevproject-5qvu.onrender.com/api/auth/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'name': name,
+          'email': email,
+          'phone': phone,
+          'password': password,
+          'isBusiness': isBusiness,
+          'businessName': businessName,
+          'businessAddress': businessAddress,
+        }),
+      );
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 201 && data['success'] == true) {
+        final userData = data['data']['user'];
+        
+        // Convert backend user data to local User model
+        final user = User(
+          id: userData['id'],
+          name: userData['name'],
+          email: userData['email'],
+          phone: userData['phone'],
+          password: '', // Don't store password locally
+          isBusiness: userData['is_business'] == 1,
+          createdAt: DateTime.fromMillisecondsSinceEpoch(userData['created_at'] ?? 0),
+          businessName: userData['business_name'],
+          businessAddress: userData['business_address'],
+        );
+
+        emit(AuthSuccess(user: user));
+        await NotificationService.registerTokenForUser(user.id!);
+      } else {
+        emit(AuthFailure(error: data['error'] ?? data['message'] ?? 'Registration failed'));
       }
-
-      final user = User(
-        id: null,
-        name: name,
-        email: email,
-        phone: phone,
-        password: password,
-        isBusiness: isBusiness,
-        createdAt: DateTime.now(),
-        businessName: businessName,
-        businessAddress: businessAddress,
-      );
-
-      final userId = await _userRepository.insertUser(user);
-
-      final createdUser = User(
-        id: userId,
-        name: name,
-        email: email,
-        phone: phone,
-        password: password,
-        isBusiness: isBusiness,
-        createdAt: DateTime.now(),
-        businessName: businessName,
-        businessAddress: businessAddress,
-      );
-
-      emit(AuthSuccess(user: createdUser));
-      await NotificationService.registerTokenForUser(userId);
     } catch (e) {
-      emit(AuthFailure(error: 'Signup failed: $e'));
+      // Fallback to local database for backward compatibility
+      try {
+        final phoneExists = await _userRepository.isPhoneRegistered(phone);
+        if (phoneExists) {
+          emit(const AuthFailure(error: 'Phone number already registered'));
+          return;
+        }
+
+        final user = User(
+          id: null,
+          name: name,
+          email: email,
+          phone: phone,
+          password: password,
+          isBusiness: isBusiness,
+          createdAt: DateTime.now(),
+          businessName: businessName,
+          businessAddress: businessAddress,
+        );
+
+        final userId = await _userRepository.insertUser(user);
+
+        final createdUser = User(
+          id: userId,
+          name: name,
+          email: email,
+          phone: phone,
+          password: password,
+          isBusiness: isBusiness,
+          createdAt: DateTime.now(),
+          businessName: businessName,
+          businessAddress: businessAddress,
+        );
+
+        emit(AuthSuccess(user: createdUser));
+        await NotificationService.registerTokenForUser(userId);
+      } catch (fallbackError) {
+        emit(AuthFailure(error: 'Signup failed: ${e.toString()}'));
+      }
     }
   }
 
