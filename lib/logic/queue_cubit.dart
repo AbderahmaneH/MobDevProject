@@ -348,8 +348,10 @@ class QueueCubit extends Cubit<QueueState> {
 
       await loadQueues();
     } catch (e) {
+      // Log technical details for debugging
+      print('QueueCubit.notifyClient error: $e');
       emit(ClientNotificationFailed(
-        error: 'Failed to notify client: $e',
+        error: 'notification_failed',
         clientId: clientId ?? 0,
       ));
     }

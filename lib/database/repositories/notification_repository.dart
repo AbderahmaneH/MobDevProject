@@ -37,7 +37,7 @@ class NotificationRepository {
       
       if (result == null) return false;
       final fcmToken = result['fcm_token'];
-      return fcmToken != null && fcmToken.toString().isNotEmpty;
+      return fcmToken != null && (fcmToken as String).isNotEmpty;
     } catch (e) {
       return false;
     }

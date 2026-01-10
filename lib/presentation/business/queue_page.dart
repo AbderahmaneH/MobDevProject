@@ -56,6 +56,7 @@ class _QueueViewState extends State<QueueView> {
   final _nameController = TextEditingController();
   // manual customers are name-only
   final _addClientFormKey = GlobalKey<FormState>();
+  bool _isNotificationLoading = false;
 
   @override
   void initState() {
@@ -187,22 +188,9 @@ class _QueueViewState extends State<QueueView> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              // Show loading dialog
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (loadingContext) => AlertDialog(
-                  content: Row(
-                    children: [
-                      const CircularProgressIndicator(),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: Text(context.loc('sending_notification')),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+              setState(() {
+                _isNotificationLoading = true;
+              });
               context.read<QueueCubit>().notifyClient(client.id);
             },
             child: Text(context.loc('notify')),
@@ -554,10 +542,9 @@ class _QueueViewState extends State<QueueView> {
             if (state is ClientAdded) {
               setState(() {});
             } else if (state is ClientNotificationSuccess) {
-              // Try to close loading dialog if it's open
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              }
+              setState(() {
+                _isNotificationLoading = false;
+              });
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(context.loc(state.message)),
@@ -565,10 +552,9 @@ class _QueueViewState extends State<QueueView> {
                 ),
               );
             } else if (state is ClientNotificationFailed) {
-              // Try to close loading dialog if it's open
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              }
+              setState(() {
+                _isNotificationLoading = false;
+              });
               // Check if error is a localization key
               final errorText = state.error.contains('_') 
                   ? context.loc(state.error)
@@ -582,6 +568,9 @@ class _QueueViewState extends State<QueueView> {
                     label: context.loc('retry'),
                     textColor: AppColors.white,
                     onPressed: () {
+                      setState(() {
+                        _isNotificationLoading = true;
+                      });
                       context.read<QueueCubit>().notifyClient(state.clientId);
                     },
                   ),
@@ -814,13 +803,29 @@ class _QueueViewState extends State<QueueView> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: _isNotificationLoading
+          ? null
+          : FloatingActionButton.extended(
         onPressed: _showAddClientDialog,
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
         icon: const Icon(Icons.person_add),
         label: Text(context.loc('add_customer')),
       ),
+      bottomSheet: _isNotificationLoading
+          ? Container(
+              color: AppColors.backgroundLight,
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(width: 16),
+                  Text(context.loc('sending_notification')),
+                ],
+              ),
+            )
+          : null,
     );
   }
 
