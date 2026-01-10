@@ -3,9 +3,8 @@ const router = express.Router();
 const { register, login, getProfile, requestPasswordReset, resetPassword, changePassword } = require('../models/auth');
 const { verifyToken } = require('../middleware/auth');
 
-/**
- * POST /api/auth/register - Register a new user
- */
+// Register a new user
+
 router.post('/register', async (req, res) => {
   try {
     const { name, email, phone, password, isBusiness, businessName, businessType, businessAddress } = req.body;
@@ -42,9 +41,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-/**
- * POST /api/auth/login - Login user with email or phone
- */
+// Login user with email or phone
 router.post('/login', async (req, res) => {
   try {
     // Support both 'identifier' (email or phone) and legacy 'phone' field
@@ -83,9 +80,8 @@ router.post('/login', async (req, res) => {
   }
 });
 
-/**
- * GET /api/auth/profile - Get current user profile (protected route)
- */
+
+// Get current user profile (protected route)
 router.get('/profile', verifyToken, async (req, res) => {
   try {
     const result = await getProfile(req.user.userId);
@@ -111,9 +107,7 @@ router.get('/profile', verifyToken, async (req, res) => {
   }
 });
 
-/**
- * POST /api/auth/forgot-password - Request password reset
- */
+// Request password reset
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
