@@ -27,6 +27,12 @@ class UserRepository {
     return User.fromMap(Map<String, dynamic>.from(result));
   }
 
+  Future<User?> getUserByEmail(String email) async {
+    final result = await _client.from(DatabaseTables.users).select().eq('email', email).maybeSingle();
+    if (result == null) return null;
+    return User.fromMap(Map<String, dynamic>.from(result));
+  }
+
   Future<bool> isPhoneRegistered(String phone) async {
     final result = await _client.from(DatabaseTables.users).select('id').eq('phone', phone).maybeSingle();
     return result != null;

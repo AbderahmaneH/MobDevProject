@@ -15,16 +15,19 @@ class AuthCubit extends Cubit<AuthState> {
       : _userRepository = userRepository,
         super(AuthInitial());
 
-  Future<void> login(String phone, String password, bool isBusiness) async {
+  Future<void> login(String identifier, String password, bool isBusiness) async {
     emit(AuthLoading());
 
     try {
+      // Determine if identifier is email or phone
+      final isEmail = identifier.contains('@');
+      
       // Use backend API for login to support bcrypt password hashing
       final response = await http.post(
         Uri.parse('https://mobdevproject-5qvu.onrender.com/api/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'phone': phone,
+          'identifier': identifier,  // Send as identifier (email or phone)
           'password': password,
         }),
       );
@@ -36,7 +39,7 @@ class AuthCubit extends Cubit<AuthState> {
         
         // Verify business account type matches
         if ((userData['is_business'] == 1) != isBusiness) {
-          emit(const AuthFailure(error: 'Invalid password or number'));
+          emit(const AuthFailure(error: 'Invalid password or email/phone'));
           return;
         }
         
@@ -56,12 +59,15 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthSuccess(user: user));
         await NotificationService.registerTokenForUser(user.id!);
       } else {
-        emit(AuthFailure(error: data['error'] ?? 'Invalid phone number or password'));
+        emit(AuthFailure(error: data['error'] ?? 'Invalid email/phone or password'));
       }
     } catch (e) {
       // Fallback to local database for backward compatibility with existing users
       try {
-        final user = await _userRepository.getUserByPhone(phone);
+        final isEmail = identifier.contains('@');
+        final user = isEmail 
+            ? await _userRepository.getUserByEmail(identifier)
+            : await _userRepository.getUserByPhone(identifier);
 
         if (user == null) {
           emit(const AuthFailure(error: 'User not found'));
@@ -69,12 +75,12 @@ class AuthCubit extends Cubit<AuthState> {
         }
 
         if (user.password != password) {
-          emit(const AuthFailure(error: 'Invalid password or number'));
+          emit(const AuthFailure(error: 'Invalid password or email/phone'));
           return;
         }
 
         if (user.isBusiness != isBusiness) {
-          emit(const AuthFailure(error: 'Invalid password or number'));
+          emit(const AuthFailure(error: 'Invalid password or email/phone'));
           return;
         }
 
@@ -256,6 +262,25 @@ class AuthCubit extends Cubit<AuthState> {
     return null;
   }
 
+  String? validateEmailOrPhone(String? value, BuildContext context) {
+    if (value == null || value.isEmpty) {
+      return context.loc('required_field');
+    }
+    // Check if it's an email format
+    if (value.contains('@')) {
+      // Validate as email
+      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+        return context.loc('invalid_email');
+      }
+    } else {
+      // Validate as phone - allow international format or local format
+      if (!RegExp(r'^\+?[0-9]{10,}$').hasMatch(value)) {
+        return 'Invalid phone number format';
+      }
+    }
+    return null;
+  }
+
   String? validatePassword(String? value, BuildContext context) {
     if (value == null || value.isEmpty) {
       return context.loc('required_field');
@@ -277,10 +302,11 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   String? validateEmail(String? value, BuildContext context, bool isBusiness) {
-    if (isBusiness && (value == null || value.isEmpty)) {
+    // Email is now required for all users
+    if (value == null || value.isEmpty) {
       return context.loc('required_field');
     }
-    if (value != null && value.isNotEmpty && !value.contains('@')) {
+    if (!value.contains('@')) {
       return context.loc('invalid_email');
     }
     return null;
