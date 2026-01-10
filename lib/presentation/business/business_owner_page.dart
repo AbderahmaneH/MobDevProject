@@ -304,7 +304,6 @@ class _BusinessOwnerViewState extends State<BusinessOwnerView> {
                 title: context.loc('served'),
                 value: '${queue.servedCount}',
               ),
-              // avg/wait time removed
             ],
           ),
           const SizedBox(height: 12),

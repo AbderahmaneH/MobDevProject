@@ -88,7 +88,6 @@ class QueueCubit extends Cubit<QueueState> {
         name: name,
         description: description ?? existingQueue.description,
         maxSize: maxSize ?? existingQueue.maxSize,
-        // estimatedWaitTime removed
         isActive: isActive ?? existingQueue.isActive,
         createdAt: existingQueue.createdAt,
         clients: existingQueue.clients,
@@ -260,7 +259,7 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> notifyClient(int? clientId) async {
     try {
-      // 1) manual customers (negative id) -> DB update only (no push possible)
+      // Manual customers (negative id) so that DB update only 
       if (clientId != null && clientId < 0) {
         final realId = -clientId;
         await _manualCustomerRepository?.updateManualCustomerStatus(realId, 'notified');
@@ -272,7 +271,7 @@ class QueueCubit extends Cubit<QueueState> {
         return;
       }
 
-      // 2) normal clients
+      // Normal clients
       if (clientId == null) {
         emit(const ClientNotificationFailed(
           error: 'Invalid client ID',
@@ -281,10 +280,10 @@ class QueueCubit extends Cubit<QueueState> {
         return;
       }
 
-      // fetch the client to get userId
+      // Fetch the client to get userId
       final client = await _queueClientRepository.getClientById(clientId);
 
-      // if no userId (or missing record), we cannot push
+      // If no userId (or missing record), we cannot push
       if (client == null) {
         emit(ClientNotificationFailed(
           error: 'Client not found',
@@ -319,7 +318,7 @@ class QueueCubit extends Cubit<QueueState> {
         return;
       }
 
-      // update queue_clients status before sending notification
+      // Update queue_clients status before sending notification
       await _queueClientRepository.updateClientStatus(clientId, 'notified');
 
       // Create notification - this will trigger the webhook

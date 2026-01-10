@@ -204,7 +204,6 @@ class _CustomerViewState extends State<CustomerView> {
                     ? '${context.loc('position')} #$position'
                     : context.loc('not_joined'),
               ),
-              // estimated wait removed
             ],
           ),
           const SizedBox(height: 16),
@@ -264,7 +263,6 @@ class _CustomerViewState extends State<CustomerView> {
 
           if (!mounted) return;
 
-          // Always refresh joined queues after returning from JoinQueuePage
           try {
             await customerCubit.loadJoinedQueues();
           } catch (_) {}
@@ -362,7 +360,6 @@ class _CustomerViewState extends State<CustomerView> {
                       BlocBuilder<CustomerCubit, CustomerState>(
                         builder: (context, state) {
                           if (state is CustomerLoaded) {
-                            // Ensure we only show queues that this user actually joined
                             final joinedQueues = state.joinedQueues.where((q) {
                               return q.clients.any((c) => c.userId == widget.user.id);
                             }).toList();
@@ -431,7 +428,6 @@ class _CustomerViewState extends State<CustomerView> {
                       ),
                     );
                   } else if (state is CustomerLoaded) {
-                    // show only queues the user actually joined
                     final queues = state.joinedQueues.where((q) => q.clients.any((c) => c.userId == widget.user.id)).toList();
 
                     if (queues.isEmpty) {

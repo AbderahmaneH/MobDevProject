@@ -3,9 +3,8 @@ const bcrypt = require('bcrypt');
 
 const SALT_ROUNDS = 10;
 
-/**
- * Insert a new user into the database with hashed password
- */
+
+// Insert a new user into the database with hashed password
 async function createUser(userData) {
   const { name, email, phone, password, isBusiness, businessName, businessType, businessAddress } = userData;
   

@@ -16,7 +16,6 @@ class Queue {
     required this.name,
     this.description,
     this.maxSize = 50,
-  // removed estimatedWaitTime (column removed from DB)
     this.isActive = true,
     required this.createdAt,
     this.clients = const [],
@@ -53,7 +52,6 @@ class Queue {
       name: map['name'],
       description: map['description'],
       maxSize: map['max_size'],
-      // estimatedWaitTime removed from DB
       isActive: map['is_active'] == 1,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at']),
       clients: [],

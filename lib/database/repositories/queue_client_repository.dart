@@ -49,7 +49,6 @@ class QueueClientRepository {
       final servedAt = existing['served_at'] as int?;
 
       if (status != 'served') {
-        // already in queue (waiting/notified)
         throw Exception('User is already in the queue');
       }
 

@@ -17,8 +17,6 @@ class NotificationRepository {
         'type': type,
         'data': data ?? {},
         'is_read': false,
-        // Do NOT send created_at unless your table doesn't auto-set it.
-        // Let Supabase handle created_at default (recommended).
       };
 
       await SupabaseService.client.from('notification').insert(payload);

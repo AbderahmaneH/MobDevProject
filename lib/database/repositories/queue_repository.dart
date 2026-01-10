@@ -160,7 +160,6 @@ class QueueRepository {
 
   Future<List<Queue>> searchQueuesByOwnerPhone(String phone) async {
     await _cleanupExpiredQueues();
-    // find users whose phone matches (partial match)
     final userResults = await _client
         .from(DatabaseTables.users)
         .select()
@@ -194,7 +193,6 @@ class QueueRepository {
 
   Future<int> deleteQueue(int id) async {
     await _client.from(DatabaseTables.queueClients).delete().eq('queue_id', id);
-    // also delete manual customers associated with this queue
     await _client.from(DatabaseTables.manualCustomers).delete().eq('queue_id', id);
     await _client.from(DatabaseTables.queues).delete().eq('id', id);
     return id;
@@ -218,7 +216,6 @@ class QueueRepository {
         }
       }
     } catch (_) {
-      // ignore cleanup errors silently
     }
   }
 
@@ -244,7 +241,7 @@ class QueueRepository {
     // load manual customers
     final manualResults = await _client.from(DatabaseTables.manualCustomers).select().eq('queue_id', queueId).order('id', ascending: true) as List<dynamic>;
     if (manualResults.isNotEmpty) {
-      // Assign positions 0 for manual customers (they are shown but have no position number)
+      // Assign positions 0 for manual customers 
       for (final m in manualResults) {
         final mid = m['id'] as int?;
         final name = m['name'] as String? ?? '';

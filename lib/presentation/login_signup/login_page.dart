@@ -33,14 +33,14 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _identifierController =
-      TextEditingController(); // Changed from _phoneController
+      TextEditingController();
   final _passwordController = TextEditingController();
   bool _isBusiness = false;
   bool _showPassword = false;
 
   @override
   void dispose() {
-    _identifierController.dispose(); // Changed from _phoneController
+    _identifierController.dispose();
     _passwordController.dispose();
     super.dispose();
   }

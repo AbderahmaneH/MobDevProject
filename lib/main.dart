@@ -16,9 +16,6 @@ import 'database/repositories/notification_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Initialize Supabase here with your URL and anon/public key.
-  // Replace the empty strings with your project's values or
-  // provide them at runtime when you have the credentials.
   await SupabaseService.initialize(url: 'https://rmxccujkhrmownftuvsn.supabase.co', anonKey: 'sb_publishable_ktYqW-uVXqp18sEImXdbyA_aUX8OVaF');
   await NotificationService.initialize();
   runApp(const MyApp());

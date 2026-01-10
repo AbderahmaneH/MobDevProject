@@ -21,9 +21,9 @@ const transporter = !useSendGrid ? nodemailer.createTransport({
   }
 }) : null;
 
-/**
- * Send password reset email
- */
+
+// Send password reset email
+
 async function sendPasswordResetEmail(email, resetToken) {
   // Remove trailing slash from APP_URL if present
   const baseUrl = process.env.APP_URL?.replace(/\/$/, '') || 'http://localhost:3000';

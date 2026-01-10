@@ -136,9 +136,7 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
-/**
- * POST /api/auth/reset-password - Reset password with token
- */
+// Reset password with token
 router.post('/reset-password', async (req, res) => {
   try {
     const { token, newPassword } = req.body;
@@ -182,9 +180,7 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
-/**
- * POST /api/auth/change-password - Change user password (requires authentication)
- */
+// Change user password (requires authentication)
 router.post('/change-password', async (req, res) => {
   try {
     const { userId, currentPassword, newPassword } = req.body;

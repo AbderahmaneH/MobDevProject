@@ -187,6 +187,7 @@ class QNowLocalizations {
       'copyright_text': '© 2025 QNow. All rights reserved.',
       'email_or_phone': 'Email or Phone',
       'enter_email_or_phone': 'Enter email or phone',
+      
       // Notifications and Status
       'queue_created': 'Queue created successfully',
       'queue_deleted': 'Queue deleted successfully',
@@ -288,6 +289,7 @@ class QNowLocalizations {
       'missed': 'Missed',
       'total_customers': 'Total Customers',
       'analytics': 'Analytics',
+
       // Validation Messages
       'required_field': 'This field is required',
       'invalid_email': 'Invalid email address',
@@ -347,6 +349,7 @@ class QNowLocalizations {
       'get_started': 'Commencer',
       'email_or_phone': 'E-mail ou téléphone',
       'enter_email_or_phone': 'Entrez e-mail ou téléphone',
+
       // Authentication and Roles
       'login': 'Connexion',
       'signup': 'S\'inscrire',
@@ -469,6 +472,7 @@ class QNowLocalizations {
           'Nous respectons votre vie privée. Cette application stocke localement les données utilisateur nécessaires (nom, téléphone et informations facultatives sur l\'e-mail/l\'entreprise) pour fournir des services de file d\'attente. Les données sont utilisées uniquement pour la fonctionnalité et ne sont pas partagées à l\'extérieur.',
       'terms_of_service_message':
           'En utilisant QNow, vous acceptez de rejoindre, quitter et gérer les files de manière responsable. N\'abusez pas de l\'application et ne fournissez pas de fausses informations. Nous pouvons mettre à jour ces conditions si nécessaire.',
+
       // Help and About (About page texts)
       'smart_queue_title':
           'Système de gestion intelligente de files d\'attente',
@@ -652,6 +656,7 @@ class QNowLocalizations {
       'get_started': 'البدء',
       'email_or_phone': 'البريد الإلكتروني أو الهاتف',
       'enter_email_or_phone': 'أدخل البريد الإلكتروني أو الهاتف',
+
       // Authentication and Roles
       'login': 'تسجيل الدخول',
       'signup': 'إنشاء حساب',

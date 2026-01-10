@@ -93,7 +93,7 @@ class _AddressDetailsPageState extends State<AddressDetailsPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Full Address
                 AppLabels.label(context, 'Full Address *'),
                 const SizedBox(height: 8),
@@ -172,26 +172,6 @@ class _AddressDetailsPageState extends State<AddressDetailsPage> {
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 16),
-
-                // Pincode
-                AppLabels.label(context, 'Pincode *'),
-                const SizedBox(height: 8),
-                AppTextFields.textField(
-                  context: context,
-                  hintText: 'Enter pincode',
-                  controller: _pincodeController,
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter pincode';
-                    }
-                    if (value.length != 6) {
-                      return 'Pincode must be 6 digits';
-                    }
-                    return null;
-                  },
                 ),
                 const SizedBox(height: 16),
 

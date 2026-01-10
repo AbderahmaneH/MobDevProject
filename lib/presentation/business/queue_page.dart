@@ -54,7 +54,6 @@ class QueueView extends StatefulWidget {
 
 class _QueueViewState extends State<QueueView> {
   final _nameController = TextEditingController();
-  // manual customers are name-only
   final _addClientFormKey = GlobalKey<FormState>();
   bool _isNotificationLoading = false;
 
@@ -104,7 +103,6 @@ class _QueueViewState extends State<QueueView> {
                   },
                 ),
                 const SizedBox(height: 16),
-                // phone removed for manual customer
               ],
             ),
           ),
@@ -572,7 +570,6 @@ class _QueueViewState extends State<QueueView> {
               setState(() {
                 _isNotificationLoading = false;
               });
-              // Check if error is a localization key
               final errorText = (state.error != null && QNowLocalizations.hasKey(state.error))
                   ? context.loc(state.error)
                   : (state.error ?? context.loc('notification_failed'));

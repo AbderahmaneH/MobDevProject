@@ -33,7 +33,7 @@ class QueuesSearched extends CustomerState {
 }
 
 class QueuesSearchedByLocation extends CustomerState {
-  final List<Map<String, dynamic>> results; // Each item contains queue and distance
+  final List<Map<String, dynamic>> results;
 
   const QueuesSearchedByLocation({required this.results});
 }

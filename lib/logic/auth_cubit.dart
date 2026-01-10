@@ -49,7 +49,7 @@ class AuthCubit extends Cubit<AuthState> {
           name: userData['name'],
           email: userData['email'],
           phone: userData['phone'],
-          password: '', // Don't store password locally
+          password: '',
           isBusiness: userData['is_business'] == 1,
           createdAt: DateTime.fromMillisecondsSinceEpoch(userData['created_at'] ?? 0),
           businessName: userData['business_name'],
@@ -137,7 +137,7 @@ class AuthCubit extends Cubit<AuthState> {
           name: userData['name'],
           email: userData['email'],
           phone: userData['phone'],
-          password: '', // Don't store password locally
+          password: '', 
           isBusiness: userData['is_business'] == 1,
           createdAt: DateTime.fromMillisecondsSinceEpoch(userData['created_at'] ?? 0),
           businessName: userData['business_name'],
