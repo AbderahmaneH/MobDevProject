@@ -381,11 +381,83 @@ async function resetPassword(token, newPassword) {
   }
 }
 
+/**
+ * Change user password (requires current password verification)
+ */
+async function changePassword(userId, currentPassword, newPassword) {
+  try {
+    console.log('Attempting to change password for user ID:', userId);
+    
+    // Get user with password
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, password')
+      .eq('id', userId)
+      .single();
+    
+    if (error || !user) {
+      console.error('User not found:', error?.message);
+      return {
+        success: false,
+        error: 'User not found'
+      };
+    }
+    
+    console.log('User found, verifying current password...');
+    
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    
+    if (!isPasswordValid) {
+      console.log('Current password is incorrect');
+      return {
+        success: false,
+        error: 'Current password is incorrect'
+      };
+    }
+    
+    console.log('Current password verified, hashing new password...');
+    
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    
+    console.log('Updating password in database...');
+    
+    // Update password
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ password: hashedPassword })
+      .eq('id', userId);
+    
+    if (updateError) {
+      console.error('Failed to update password:', updateError);
+      return {
+        success: false,
+        error: 'Failed to update password'
+      };
+    }
+    
+    console.log('Password changed successfully for user ID:', userId);
+    
+    return {
+      success: true,
+      message: 'Password changed successfully'
+    };
+  } catch (error) {
+    console.error('Error changing password:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
 module.exports = {
   register,
   login,
   verifyToken,
   getProfile,
   requestPasswordReset,
-  resetPassword
+  resetPassword,
+  changePassword
 };
