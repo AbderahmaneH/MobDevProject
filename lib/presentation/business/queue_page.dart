@@ -117,21 +117,30 @@ class _QueueViewState extends State<QueueView> {
               child: Text(context.loc('cancel')),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_addClientFormKey.currentState!.validate()) {
                   // Use cubit to add manual customer (name-only)
-                  context.read<QueueCubit>().addManualCustomer(
+                  final cubit = context.read<QueueCubit>();
+                  
+                  await cubit.addManualCustomer(
                         queueId: widget.queue.id,
                         name: _nameController.text.trim(),
                       );
-                  _nameController.clear();
-                  Navigator.pop(dialogContext);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(context.loc('person_added')),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
+                  
+                  if (mounted) {
+                    // Check if operation succeeded by checking if we got an error state
+                    final currentState = cubit.state;
+                    if (currentState is! QueueError) {
+                      _nameController.clear();
+                      Navigator.pop(dialogContext);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(context.loc('person_added')),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
+                  }
                 }
               },
               child: Text(context.loc('add')),
@@ -203,24 +212,32 @@ class _QueueViewState extends State<QueueView> {
   void _removeClient(QueueClient client) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(context.loc('remove_customer')),
         content: Text('${context.loc('remove_confirm')} ${client.name}?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(context.loc('cancel')),
           ),
           ElevatedButton(
-            onPressed: () {
-              context.read<QueueCubit>().removeClientFromQueue(client.id);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${client.name} ${context.loc('removed')}'),
-                  backgroundColor: AppColors.success,
-                ),
-              );
+            onPressed: () async {
+              final cubit = context.read<QueueCubit>();
+              await cubit.removeClientFromQueue(client.id);
+              
+              if (mounted) {
+                // Check if operation succeeded by checking if we got an error state
+                final currentState = cubit.state;
+                if (currentState is! QueueError) {
+                  Navigator.pop(dialogContext);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${client.name} ${context.loc('removed')}'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
             child: Text(context.loc('remove')),
