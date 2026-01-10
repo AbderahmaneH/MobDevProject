@@ -43,6 +43,11 @@ app.get('/reset-password', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/reset-password.html'));
 });
 
+// Password reset success page
+app.get('/reset-success', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/reset-success.html'));
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

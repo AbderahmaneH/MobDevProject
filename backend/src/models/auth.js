@@ -265,7 +265,7 @@ async function requestPasswordReset(email) {
       console.error('Failed to store reset token:', updateError);
       return {
         success: false,
-        error: 'Failed to generate reset token. Please ensure reset_token columns exist in users table.'
+        error: 'Failed to generate reset token. Please try again later.'
       };
     }
     
@@ -315,7 +315,7 @@ async function resetPassword(token, newPassword) {
       console.error('Error finding user with reset token:', error);
       return {
         success: false,
-        error: 'Invalid or expired reset token. Please ensure reset_token columns exist in users table.'
+        error: 'This reset link has expired or is invalid. Please request a new password reset link.'
       };
     }
     
@@ -323,7 +323,7 @@ async function resetPassword(token, newPassword) {
       console.log('No user found with provided reset token');
       return {
         success: false,
-        error: 'Invalid or expired reset token'
+        error: 'This reset link has expired or is invalid. Please request a new password reset link.'
       };
     }
     
@@ -334,7 +334,7 @@ async function resetPassword(token, newPassword) {
       console.log('Reset token has expired');
       return {
         success: false,
-        error: 'Reset token has expired. Please request a new password reset.'
+        error: 'This reset link has expired. Please request a new password reset link.'
       };
     }
     
