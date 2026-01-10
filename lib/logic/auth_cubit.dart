@@ -222,6 +222,8 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
 
     try {
+      print('Attempting to change password for user ID: $userId');
+      
       // Use backend API for password change to support bcrypt hashing
       final response = await http.post(
         Uri.parse('https://mobdevproject-5qvu.onrender.com/api/auth/change-password'),
@@ -233,14 +235,21 @@ class AuthCubit extends Cubit<AuthState> {
         }),
       );
 
+      print('Change password response status: ${response.statusCode}');
+      print('Change password response body: ${response.body}');
+
       final data = json.decode(response.body);
 
       if (response.statusCode == 200 && data['success'] == true) {
         emit(PasswordChanged());
       } else {
-        emit(AuthFailure(error: data['error'] ?? 'Password change failed'));
+        // Extract error message from response
+        final errorMsg = data['error'] ?? data['message'] ?? 'Password change failed';
+        print('Password change failed: $errorMsg');
+        emit(AuthFailure(error: errorMsg));
       }
     } catch (e) {
+      print('Error calling backend API: $e');
       // Fallback to local database for backward compatibility
       try {
         final user = await _userRepository.getUserById(userId);
@@ -275,6 +284,7 @@ class AuthCubit extends Cubit<AuthState> {
         await _userRepository.updateUser(updatedUser);
         emit(PasswordChanged());
       } catch (fallbackError) {
+        print('Fallback error: $fallbackError');
         emit(AuthFailure(error: 'Password change failed: ${e.toString()}'));
       }
     }

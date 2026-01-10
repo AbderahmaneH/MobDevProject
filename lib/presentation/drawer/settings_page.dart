@@ -24,27 +24,14 @@ class _SettingsPageState extends State<SettingsPage> {
   bool soundAlerts = true;
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: AppColors.backgroundLight,
         body: SafeArea(
           child: BlocListener<AuthCubit, AuthState>(
             listener: (context, state) {
-              if (state is PasswordChanged) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(context.loc('password_changed')),
-                    backgroundColor: AppColors.success,
-                  ),
-                );
-              } else if (state is AuthFailure) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.error),
-                    backgroundColor: AppColors.error,
-                  ),
-                );
-              } else if (state is AuthInitial) {
+              if (state is AuthInitial) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (_) => const WelcomePage()),
@@ -283,93 +270,124 @@ class _SettingsPageState extends State<SettingsPage> {
     final formKey = GlobalKey<FormState>();
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
         bool showPassword1 = false;
         bool showPassword2 = false;
         bool showPassword3 = false;
 
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: AppColors.adaptiveCardColor(context),
-              title: Text(context.loc('change_pass')),
-              content: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AppTextFields.passwordField(
-                      context: context,
-                      hintText: context.loc('current_password'),
-                      controller: currentPasswordController,
-                      isVisible: showPassword1,
-                      onToggleVisibility: () =>
-                          setState(() => showPassword1 = !showPassword1),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return context.loc('required_field');
-                        }
-                        return null;
-                      },
+        return BlocConsumer<AuthCubit, AuthState>(
+          listener: (context, state) {
+            if (state is PasswordChanged) {
+              Navigator.pop(dialogContext);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(context.loc('password_changed')),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+            } else if (state is AuthFailure) {
+              // Don't close dialog on failure, just show error
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.error),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            final isLoading = state is AuthLoading;
+            
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return AlertDialog(
+                  backgroundColor: AppColors.adaptiveCardColor(context),
+                  title: Text(context.loc('change_pass')),
+                  content: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AppTextFields.passwordField(
+                          context: context,
+                          hintText: context.loc('current_password'),
+                          controller: currentPasswordController,
+                          isVisible: showPassword1,
+                          onToggleVisibility: () =>
+                              setState(() => showPassword1 = !showPassword1),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return context.loc('required_field');
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextFields.passwordField(
+                          context: context,
+                          hintText: context.loc('new_password'),
+                          controller: newPasswordController,
+                          isVisible: showPassword2,
+                          onToggleVisibility: () =>
+                              setState(() => showPassword2 = !showPassword2),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return context.loc('required_field');
+                            }
+                            if (value.length < 6) {
+                              return context.loc('password_too_short');
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextFields.passwordField(
+                          context: context,
+                          hintText: context.loc('confirm_new_password'),
+                          controller: confirmPasswordController,
+                          isVisible: showPassword3,
+                          onToggleVisibility: () =>
+                              setState(() => showPassword3 = !showPassword3),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return context.loc('required_field');
+                            }
+                            if (value != newPasswordController.text) {
+                              return context.loc('passwords_not_match');
+                            }
+                            return null;
+                          },
+                        ),
+                        if (isLoading) ...[
+                          const SizedBox(height: 16),
+                          const CircularProgressIndicator(),
+                        ],
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    AppTextFields.passwordField(
-                      context: context,
-                      hintText: context.loc('new_password'),
-                      controller: newPasswordController,
-                      isVisible: showPassword2,
-                      onToggleVisibility: () =>
-                          setState(() => showPassword2 = !showPassword2),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return context.loc('required_field');
-                        }
-                        if (value.length < 6) {
-                          return context.loc('password_too_short');
-                        }
-                        return null;
-                      },
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: isLoading ? null : () => Navigator.pop(dialogContext),
+                      child: Text(context.loc('cancel')),
                     ),
-                    const SizedBox(height: 16),
-                    AppTextFields.passwordField(
-                      context: context,
-                      hintText: context.loc('confirm_new_password'),
-                      controller: confirmPasswordController,
-                      isVisible: showPassword3,
-                      onToggleVisibility: () =>
-                          setState(() => showPassword3 = !showPassword3),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return context.loc('required_field');
-                        }
-                        if (value != newPasswordController.text) {
-                          return context.loc('passwords_not_match');
-                        }
-                        return null;
-                      },
+                    ElevatedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              if (formKey.currentState!.validate()) {
+                                context.read<AuthCubit>().changePassword(
+                                      userId: widget.user.id,
+                                      currentPassword: currentPasswordController.text,
+                                      newPassword: newPasswordController.text,
+                                    );
+                              }
+                            },
+                      child: Text(context.loc('change')),
                     ),
                   ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(context.loc('cancel')),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      context.read<AuthCubit>().changePassword(
-                            userId: widget.user.id,
-                            currentPassword: currentPasswordController.text,
-                            newPassword: newPasswordController.text,
-                          );
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Text(context.loc('change')),
-                ),
-              ],
+                );
+              },
             );
           },
         );
