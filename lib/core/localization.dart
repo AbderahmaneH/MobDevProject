@@ -923,6 +923,14 @@ class QNowLocalizations {
     }
   }
 
+  static bool hasKey(String key) {
+    try {
+      return _localizedValues['en']?.containsKey(key) ?? false;
+    } catch (e) {
+      return false;
+    }
+  }
+
   static String getTranslation(String key) {
     try {
       return _localizedValues[_instance._currentLocale.languageCode]?[key] ??
