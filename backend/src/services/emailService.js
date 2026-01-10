@@ -1,8 +1,11 @@
 const nodemailer = require('nodemailer');
 
-// Create reusable transporter using Gmail
+// Create reusable transporter using Gmail with secure connection
+// Render blocks port 587, so we use port 465 (SSL)
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // use SSL
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS

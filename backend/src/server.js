@@ -16,16 +16,18 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/api/webhooks', webhookRoutes);
 
-// Serve static files from public directory
-app.use(express.static(path.join(__dirname, '../public')));
-
-// Request logging middleware
+// Request logging middleware (must be before routes)
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
 });
+
+// Webhooks need to be before static files to process raw body
+app.use('/api/webhooks', webhookRoutes);
+
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
