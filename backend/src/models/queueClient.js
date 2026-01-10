@@ -96,9 +96,7 @@ async function updateQueueClient(clientId, updateData) {
   }
 }
 
-/**
- * Remove a client from queue
- */
+// Remove a client from queue
 async function removeQueueClient(clientId) {
   try {
     const { data, error } = await supabase

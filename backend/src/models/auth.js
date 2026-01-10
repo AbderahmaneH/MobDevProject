@@ -6,9 +6,7 @@ const { sendPasswordResetEmail } = require('../services/emailService');
 
 const SALT_ROUNDS = 10;
 
-/**
- * Register a new user with hashed password
- */
+// Register a new user with hashed password
 async function register(userData) {
   const { name, email, phone, password, isBusiness, businessName, businessType, businessAddress } = userData;
   
@@ -108,9 +106,7 @@ async function register(userData) {
   }
 }
 
-/**
- * Login user with email or phone and password
- */
+// Login user with email or phone and password
 async function login(identifier, password) {
   try {
     // Determine if identifier is email or phone
@@ -171,9 +167,7 @@ async function login(identifier, password) {
   }
 }
 
-/**
- * Verify JWT token
- */
+// Verify JWT token
 function verifyToken(token) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -189,9 +183,7 @@ function verifyToken(token) {
   }
 }
 
-/**
- * Get user profile by ID
- */
+// Get user profile by ID
 async function getProfile(userId) {
   try {
     const { data: user, error } = await supabase
@@ -224,9 +216,7 @@ async function getProfile(userId) {
   }
 }
 
-/**
- * Request password reset - generates token and sends email
- */
+// Request password reset - generates token and sends email
 async function requestPasswordReset(email) {
   try {
     console.log('Password reset requested for email:', email);
@@ -251,8 +241,7 @@ async function requestPasswordReset(email) {
     
     // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
-    
+    const resetTokenExpiry = Date.now() + 3600000;
     console.log('Storing reset token in database...');
     
     // Store token in database
@@ -300,9 +289,7 @@ async function requestPasswordReset(email) {
   }
 }
 
-/**
- * Reset password using token
- */
+// Reset password using token
 async function resetPassword(token, newPassword) {
   try {
     console.log('Attempting to reset password with token');
@@ -381,9 +368,7 @@ async function resetPassword(token, newPassword) {
   }
 }
 
-/**
- * Change user password (requires current password verification)
- */
+// Change user password (requires current password verification)
 async function changePassword(userId, currentPassword, newPassword) {
   try {
     console.log('Attempting to change password for user ID:', userId);

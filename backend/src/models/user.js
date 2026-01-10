@@ -122,9 +122,8 @@ async function updateUser(userId, userData) {
   }
 }
 
-/**
- * Delete a user
- */
+// Delete a user
+
 async function deleteUser(userId) {
   try {
     const { data, error } = await supabase
