@@ -207,6 +207,13 @@ class QNowLocalizations {
       'promotional_notifications_subtitle': 'Receive offers and updates',
       'sound_alerts': 'Sound Alerts',
       'sound_alerts_subtitle': 'Play sound for notifications',
+      'notification_sent_successfully': 'Notification sent successfully',
+      'notification_failed': 'Failed to send notification',
+      'user_no_notifications': 'User has notifications disabled',
+      'sending_notification': 'Sending notification...',
+      'notify_customer': 'Notify Customer',
+      'manual_customer_notified': 'Manual customer notified (no push notification)',
+      'customer_notified_no_user': 'Customer marked as notified (no registered user)',
 
       // Settings and Help
       'privacy_policy': 'Privacy Policy',
@@ -499,6 +506,13 @@ class QNowLocalizations {
           'Recevoir des offres et mises à jour',
       'sound_alerts': 'Alertes sonores',
       'sound_alerts_subtitle': 'Jouer un son pour les notifications',
+      'notification_sent_successfully': 'Notification envoyée avec succès',
+      'notification_failed': 'Échec de l\'envoi de la notification',
+      'user_no_notifications': 'L\'utilisateur a désactivé les notifications',
+      'sending_notification': 'Envoi de la notification...',
+      'notify_customer': 'Notifier le client',
+      'manual_customer_notified': 'Client manuel notifié (pas de notification push)',
+      'customer_notified_no_user': 'Client marqué comme notifié (pas d\'utilisateur enregistré)',
 
       // Settings and Help
       'privacy_policy': 'Politique de confidentialité',
@@ -790,6 +804,13 @@ class QNowLocalizations {
       'promotional_notifications_subtitle': 'تلقي العروض والتحديثات',
       'sound_alerts': 'التنبيهات الصوتية',
       'sound_alerts_subtitle': 'تشغيل الصوت للإشعارات',
+      'notification_sent_successfully': 'تم إرسال الإشعار بنجاح',
+      'notification_failed': 'فشل إرسال الإشعار',
+      'user_no_notifications': 'قام المستخدم بتعطيل الإشعارات',
+      'sending_notification': 'جاري إرسال الإشعار...',
+      'notify_customer': 'تنبيه العميل',
+      'manual_customer_notified': 'تم تنبيه العميل اليدوي (بدون إشعار دفع)',
+      'customer_notified_no_user': 'تم وضع علامة على العميل كمنبه (لا يوجد مستخدم مسجل)',
 
       // Settings and Help
       'privacy_policy': 'سياسة الخصوصية',
@@ -899,6 +920,14 @@ class QNowLocalizations {
           key;
     } catch (e) {
       return key;
+    }
+  }
+
+  static bool hasKey(String key) {
+    try {
+      return _localizedValues['en']?.containsKey(key) ?? false;
+    } catch (e) {
+      return false;
     }
   }
 

@@ -56,6 +56,7 @@ class _QueueViewState extends State<QueueView> {
   final _nameController = TextEditingController();
   // manual customers are name-only
   final _addClientFormKey = GlobalKey<FormState>();
+  bool _isNotificationLoading = false;
 
   @override
   void initState() {
@@ -175,24 +176,22 @@ class _QueueViewState extends State<QueueView> {
   void _notifyClient(QueueClient client) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
         title: Text(context.loc('notify_customer')),
         content: Text('${context.loc('notify_confirm')} ${client.name}?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(context.loc('cancel')),
           ),
           ElevatedButton(
             onPressed: () {
+              Navigator.pop(dialogContext);
+              setState(() {
+                _isNotificationLoading = true;
+              });
               context.read<QueueCubit>().notifyClient(client.id);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${client.name} ${context.loc('notified')}'),
-                  backgroundColor: AppColors.info,
-                ),
-              );
             },
             child: Text(context.loc('notify')),
           ),
@@ -542,6 +541,41 @@ class _QueueViewState extends State<QueueView> {
           listener: (context, state) {
             if (state is ClientAdded) {
               setState(() {});
+            } else if (state is ClientNotificationSuccess) {
+              setState(() {
+                _isNotificationLoading = false;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(context.loc(state.message)),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+            } else if (state is ClientNotificationFailed) {
+              setState(() {
+                _isNotificationLoading = false;
+              });
+              // Check if error is a localization key
+              final errorText = (state.error != null && QNowLocalizations.hasKey(state.error))
+                  ? context.loc(state.error)
+                  : (state.error ?? context.loc('notification_failed'));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(errorText),
+                  backgroundColor: AppColors.error,
+                  duration: const Duration(seconds: 4),
+                  action: SnackBarAction(
+                    label: context.loc('retry'),
+                    textColor: AppColors.white,
+                    onPressed: () {
+                      setState(() {
+                        _isNotificationLoading = true;
+                      });
+                      context.read<QueueCubit>().notifyClient(state.clientId);
+                    },
+                  ),
+                ),
+              );
             } else if (state is QueueError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -769,13 +803,29 @@ class _QueueViewState extends State<QueueView> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: _isNotificationLoading
+          ? null
+          : FloatingActionButton.extended(
         onPressed: _showAddClientDialog,
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
         icon: const Icon(Icons.person_add),
         label: Text(context.loc('add_customer')),
       ),
+      bottomSheet: _isNotificationLoading
+          ? Container(
+              color: AppColors.backgroundLight,
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(width: 16),
+                  Text(context.loc('sending_notification')),
+                ],
+              ),
+            )
+          : null,
     );
   }
 

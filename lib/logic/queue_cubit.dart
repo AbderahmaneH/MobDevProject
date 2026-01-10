@@ -260,32 +260,70 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> notifyClient(int? clientId) async {
     try {
-      emit(ClientNotified());
-
       // 1) manual customers (negative id) -> DB update only (no push possible)
       if (clientId != null && clientId < 0) {
         final realId = -clientId;
         await _manualCustomerRepository?.updateManualCustomerStatus(realId, 'notified');
+        emit(ClientNotificationSuccess(
+          clientId: clientId,
+          message: 'manual_customer_notified',
+        ));
         await loadQueues();
         return;
       }
 
       // 2) normal clients
-      if (clientId == null) throw Exception("clientId is null");
-
-      // update queue_clients status (existing behavior)
-      await _queueClientRepository.updateClientStatus(clientId, 'notified');
+      if (clientId == null) {
+        emit(const ClientNotificationFailed(
+          error: 'Invalid client ID',
+          clientId: 0,
+        ));
+        return;
+      }
 
       // fetch the client to get userId
       final client = await _queueClientRepository.getClientById(clientId);
 
       // if no userId (or missing record), we cannot push
-      if (client == null || client.userId == null) {
+      if (client == null) {
+        emit(ClientNotificationFailed(
+          error: 'Client not found',
+          clientId: clientId,
+        ));
+        return;
+      }
+
+      if (client.userId == null || client.userId! <= 0) {
+        // Update status but no notification can be sent
+        await _queueClientRepository.updateClientStatus(clientId, 'notified');
+        emit(ClientNotificationSuccess(
+          clientId: clientId,
+          message: 'customer_notified_no_user',
+        ));
         await loadQueues();
         return;
       }
 
-      await _notificationRepository.createNotification(
+      // Check if user has FCM token
+      final hasFCMToken = await _notificationRepository.userHasFCMToken(client.userId!);
+      
+      if (!hasFCMToken) {
+        // Still update the status to mark manual notification attempt
+        // Business owner has notified the customer via the button
+        await _queueClientRepository.updateClientStatus(clientId, 'notified');
+        emit(ClientNotificationFailed(
+          error: 'user_no_notifications',
+          clientId: clientId,
+        ));
+        await loadQueues();
+        return;
+      }
+
+      // update queue_clients status before sending notification
+      await _queueClientRepository.updateClientStatus(clientId, 'notified');
+
+      // Create notification - this will trigger the webhook
+      final success = await _notificationRepository.createNotification(
         userId: client.userId!,
         title: "It's your turn soon",
         message: "Please get ready. You will be called shortly.",
@@ -297,9 +335,26 @@ class QueueCubit extends Cubit<QueueState> {
         },
       );
 
+      if (success) {
+        emit(ClientNotificationSuccess(
+          clientId: clientId,
+          message: 'notification_sent_successfully',
+        ));
+      } else {
+        emit(ClientNotificationFailed(
+          error: 'Failed to create notification record',
+          clientId: clientId,
+        ));
+      }
+
       await loadQueues();
     } catch (e) {
-      emit(QueueError(error: 'Failed to notify client: $e'));
+      // Log technical details for debugging
+      debugPrint('QueueCubit.notifyClient error: $e');
+      emit(ClientNotificationFailed(
+        error: 'notification_failed',
+        clientId: clientId ?? 0,
+      ));
     }
   }
 
