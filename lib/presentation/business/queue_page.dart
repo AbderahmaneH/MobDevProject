@@ -556,9 +556,9 @@ class _QueueViewState extends State<QueueView> {
                 _isNotificationLoading = false;
               });
               // Check if error is a localization key
-              final errorText = QNowLocalizations.hasKey(state.error)
+              final errorText = (state.error != null && QNowLocalizations.hasKey(state.error))
                   ? context.loc(state.error)
-                  : state.error;
+                  : (state.error ?? context.loc('notification_failed'));
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(errorText),

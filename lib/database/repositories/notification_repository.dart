@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../../services/supabase_service.dart';
 
 class NotificationRepository {
@@ -23,6 +24,7 @@ class NotificationRepository {
       await SupabaseService.client.from('notification').insert(payload);
       return true;
     } catch (e) {
+      debugPrint('NotificationRepository.createNotification error: $e');
       return false;
     }
   }

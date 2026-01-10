@@ -308,7 +308,8 @@ class QueueCubit extends Cubit<QueueState> {
       final hasFCMToken = await _notificationRepository.userHasFCMToken(client.userId!);
       
       if (!hasFCMToken) {
-        // Still update the status but inform the business owner
+        // Still update the status to mark manual notification attempt
+        // Business owner has notified the customer via the button
         await _queueClientRepository.updateClientStatus(clientId, 'notified');
         emit(ClientNotificationFailed(
           error: 'user_no_notifications',
@@ -318,7 +319,7 @@ class QueueCubit extends Cubit<QueueState> {
         return;
       }
 
-      // update queue_clients status
+      // update queue_clients status before sending notification
       await _queueClientRepository.updateClientStatus(clientId, 'notified');
 
       // Create notification - this will trigger the webhook
