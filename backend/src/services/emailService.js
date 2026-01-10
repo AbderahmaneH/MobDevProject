@@ -25,7 +25,9 @@ const transporter = !useSendGrid ? nodemailer.createTransport({
  * Send password reset email
  */
 async function sendPasswordResetEmail(email, resetToken) {
-  const resetLink = `${process.env.APP_URL}/reset-password?token=${resetToken}`;
+  // Remove trailing slash from APP_URL if present
+  const baseUrl = process.env.APP_URL?.replace(/\/$/, '') || 'http://localhost:3000';
+  const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
   
   const htmlContent = `
     <!DOCTYPE html>
