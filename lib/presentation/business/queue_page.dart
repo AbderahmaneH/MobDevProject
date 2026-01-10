@@ -121,7 +121,6 @@ class _QueueViewState extends State<QueueView> {
                 if (_addClientFormKey.currentState!.validate()) {
                   // Use cubit to add manual customer (name-only)
                   final cubit = context.read<QueueCubit>();
-                  final initialState = cubit.state;
                   
                   await cubit.addManualCustomer(
                         queueId: widget.queue.id,
