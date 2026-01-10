@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getProfile, requestPasswordReset, resetPassword } = require('../models/auth');
+const { register, login, getProfile, requestPasswordReset, resetPassword, changePassword } = require('../models/auth');
 const { verifyToken } = require('../middleware/auth');
 
 /**
@@ -176,6 +176,52 @@ router.post('/reset-password', async (req, res) => {
       res.status(400).json({
         success: false,
         message: 'Password reset failed',
+        error: result.error
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/auth/change-password - Change user password (requires authentication)
+ */
+router.post('/change-password', async (req, res) => {
+  try {
+    const { userId, currentPassword, newPassword } = req.body;
+    
+    // Validate required fields
+    if (!userId || !currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID, current password, and new password are required'
+      });
+    }
+    
+    // Validate new password length
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password must be at least 6 characters long'
+      });
+    }
+    
+    const result = await changePassword(userId, currentPassword, newPassword);
+    
+    if (result.success) {
+      res.status(200).json({
+        success: true,
+        message: 'Password changed successfully'
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Password change failed',
         error: result.error
       });
     }
