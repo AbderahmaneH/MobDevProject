@@ -3,8 +3,11 @@ const nodemailer = require('nodemailer');
 // Create transporter based on environment
 // For production (Render), use SendGrid API
 // For local dev, use Gmail SMTP
+const useSendGrid = !!process.env.SENDGRID_API_KEY;
+console.log(`Email service initialized: Using ${useSendGrid ? 'SendGrid' : 'Gmail SMTP'}`);
+
 const transporter = nodemailer.createTransport(
-  process.env.SENDGRID_API_KEY ? {
+  useSendGrid ? {
     host: 'smtp.sendgrid.net',
     port: 587,
     auth: {
