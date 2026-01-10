@@ -127,13 +127,12 @@ class _QueueViewState extends State<QueueView> {
                         name: _nameController.text.trim(),
                       );
                   
-                  _nameController.clear();
-                  Navigator.pop(dialogContext);
-                  
                   if (mounted) {
                     // Check if operation succeeded by checking if we got an error state
                     final currentState = cubit.state;
                     if (currentState is! QueueError) {
+                      _nameController.clear();
+                      Navigator.pop(dialogContext);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(context.loc('person_added')),
@@ -225,12 +224,12 @@ class _QueueViewState extends State<QueueView> {
             onPressed: () async {
               final cubit = context.read<QueueCubit>();
               await cubit.removeClientFromQueue(client.id);
-              Navigator.pop(dialogContext);
               
               if (mounted) {
                 // Check if operation succeeded by checking if we got an error state
                 final currentState = cubit.state;
                 if (currentState is! QueueError) {
+                  Navigator.pop(dialogContext);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('${client.name} ${context.loc('removed')}'),
