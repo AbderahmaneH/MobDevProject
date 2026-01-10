@@ -222,33 +222,71 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
 
     try {
-      final user = await _userRepository.getUserById(userId);
-      if (user == null) {
-        emit(const AuthFailure(error: 'User not found'));
-        return;
-      }
-
-      if (user.password != currentPassword) {
-        emit(const AuthFailure(error: 'Current password is incorrect'));
-        return;
-      }
-
-      final updatedUser = User(
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        password: newPassword,
-        isBusiness: user.isBusiness,
-        createdAt: user.createdAt,
-        businessName: user.businessName,
-        businessAddress: user.businessAddress,
+      print('Attempting to change password for user ID: $userId');
+      
+      // Use backend API for password change to support bcrypt hashing
+      final response = await http.post(
+        Uri.parse('https://mobdevproject-5qvu.onrender.com/api/auth/change-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'userId': userId,
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        }),
       );
 
-      await _userRepository.updateUser(updatedUser);
-      emit(PasswordChanged());
+      print('Change password response status: ${response.statusCode}');
+      print('Change password response body: ${response.body}');
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        emit(PasswordChanged());
+      } else {
+        // Extract error message from response
+        final errorMsg = data['error'] ?? data['message'] ?? 'Password change failed';
+        print('Password change failed: $errorMsg');
+        emit(AuthFailure(error: errorMsg));
+      }
     } catch (e) {
-      emit(AuthFailure(error: 'Password change failed: $e'));
+      print('Error calling backend API: $e');
+      // Fallback to local database for backward compatibility
+      try {
+        final user = await _userRepository.getUserById(userId);
+        if (user == null) {
+          emit(const AuthFailure(error: 'User not found'));
+          return;
+        }
+
+        // Check if user has a password stored locally (legacy users)
+        if (user.password.isEmpty) {
+          emit(const AuthFailure(error: 'Please use the forgot password feature to reset your password'));
+          return;
+        }
+
+        if (user.password != currentPassword) {
+          emit(const AuthFailure(error: 'Current password is incorrect'));
+          return;
+        }
+
+        final updatedUser = User(
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          password: newPassword,
+          isBusiness: user.isBusiness,
+          createdAt: user.createdAt,
+          businessName: user.businessName,
+          businessAddress: user.businessAddress,
+        );
+
+        await _userRepository.updateUser(updatedUser);
+        emit(PasswordChanged());
+      } catch (fallbackError) {
+        print('Fallback error: $fallbackError');
+        emit(AuthFailure(error: 'Password change failed: ${e.toString()}'));
+      }
     }
   }
 
