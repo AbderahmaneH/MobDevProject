@@ -100,6 +100,13 @@ class AuthCubit extends Cubit<AuthState> {
     required bool isBusiness,
     String? businessName,
     String? businessAddress,
+    double? latitude,
+    double? longitude,
+    String? area,
+    String? city,
+    String? state,
+    String? pincode,
+    String? landmark,
   }) async {
     emit(AuthLoading());
 

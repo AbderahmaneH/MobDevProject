@@ -9,6 +9,13 @@ class User {
   String? businessName;
   String? businessType;
   String? businessAddress;
+  double? latitude;
+  double? longitude;
+  String? area;
+  String? city;
+  String? state;
+  String? pincode;
+  String? landmark;
 
   User({
     required this.id,
@@ -21,6 +28,13 @@ class User {
     this.businessName,
     this.businessType,
     this.businessAddress,
+    this.latitude,
+    this.longitude,
+    this.area,
+    this.city,
+    this.state,
+    this.pincode,
+    this.landmark,
   });
 
   Map<String, dynamic> toMap() {
@@ -35,6 +49,13 @@ class User {
       'business_name': businessName,
       'business_type': businessType,
       'business_address': businessAddress,
+      'latitude': latitude,
+      'longitude': longitude,
+      'area': area,
+      'city': city,
+      'state': state,
+      'pincode': pincode,
+      'landmark': landmark,
     };
   }
 
@@ -50,6 +71,13 @@ class User {
       businessName: map['business_name'],
       businessType: map['business_type'],
       businessAddress: map['business_address'],
+      latitude: map['latitude'],
+      longitude: map['longitude'],
+      area: map['area'],
+      city: map['city'],
+      state: map['state'],
+      pincode: map['pincode'],
+      landmark: map['landmark'],
     );
   }
 }

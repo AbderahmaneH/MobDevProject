@@ -51,6 +51,34 @@ class CustomerCubit extends Cubit<CustomerState> {
     }
   }
 
+  Future<void> searchQueuesByLocation({
+    required double latitude,
+    required double longitude,
+    double maxDistanceKm = 50,
+    String? searchQuery,
+  }) async {
+    emit(CustomerLoading());
+
+    try {
+      final results = await _queueRepository.searchQueuesByLocation(
+        userLatitude: latitude,
+        userLongitude: longitude,
+        maxDistanceKm: maxDistanceKm,
+        searchQuery: searchQuery,
+      );
+      
+      final joinedIds = await _queueClientRepository.getQueueIdsForUser(_userId, includeServed: true);
+      final filtered = results.where((item) {
+        final queue = item['queue'] as Queue;
+        return !joinedIds.contains(queue.id);
+      }).toList();
+
+      emit(QueuesSearchedByLocation(results: filtered));
+    } catch (e) {
+      emit(CustomerError(error: 'Location search failed: $e'));
+    }
+  }
+
   Future<void> getAvailableQueues() async {
     emit(CustomerLoading());
 
