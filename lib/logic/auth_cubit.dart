@@ -19,27 +19,70 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
 
     try {
-      final user = await _userRepository.getUserByPhone(phone);
+      // Use backend API for login to support bcrypt password hashing
+      final response = await http.post(
+        Uri.parse('https://mobdevproject-5qvu.onrender.com/api/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'phone': phone,
+          'password': password,
+        }),
+      );
 
-      if (user == null) {
-        emit(const AuthFailure(error: 'User not found'));
-        return;
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        final userData = data['data']['user'];
+        
+        // Verify business account type matches
+        if ((userData['is_business'] == 1) != isBusiness) {
+          emit(const AuthFailure(error: 'Invalid password or number'));
+          return;
+        }
+        
+        // Convert backend user data to local User model
+        final user = User(
+          id: userData['id'],
+          name: userData['name'],
+          email: userData['email'],
+          phone: userData['phone'],
+          password: '', // Don't store password locally
+          isBusiness: userData['is_business'] == 1,
+          createdAt: DateTime.fromMillisecondsSinceEpoch(userData['created_at'] ?? 0),
+          businessName: userData['business_name'],
+          businessAddress: userData['business_address'],
+        );
+
+        emit(AuthSuccess(user: user));
+        await NotificationService.registerTokenForUser(user.id!);
+      } else {
+        emit(AuthFailure(error: data['error'] ?? 'Invalid phone number or password'));
       }
-
-      if (user.password != password) {
-        emit(const AuthFailure(error: 'Invalid password or number'));
-        return;
-      }
-
-      if (user.isBusiness != isBusiness) {
-        emit(const AuthFailure(error: 'Invalid password or number'));
-        return;
-      }
-
-      emit(AuthSuccess(user: user));
-      await NotificationService.registerTokenForUser(user.id!);
     } catch (e) {
-      emit(const AuthFailure(error: 'Login failed'));
+      // Fallback to local database for backward compatibility with existing users
+      try {
+        final user = await _userRepository.getUserByPhone(phone);
+
+        if (user == null) {
+          emit(const AuthFailure(error: 'User not found'));
+          return;
+        }
+
+        if (user.password != password) {
+          emit(const AuthFailure(error: 'Invalid password or number'));
+          return;
+        }
+
+        if (user.isBusiness != isBusiness) {
+          emit(const AuthFailure(error: 'Invalid password or number'));
+          return;
+        }
+
+        emit(AuthSuccess(user: user));
+        await NotificationService.registerTokenForUser(user.id!);
+      } catch (fallbackError) {
+        emit(AuthFailure(error: 'Login failed: ${e.toString()}'));
+      }
     }
   }
 
