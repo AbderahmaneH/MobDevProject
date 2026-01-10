@@ -227,11 +227,11 @@ class _LoginViewState extends State<LoginView> {
                           },
                         ),
                         const SizedBox(height: 24),
-                        AppLabels.label(context, 'Email or Phone'),
+                        AppLabels.label(context , context.loc('email_or_phone')),
                         const SizedBox(height: 6),
                         AppTextFields.textField(
                           context: context,
-                          hintText: 'Enter email or phone',
+                          hintText: context.loc('enter_email_or_phone'),
                           controller: _identifierController,
                           keyboardType: TextInputType.text,
                           validator: (value) => context

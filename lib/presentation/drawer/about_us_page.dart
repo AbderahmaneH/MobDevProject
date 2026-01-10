@@ -118,25 +118,25 @@ class AboutUsPage extends StatelessWidget {
                       children: [
                         _buildTeamMember(
                           name: 'Abderrahmane Hababela',
-                          role: 'Contact : 0553 72 90 19',
+                          role: '0553 72 90 19',
                           context: context,
                         ),
                         const SizedBox(height: 12),
                         _buildTeamMember(
                           name: 'Mohamed Sahnoune Toubal',
-                          role: 'Contact : 0794 32 40 12',
+                          role: '0794 32 40 12',
                           context: context,
                         ),
                         const SizedBox(height: 12),
                         _buildTeamMember(
                           name: 'Ahmed Ouassim Kacher',
-                          role: 'Contact : 0770 10 56 28',
+                          role: '0770 10 56 28',
                           context: context,
                         ),
                         const SizedBox(height: 12),
                         _buildTeamMember(
                           name: 'Hassane Ait Ahmad Lamara',
-                          role: 'Contact : +33 7 51 31 72 65',
+                          role: '+33 7 51 31 72 65',
                           context: context,
                         ),
                       ],
@@ -165,7 +165,7 @@ class AboutUsPage extends StatelessWidget {
                           const SizedBox(height: 16),
                           _buildContactInfo(
                             icon: Icons.email,
-                            text: 'support@qnow.com',
+                            text: 'teamqnow@gmail.com',
                             context: context,
                           ),
                           const SizedBox(height: 8),

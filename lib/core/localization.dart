@@ -185,7 +185,8 @@ class QNowLocalizations {
       'feature_multilanguage_desc': 'Available in English, French, and Arabic',
       'contact_us': 'Contact Us',
       'copyright_text': '© 2025 QNow. All rights reserved.',
-
+      'email_or_phone': 'Email or Phone',
+      'enter_email_or_phone': 'Enter email or phone',
       // Notifications and Status
       'queue_created': 'Queue created successfully',
       'queue_deleted': 'Queue deleted successfully',
@@ -344,7 +345,8 @@ class QNowLocalizations {
       'refresh': 'Actualiser',
       'language': 'Langue',
       'get_started': 'Commencer',
-
+      'email_or_phone': 'E-mail ou téléphone',
+      'enter_email_or_phone': 'Entrez e-mail ou téléphone',
       // Authentication and Roles
       'login': 'Connexion',
       'signup': 'S\'inscrire',
@@ -648,7 +650,8 @@ class QNowLocalizations {
       'refresh': 'تحديث',
       'language': 'اللغة',
       'get_started': 'البدء',
-
+      'email_or_phone': 'البريد الإلكتروني أو الهاتف',
+      'enter_email_or_phone': 'أدخل البريد الإلكتروني أو الهاتف',
       // Authentication and Roles
       'login': 'تسجيل الدخول',
       'signup': 'إنشاء حساب',
