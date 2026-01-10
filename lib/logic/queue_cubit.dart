@@ -189,7 +189,6 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> removeClientFromQueue(int? clientId) async {
     try {
-      emit(ClientRemoved());
       if (clientId != null && clientId < 0) {
         final realId = -clientId;
         await _manualCustomerRepository?.deleteManualCustomer(realId);
@@ -213,6 +212,7 @@ class QueueCubit extends Cubit<QueueState> {
           }
         }
       }
+      emit(ClientRemoved());
       await loadQueues();
     } catch (e) {
       emit(QueueError(error: 'Failed to remove client: $e'));
