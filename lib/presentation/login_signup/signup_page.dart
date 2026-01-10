@@ -11,7 +11,6 @@ import '../../database/models/user_model.dart';
 import '../common/map_location_picker.dart';
 import '../common/address_details_page.dart';
 
-
 class SignupPage extends StatelessWidget {
   const SignupPage({super.key});
 
@@ -186,6 +185,9 @@ class _SignupViewState extends State<SignupView> {
                         LogoHeader(
                           title: context.loc('app_title'),
                           subtitle: context.loc('signup'),
+                          imagePath: 'assets/images/qnow_logo.png',
+                          imageSize: 100,
+                          showContainer: false,
                         ),
                         const SizedBox(height: 24),
                         RoleToggle(
@@ -220,19 +222,19 @@ class _SignupViewState extends State<SignupView> {
                               .validatePhone(value, context),
                         ),
                         const SizedBox(height: 14),
+                        AppLabels.label(context, context.loc('email')),
+                        const SizedBox(height: 6),
+                        AppTextFields.textField(
+                          context: context,
+                          hintText: context.loc('email'),
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) => context
+                              .read<AuthCubit>()
+                              .validateEmail(value, context, _isBusiness),
+                        ),
+                        const SizedBox(height: 14),
                         if (_isBusiness) ...[
-                          AppLabels.label(context, context.loc('email')),
-                          const SizedBox(height: 6),
-                          AppTextFields.textField(
-                            context: context,
-                            hintText: context.loc('email'),
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) => context
-                                .read<AuthCubit>()
-                                .validateEmail(value, context, _isBusiness),
-                          ),
-                          const SizedBox(height: 14),
                           AppLabels.label(
                               context, context.loc('business_name')),
                           const SizedBox(height: 6),

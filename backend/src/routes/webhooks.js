@@ -12,7 +12,7 @@ router.get('/notification-created', (req, res) => {
   res.status(405).json({ success: false, message: 'Use POST' });
 });
 
-// simple shared secret protection
+// Simple shared secret protection
 function requireWebhookSecret(req, res, next) {
   const header = req.headers['authorization'] || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
@@ -23,15 +23,14 @@ function requireWebhookSecret(req, res, next) {
   next();
 }
 
-
 // Supabase Database Webhook payload includes: type, table, schema, record, old_record
 router.post('/notification-created', requireWebhookSecret, async (req, res) => {
   try {
     const payload = req.body;
-    const record = payload.record; // new row data
+    const record = payload.record;
     if (!record) return res.status(400).json({ success: false, message: 'Missing record' });
 
-    // Only handle INSERTs (optional but safe)
+    // Only handle inserts
     if (payload.type && payload.type !== 'INSERT') {
       console.log(`[Webhook] Ignoring non-INSERT event type: ${payload.type}`);
       return res.json({ success: true, ignored: true });
@@ -42,7 +41,7 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
 
     console.log(`[Webhook] Processing notification ${notificationId} for user ${userId}`);
 
-    // 1) get user token from Supabase
+    // Get user token from Supabase
     const { data: user, error: userErr } = await supabaseService
       .from('users')
       .select('fcm_token')
@@ -57,7 +56,6 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
     // No token => can't push
     if (!user || !user.fcm_token) {
       console.warn(`[Webhook] No FCM token for user ${userId}, skipping push notification`);
-      // Optional: write status into notification.data
       const newData = {
         ...(record.data || {}),
         delivery_status: 'failed',
@@ -69,7 +67,6 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
       return res.json({ success: true, skipped: true, reason: 'no_fcm_token' });
     }
 
-    // Optional safety: avoid duplicate sends if webhook retries
     // Fetch latest row and check if already sent
     const { data: latest } = await supabaseService
       .from('notification')
@@ -82,13 +79,13 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
       return res.json({ success: true, deduped: true });
     }
 
-    // 2) send push with Firebase Admin
+    // Send push with Firebase Admin
     const admin = getFirebaseAdmin();
 
     const title = record.title || 'QNow';
     const body = record.message || '';
 
-    // FCM data values must be strings in practice, so convert.
+    // FCM data values must be strings in practice so convert.
     const data = record.data || {};
     const stringData = Object.fromEntries(
       Object.entries(data).map(([k, v]) => [String(k), v == null ? '' : String(v)])
@@ -105,7 +102,6 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
       console.log(`[Webhook] Successfully sent FCM notification ${notificationId} to user ${userId}`);
     } catch (fcmError) {
       console.error(`[Webhook] FCM send error for notification ${notificationId}:`, fcmError);
-      // Update notification with error status
       const errorData = {
         ...(record.data || {}),
         delivery_status: 'failed',
@@ -116,7 +112,7 @@ router.post('/notification-created', requireWebhookSecret, async (req, res) => {
       return res.status(500).json({ success: false, error: 'FCM send failed', details: fcmError.message });
     }
 
-    // 3) mark as sent inside `data` (since your table has no status column)
+    // Mark as sent inside `data`
     const updatedData = {
       ...(record.data || {}),
       delivery_status: 'sent',

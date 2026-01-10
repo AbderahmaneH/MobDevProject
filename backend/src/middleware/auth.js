@@ -1,12 +1,11 @@
 const jwt = require('jsonwebtoken');
 
-/**
- * Middleware to verify JWT token
- */
+// Middleware to verify JWT token
 function verifyToken(req, res, next) {
   // Get token from header
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  // Bearer TOKEN
+  const token = authHeader && authHeader.split(' ')[1];
   
   if (!token) {
     return res.status(401).json({
@@ -28,9 +27,7 @@ function verifyToken(req, res, next) {
   }
 }
 
-/**
- * Middleware to verify if user is a business owner
- */
+// Middleware to verify if user is a business owner
 function verifyBusiness(req, res, next) {
   if (!req.user.isBusiness) {
     return res.status(403).json({

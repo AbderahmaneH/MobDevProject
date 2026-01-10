@@ -15,31 +15,80 @@ class AuthCubit extends Cubit<AuthState> {
       : _userRepository = userRepository,
         super(AuthInitial());
 
-  Future<void> login(String phone, String password, bool isBusiness) async {
+  Future<void> login(String identifier, String password, bool isBusiness) async {
     emit(AuthLoading());
 
     try {
-      final user = await _userRepository.getUserByPhone(phone);
+      // Determine if identifier is email or phone
+      final isEmail = identifier.contains('@');
+      
+      // Use backend API for login to support bcrypt password hashing
+      final response = await http.post(
+        Uri.parse('https://mobdevproject-5qvu.onrender.com/api/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'identifier': identifier,  // Send as identifier (email or phone)
+          'password': password,
+        }),
+      );
 
-      if (user == null) {
-        emit(const AuthFailure(error: 'User not found'));
-        return;
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        final userData = data['data']['user'];
+        
+        // Verify business account type matches
+        if ((userData['is_business'] == 1) != isBusiness) {
+          emit(const AuthFailure(error: 'Invalid password or email/phone'));
+          return;
+        }
+        
+        // Convert backend user data to local User model
+        final user = User(
+          id: userData['id'],
+          name: userData['name'],
+          email: userData['email'],
+          phone: userData['phone'],
+          password: '', // Don't store password locally
+          isBusiness: userData['is_business'] == 1,
+          createdAt: DateTime.fromMillisecondsSinceEpoch(userData['created_at'] ?? 0),
+          businessName: userData['business_name'],
+          businessAddress: userData['business_address'],
+        );
+
+        emit(AuthSuccess(user: user));
+        await NotificationService.registerTokenForUser(user.id!);
+      } else {
+        emit(AuthFailure(error: data['error'] ?? 'Invalid email/phone or password'));
       }
-
-      if (user.password != password) {
-        emit(const AuthFailure(error: 'Invalid password or number'));
-        return;
-      }
-
-      if (user.isBusiness != isBusiness) {
-        emit(const AuthFailure(error: 'Invalid password or number'));
-        return;
-      }
-
-      emit(AuthSuccess(user: user));
-      await NotificationService.registerTokenForUser(user.id!);
     } catch (e) {
-      emit(const AuthFailure(error: 'Login failed'));
+      // Fallback to local database for backward compatibility with existing users
+      try {
+        final isEmail = identifier.contains('@');
+        final user = isEmail 
+            ? await _userRepository.getUserByEmail(identifier)
+            : await _userRepository.getUserByPhone(identifier);
+
+        if (user == null) {
+          emit(const AuthFailure(error: 'User not found'));
+          return;
+        }
+
+        if (user.password != password) {
+          emit(const AuthFailure(error: 'Invalid password or email/phone'));
+          return;
+        }
+
+        if (user.isBusiness != isBusiness) {
+          emit(const AuthFailure(error: 'Invalid password or email/phone'));
+          return;
+        }
+
+        emit(AuthSuccess(user: user));
+        await NotificationService.registerTokenForUser(user.id!);
+      } catch (fallbackError) {
+        emit(AuthFailure(error: 'Login failed: ${e.toString()}'));
+      }
     }
   }
 
@@ -62,56 +111,84 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
 
     try {
-      final phoneExists = await _userRepository.isPhoneRegistered(phone);
-      if (phoneExists) {
-        emit(const AuthFailure(error: 'Phone number already registered'));
-        return;
+      // Use backend API for registration to support bcrypt password hashing
+      final response = await http.post(
+        Uri.parse('https://mobdevproject-5qvu.onrender.com/api/auth/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'name': name,
+          'email': email,
+          'phone': phone,
+          'password': password,
+          'isBusiness': isBusiness,
+          'businessName': businessName,
+          'businessAddress': businessAddress,
+        }),
+      );
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 201 && data['success'] == true) {
+        final userData = data['data']['user'];
+        
+        // Convert backend user data to local User model
+        final user = User(
+          id: userData['id'],
+          name: userData['name'],
+          email: userData['email'],
+          phone: userData['phone'],
+          password: '', // Don't store password locally
+          isBusiness: userData['is_business'] == 1,
+          createdAt: DateTime.fromMillisecondsSinceEpoch(userData['created_at'] ?? 0),
+          businessName: userData['business_name'],
+          businessAddress: userData['business_address'],
+        );
+
+        emit(AuthSuccess(user: user));
+        await NotificationService.registerTokenForUser(user.id!);
+      } else {
+        emit(AuthFailure(error: data['error'] ?? data['message'] ?? 'Registration failed'));
       }
-
-      final user = User(
-        id: null,
-        name: name,
-        email: email,
-        phone: phone,
-        password: password,
-        isBusiness: isBusiness,
-        createdAt: DateTime.now(),
-        businessName: businessName,
-        businessAddress: businessAddress,
-        latitude: latitude,
-        longitude: longitude,
-        area: area,
-        city: city,
-        state: state,
-        pincode: pincode,
-        landmark: landmark,
-      );
-
-      final userId = await _userRepository.insertUser(user);
-
-      final createdUser = User(
-        id: userId,
-        name: name,
-        email: email,
-        phone: phone,
-        password: password,
-        isBusiness: isBusiness,
-        createdAt: DateTime.now(),
-        businessName: businessName,
-        businessAddress: businessAddress,
-        latitude: latitude,
-        longitude: longitude,
-        area: area,
-        city: city,
-        state: state,
-        pincode: pincode,
-        landmark: landmark,
-      );
-
-      emit(AuthSuccess(user: createdUser));
-      await NotificationService.registerTokenForUser(userId);
     } catch (e) {
-      emit(AuthFailure(error: 'Signup failed: $e'));
+      // Fallback to local database for backward compatibility
+      try {
+        final phoneExists = await _userRepository.isPhoneRegistered(phone);
+        if (phoneExists) {
+          emit(const AuthFailure(error: 'Phone number already registered'));
+          return;
+        }
+
+        final user = User(
+          id: null,
+          name: name,
+          email: email,
+          phone: phone,
+          password: password,
+          isBusiness: isBusiness,
+          createdAt: DateTime.now(),
+          businessName: businessName,
+          businessAddress: businessAddress,
+        );
+
+        final userId = await _userRepository.insertUser(user);
+
+        final createdUser = User(
+          id: userId,
+          name: name,
+          email: email,
+          phone: phone,
+          password: password,
+          isBusiness: isBusiness,
+          createdAt: DateTime.now(),
+          businessName: businessName,
+          businessAddress: businessAddress,
+        );
+
+        emit(AuthSuccess(user: createdUser));
+        await NotificationService.registerTokenForUser(userId);
+      } catch (fallbackError) {
+        emit(AuthFailure(error: 'Signup failed: ${e.toString()}'));
+      }
     }
   }
 
@@ -152,33 +229,71 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
 
     try {
-      final user = await _userRepository.getUserById(userId);
-      if (user == null) {
-        emit(const AuthFailure(error: 'User not found'));
-        return;
-      }
-
-      if (user.password != currentPassword) {
-        emit(const AuthFailure(error: 'Current password is incorrect'));
-        return;
-      }
-
-      final updatedUser = User(
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        password: newPassword,
-        isBusiness: user.isBusiness,
-        createdAt: user.createdAt,
-        businessName: user.businessName,
-        businessAddress: user.businessAddress,
+      print('Attempting to change password for user ID: $userId');
+      
+      // Use backend API for password change to support bcrypt hashing
+      final response = await http.post(
+        Uri.parse('https://mobdevproject-5qvu.onrender.com/api/auth/change-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'userId': userId,
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        }),
       );
 
-      await _userRepository.updateUser(updatedUser);
-      emit(PasswordChanged());
+      print('Change password response status: ${response.statusCode}');
+      print('Change password response body: ${response.body}');
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        emit(PasswordChanged());
+      } else {
+        // Extract error message from response
+        final errorMsg = data['error'] ?? data['message'] ?? 'Password change failed';
+        print('Password change failed: $errorMsg');
+        emit(AuthFailure(error: errorMsg));
+      }
     } catch (e) {
-      emit(AuthFailure(error: 'Password change failed: $e'));
+      print('Error calling backend API: $e');
+      // Fallback to local database for backward compatibility
+      try {
+        final user = await _userRepository.getUserById(userId);
+        if (user == null) {
+          emit(const AuthFailure(error: 'User not found'));
+          return;
+        }
+
+        // Check if user has a password stored locally (legacy users)
+        if (user.password.isEmpty) {
+          emit(const AuthFailure(error: 'Please use the forgot password feature to reset your password'));
+          return;
+        }
+
+        if (user.password != currentPassword) {
+          emit(const AuthFailure(error: 'Current password is incorrect'));
+          return;
+        }
+
+        final updatedUser = User(
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          password: newPassword,
+          isBusiness: user.isBusiness,
+          createdAt: user.createdAt,
+          businessName: user.businessName,
+          businessAddress: user.businessAddress,
+        );
+
+        await _userRepository.updateUser(updatedUser);
+        emit(PasswordChanged());
+      } catch (fallbackError) {
+        print('Fallback error: $fallbackError');
+        emit(AuthFailure(error: 'Password change failed: ${e.toString()}'));
+      }
     }
   }
 
@@ -188,6 +303,25 @@ class AuthCubit extends Cubit<AuthState> {
     }
     if (value.length != 10 || !value.startsWith(RegExp(r'0[567]'))) {
       return context.loc('invalid_phone');
+    }
+    return null;
+  }
+
+  String? validateEmailOrPhone(String? value, BuildContext context) {
+    if (value == null || value.isEmpty) {
+      return context.loc('required_field');
+    }
+    // Check if it's an email format
+    if (value.contains('@')) {
+      // Validate as email
+      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+        return context.loc('invalid_email');
+      }
+    } else {
+      // Validate as phone - allow international format or local format
+      if (!RegExp(r'^\+?[0-9]{10,}$').hasMatch(value)) {
+        return 'Invalid phone number format';
+      }
     }
     return null;
   }
@@ -213,10 +347,11 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   String? validateEmail(String? value, BuildContext context, bool isBusiness) {
-    if (isBusiness && (value == null || value.isEmpty)) {
+    // Email is now required for all users
+    if (value == null || value.isEmpty) {
       return context.loc('required_field');
     }
-    if (value != null && value.isNotEmpty && !value.contains('@')) {
+    if (!value.contains('@')) {
       return context.loc('invalid_email');
     }
     return null;

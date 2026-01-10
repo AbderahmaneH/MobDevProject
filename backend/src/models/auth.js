@@ -6,9 +6,7 @@ const { sendPasswordResetEmail } = require('../services/emailService');
 
 const SALT_ROUNDS = 10;
 
-/**
- * Register a new user with hashed password
- */
+// Register a new user with hashed password
 async function register(userData) {
   const { name, email, phone, password, isBusiness, businessName, businessType, businessAddress } = userData;
   
@@ -108,22 +106,23 @@ async function register(userData) {
   }
 }
 
-/**
- * Login user with phone and password
- */
-async function login(phone, password) {
+// Login user with email or phone and password
+async function login(identifier, password) {
   try {
-    // Get user by phone
+    // Determine if identifier is email or phone
+    const isEmail = identifier.includes('@');
+    
+    // Get user by email or phone
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
-      .eq('phone', phone)
+      .eq(isEmail ? 'email' : 'phone', identifier)
       .single();
     
     if (error || !user) {
       return {
         success: false,
-        error: 'Invalid phone number or password'
+        error: 'Invalid email/phone or password'
       };
     }
     
@@ -133,7 +132,7 @@ async function login(phone, password) {
     if (!isPasswordValid) {
       return {
         success: false,
-        error: 'Invalid phone number or password'
+        error: 'Invalid email/phone or password'
       };
     }
     
@@ -168,9 +167,7 @@ async function login(phone, password) {
   }
 }
 
-/**
- * Verify JWT token
- */
+// Verify JWT token
 function verifyToken(token) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -186,9 +183,7 @@ function verifyToken(token) {
   }
 }
 
-/**
- * Get user profile by ID
- */
+// Get user profile by ID
 async function getProfile(userId) {
   try {
     const { data: user, error } = await supabase
@@ -221,11 +216,11 @@ async function getProfile(userId) {
   }
 }
 
-/**
- * Request password reset - generates token and sends email
- */
+// Request password reset - generates token and sends email
 async function requestPasswordReset(email) {
   try {
+    console.log('Password reset requested for email:', email);
+    
     // Check if user exists
     const { data: user, error } = await supabase
       .from('users')
@@ -234,6 +229,7 @@ async function requestPasswordReset(email) {
       .single();
     
     if (error || !user) {
+      console.log('User not found or error:', error?.message || 'No user');
       // Don't reveal if email exists or not (security)
       return {
         success: true,
@@ -241,12 +237,15 @@ async function requestPasswordReset(email) {
       };
     }
     
+    console.log('User found, generating reset token for user ID:', user.id);
+    
     // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
+    const resetTokenExpiry = Date.now() + 3600000;
+    console.log('Storing reset token in database...');
     
-    // Store token in database (you'll need to add these columns to users table)
-    await supabase
+    // Store token in database
+    const { error: updateError } = await supabase
       .from('users')
       .update({
         reset_token: resetToken,
@@ -254,15 +253,28 @@ async function requestPasswordReset(email) {
       })
       .eq('id', user.id);
     
+    if (updateError) {
+      console.error('Failed to store reset token:', updateError);
+      return {
+        success: false,
+        error: 'Failed to generate reset token. Please try again later.'
+      };
+    }
+    
+    console.log('Sending password reset email...');
+    
     // Send email
     const emailResult = await sendPasswordResetEmail(email, resetToken);
     
     if (!emailResult.success) {
+      console.error('Failed to send reset email:', emailResult.error);
       return {
         success: false,
-        error: 'Failed to send reset email'
+        error: 'Failed to send reset email. Please check email configuration.'
       };
     }
+    
+    console.log('Password reset email sent successfully to:', email);
     
     return {
       success: true,
@@ -277,11 +289,11 @@ async function requestPasswordReset(email) {
   }
 }
 
-/**
- * Reset password using token
- */
+// Reset password using token
 async function resetPassword(token, newPassword) {
   try {
+    console.log('Attempting to reset password with token');
+    
     // Find user with valid token
     const { data: user, error } = await supabase
       .from('users')
@@ -289,26 +301,42 @@ async function resetPassword(token, newPassword) {
       .eq('reset_token', token)
       .single();
     
-    if (error || !user) {
+    if (error) {
+      console.error('Error finding user with reset token:', error);
       return {
         success: false,
-        error: 'Invalid or expired reset token'
+        error: 'This reset link has expired or is invalid. Please request a new password reset link.'
       };
     }
     
-    // Check if token is expired
-    if (user.reset_token_expiry < Date.now()) {
+    if (!user) {
+      console.log('No user found with provided reset token');
       return {
         success: false,
-        error: 'Reset token has expired'
+        error: 'This reset link has expired or is invalid. Please request a new password reset link.'
       };
     }
+    
+    console.log('User found, checking token expiry...');
+    
+    // Check if token is expired
+    if (user.reset_token_expiry < Date.now()) {
+      console.log('Reset token has expired');
+      return {
+        success: false,
+        error: 'This reset link has expired. Please request a new password reset link.'
+      };
+    }
+    
+    console.log('Token valid, hashing new password...');
     
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
     
+    console.log('Updating password in database...');
+    
     // Update password and clear reset token
-    await supabase
+    const { error: updateError } = await supabase
       .from('users')
       .update({
         password: hashedPassword,
@@ -316,6 +344,16 @@ async function resetPassword(token, newPassword) {
         reset_token_expiry: null
       })
       .eq('id', user.id);
+    
+    if (updateError) {
+      console.error('Failed to update password:', updateError);
+      return {
+        success: false,
+        error: 'Failed to update password'
+      };
+    }
+    
+    console.log('Password reset successfully for user ID:', user.id);
     
     return {
       success: true,
@@ -330,11 +368,81 @@ async function resetPassword(token, newPassword) {
   }
 }
 
+// Change user password (requires current password verification)
+async function changePassword(userId, currentPassword, newPassword) {
+  try {
+    console.log('Attempting to change password for user ID:', userId);
+    
+    // Get user with password
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, password')
+      .eq('id', userId)
+      .single();
+    
+    if (error || !user) {
+      console.error('User not found:', error?.message);
+      return {
+        success: false,
+        error: 'User not found'
+      };
+    }
+    
+    console.log('User found, verifying current password...');
+    
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    
+    if (!isPasswordValid) {
+      console.log('Current password is incorrect');
+      return {
+        success: false,
+        error: 'Current password is incorrect'
+      };
+    }
+    
+    console.log('Current password verified, hashing new password...');
+    
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    
+    console.log('Updating password in database...');
+    
+    // Update password
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ password: hashedPassword })
+      .eq('id', userId);
+    
+    if (updateError) {
+      console.error('Failed to update password:', updateError);
+      return {
+        success: false,
+        error: 'Failed to update password'
+      };
+    }
+    
+    console.log('Password changed successfully for user ID:', userId);
+    
+    return {
+      success: true,
+      message: 'Password changed successfully'
+    };
+  } catch (error) {
+    console.error('Error changing password:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
 module.exports = {
   register,
   login,
   verifyToken,
   getProfile,
   requestPasswordReset,
-  resetPassword
+  resetPassword,
+  changePassword
 };

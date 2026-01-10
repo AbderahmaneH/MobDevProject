@@ -32,14 +32,15 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
+  final _identifierController =
+      TextEditingController(); // Changed from _phoneController
   final _passwordController = TextEditingController();
   bool _isBusiness = false;
   bool _showPassword = false;
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _identifierController.dispose(); // Changed from _phoneController
     _passwordController.dispose();
     super.dispose();
   }
@@ -212,6 +213,9 @@ class _LoginViewState extends State<LoginView> {
                         LogoHeader(
                           title: context.loc('app_title'),
                           subtitle: context.loc('login'),
+                          imagePath: 'assets/images/qnow_logo.png',
+                          imageSize: 100,
+                          showContainer: false,
                         ),
                         const SizedBox(height: 24),
                         RoleToggle(
@@ -223,16 +227,16 @@ class _LoginViewState extends State<LoginView> {
                           },
                         ),
                         const SizedBox(height: 24),
-                        AppLabels.label(context, context.loc('phone')),
+                        AppLabels.label(context, 'Email or Phone'),
                         const SizedBox(height: 6),
                         AppTextFields.textField(
                           context: context,
-                          hintText: context.loc('phone'),
-                          controller: _phoneController,
-                          keyboardType: TextInputType.phone,
+                          hintText: 'Enter email or phone',
+                          controller: _identifierController,
+                          keyboardType: TextInputType.text,
                           validator: (value) => context
                               .read<AuthCubit>()
-                              .validatePhone(value, context),
+                              .validateEmailOrPhone(value, context),
                         ),
                         const SizedBox(height: 16),
                         AppLabels.label(context, context.loc('password')),
@@ -259,7 +263,7 @@ class _LoginViewState extends State<LoginView> {
                                   : () {
                                       if (_formKey.currentState!.validate()) {
                                         context.read<AuthCubit>().login(
-                                              _phoneController.text.trim(),
+                                              _identifierController.text.trim(),
                                               _passwordController.text.trim(),
                                               _isBusiness,
                                             );
