@@ -44,19 +44,19 @@ async function updateQueueClient(clientId, updateData) {
   
   const updates = {};
   
-  if (status !== undefined) {
-    updates.status = status;
+  if (status !== undefined) { // Only include status if it's provided
+    updates.status = status; 
   }
   
-  if (servedAt !== undefined) {
+  if (servedAt !== undefined) {  // Only include servedAt if it's provided
     updates.served_at = servedAt;
   }
   
-  if (notifiedAt !== undefined) {
+  if (notifiedAt !== undefined) {  // Only include notifiedAt if it's provided
     updates.notified_at = notifiedAt;
   }
   
-  if (position !== undefined) {
+  if (position !== undefined) {  // Only include position if it's provided
     updates.position = position;
   }
   

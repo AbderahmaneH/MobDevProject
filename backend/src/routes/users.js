@@ -3,7 +3,6 @@ const router = express.Router();
 const { createUser, updateUser, deleteUser } = require('../models/user');
 
 // Create a new user
-
 router.post('/', async (req, res) => {
   try {
     const result = await createUser(req.body);
@@ -32,7 +31,6 @@ router.post('/', async (req, res) => {
 
 
 // Update a user
-
 router.put('/:id', async (req, res) => {
   try {
     const userId = parseInt(req.params.id);
@@ -61,7 +59,6 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete a user
-
 router.delete('/:id', async (req, res) => {
   try {
     const userId = parseInt(req.params.id);

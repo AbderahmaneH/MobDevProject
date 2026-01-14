@@ -1,22 +1,20 @@
-part of 'queue_cubit.dart';
+part of 'queue_cubit.dart'; // 1llows the two files to share private variables
 
-abstract class QueueState {
-  const QueueState();
+abstract class QueueState { // Parent class
+  const QueueState(); // Constructor
 }
 
-class QueueInitial extends QueueState {}
+class QueueInitial extends QueueState {} // Starting state
 
-class QueueLoading extends QueueState {}
+class QueueLoading extends QueueState {} // Asynchronous operation is in progress
 
-class QueueLoaded extends QueueState {
-  final List<Queue> queues;
-
+class QueueLoaded extends QueueState { // Success state
+  final List<Queue> queues; // Carries data
   const QueueLoaded({required this.queues});
 }
 
-class QueueError extends QueueState {
-  final String error;
-
+class QueueError extends QueueState { // Failure state
+  final String error; // Carries error message
   const QueueError({required this.error});
 }
 

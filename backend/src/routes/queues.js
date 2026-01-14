@@ -2,15 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { createQueue, updateQueue, deleteQueue } = require('../models/queue');
 
-
-//Create a new queue
-
+// Create a new queue
 router.post('/', async (req, res) => {
   try {
     const result = await createQueue(req.body);
     
     if (result.success) {
-      res.status(201).json({
+      res.status(201).json({ 
         success: true,
         message: 'Queue created successfully',
         data: result.data
@@ -33,7 +31,6 @@ router.post('/', async (req, res) => {
 
 
 // Update a queue
-
 router.put('/:id', async (req, res) => {
   try {
     const queueId = parseInt(req.params.id);
@@ -62,7 +59,6 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete a queue
-
 router.delete('/:id', async (req, res) => {
   try {
     const queueId = parseInt(req.params.id);

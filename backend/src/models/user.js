@@ -1,27 +1,24 @@
 const supabase = require('../config/database');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt'); // For hashing passwords
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 10; // Number of salt rounds (cost) for bcrypt
 
 
-// Insert a new user into the database with hashed password
 async function createUser(userData) {
   const { name, email, phone, password, isBusiness, businessName, businessType, businessAddress } = userData;
   
   try {
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS); // Hash the password before storing it
     
-    // Validate required fields
-    if (!email) {
+    if (!email) { // Ensure email is provided
       return {
         success: false,
         error: 'Email is required'
       };
     }
     
-    const { data, error } = await supabase
-      .from('users')
+    const { data, error } = await supabase // Insert the new user into the users table
+      .from('users') 
       .insert({
         name,
         email,
@@ -61,9 +58,6 @@ async function createUser(userData) {
   }
 }
 
-/**
- * Update an existing user
- */
 async function updateUser(userId, userData) {
   const { name, email, phone, password, businessName, businessType, businessAddress } = userData;
   
@@ -77,8 +71,7 @@ async function updateUser(userId, userData) {
       business_address: businessAddress || null
     };
     
-    // Only hash and update password if provided
-    if (password) {
+    if (password) { // If password is provided hash it before updating
       updateData.password = await bcrypt.hash(password, SALT_ROUNDS);
     }
     
@@ -104,7 +97,6 @@ async function updateUser(userId, userData) {
       };
     }
     
-    // Remove password from response
     const userResponse = { ...data };
     delete userResponse.password;
     
@@ -120,8 +112,6 @@ async function updateUser(userId, userData) {
     };
   }
 }
-
-// Delete a user
 
 async function deleteUser(userId) {
   try {
